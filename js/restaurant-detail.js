@@ -1,89 +1,793 @@
 (() => {
   "use strict";
-  const profile = window.ASADOR_DATA;
-  const restaurant = window.MESA_DATA.restaurants.find((item) => item.id === 4);
-  const icon = (name) => `<svg aria-hidden="true"><use href="#${name}"/></svg>`;
-  document.querySelector("#detail-address").textContent = profile.address;
-  document.querySelector("#detail-description").textContent =
-    profile.description;
-  document.querySelector("#detail-rating").textContent =
-    `${restaurant.rating} (${profile.reviews} reseñas)`;
-  document.querySelector("#about-copy").innerHTML = profile.about
-    .map((text) => `<p>${text}</p>`)
-    .join("");
-  document.querySelector("#services-list").innerHTML = profile.services
-    .map(([symbol, label]) => `<li>${icon(symbol)}${label}</li>`)
-    .join("");
-  document.querySelector("#hours-list").innerHTML = profile.hours
-    .map(([day, time]) => `<div><dt>${day}</dt><dd>${time}</dd></div>`)
-    .join("");
-  document.querySelector("#contact-list").innerHTML = profile.contact
-    .map(([symbol, value]) => `<li>${icon(symbol)}<span>${value}</span></li>`)
-    .join("");
-  document.querySelector("#summary-list").innerHTML = profile.summary
-    .map(
-      ([symbol, label, value]) =>
-        `<div><dt>${icon(symbol)}${label}</dt><dd>${value}</dd></div>`,
-    )
-    .join("");
-  document.querySelector("#locations-list").innerHTML = profile.locations
-    .map(
-      (location, index) =>
-        `<button class="location-card ${location.primary ? "selected" : ""}" type="button" data-location="${index}" aria-pressed="${Boolean(location.primary)}">${icon("pin")}<span><strong>${location.name}${location.primary ? "<small>Principal</small>" : ""}</strong><span>${location.address}</span><span>${location.district}, Lima</span></span></button>`,
-    )
-    .join("");
-
-  const tabs = [...document.querySelectorAll('[role="tab"]')];
-  function selectTab(tab, focus = false) {
-    tabs.forEach((item) => {
-      const selected = item === tab;
-      item.setAttribute("aria-selected", String(selected));
-      item.tabIndex = selected ? 0 : -1;
-      document.getElementById(item.getAttribute("aria-controls")).hidden =
+  const {
+    $,
+    element,
+    label,
+    money,
+    image,
+    button,
+    state,
+    field,
+    external,
+    feedback,
+    paginate,
+  } = MesaUI;
+  let restaurant,
+    branches = [],
+    selectedBranch,
+    photoRecords = [],
+    menuRecords = [],
+    reviewPage = 1,
+    reviewVersion = 0,
+    initialized = false;
+  const days = [
+    "Lunes",
+    "Martes",
+    "Miércoles",
+    "Jueves",
+    "Viernes",
+    "Sábado",
+    "Domingo",
+  ];
+  const address = (branch) =>
+    branch?.address
+      ? [
+          branch.address.street,
+          branch.address.district,
+          branch.address.province,
+        ]
+          .filter(Boolean)
+          .join(", ")
+      : "Dirección pendiente";
+  const hours = (periods) =>
+    periods
+      .map(
+        (p) =>
+          p.opens +
+          " – " +
+          p.closes +
+          (p.closesNextDay ? " (día siguiente)" : ""),
+      )
+      .join(", ");
+  const base = () => "/restaurants/" + restaurant._id;
+  function selectTab(name, focus = false) {
+    document.querySelectorAll('[role="tab"]').forEach((tab) => {
+      const selected = tab.id === "tab-" + name;
+      tab.setAttribute("aria-selected", String(selected));
+      tab.tabIndex = selected ? 0 : -1;
+      document.getElementById(tab.getAttribute("aria-controls")).hidden =
         !selected;
+      if (selected && focus) tab.focus();
     });
-    if (focus) tab.focus();
+    history.replaceState(null, "", "#" + name);
     window.AOS?.refreshHard();
   }
+  const tabs = [...document.querySelectorAll('[role="tab"]')];
   tabs.forEach((tab, index) => {
-    tab.addEventListener("click", () => selectTab(tab));
+    tab.addEventListener("click", () => selectTab(tab.id.replace("tab-", "")));
     tab.addEventListener("keydown", (event) => {
-      let target;
-      if (event.key === "ArrowRight") target = tabs[(index + 1) % tabs.length];
-      if (event.key === "ArrowLeft")
-        target = tabs[(index - 1 + tabs.length) % tabs.length];
-      if (event.key === "Home") target = tabs[0];
-      if (event.key === "End") target = tabs[tabs.length - 1];
-      if (target) {
+      const next =
+        event.key === "ArrowRight"
+          ? tabs[(index + 1) % tabs.length]
+          : event.key === "ArrowLeft"
+            ? tabs[(index + tabs.length - 1) % tabs.length]
+            : event.key === "Home"
+              ? tabs[0]
+              : event.key === "End"
+                ? tabs.at(-1)
+                : null;
+      if (next) {
         event.preventDefault();
-        selectTab(target, true);
+        selectTab(next.id.replace("tab-", ""), true);
       }
     });
   });
-  document.querySelector("#all-locations").addEventListener("click", () => {
-    const expanded = document
-      .querySelector("#locations-list")
-      .classList.toggle("expanded");
-    document
-      .querySelector("#all-locations")
-      .setAttribute("aria-expanded", String(expanded));
-    document.querySelector("#all-locations-label").textContent = expanded
-      ? "Ver menos locales"
-      : "Ver todos los locales";
-  });
-  document
-    .querySelector("#locations-list")
-    .addEventListener("click", (event) => {
-      const button = event.target.closest("[data-location]");
-      if (!button) return;
-      document.querySelectorAll("[data-location]").forEach((item) => {
-        const selected = item === button;
-        item.classList.toggle("selected", selected);
-        item.setAttribute("aria-pressed", String(selected));
+  function practicalInfo() {
+    const branch = selectedBranch;
+    $("#detail-address").textContent = address(branch);
+    $("#detail-price").textContent =
+      money(branch?.averagePricePerPersonCents) + " aprox. por persona";
+    const services = $("#services-list");
+    services.replaceChildren();
+    (branch?.services || []).forEach((code) =>
+      services.append(element("li", "", label(code))),
+    );
+    if (!services.children.length)
+      services.append(element("li", "", "Servicios por confirmar"));
+    const dl = $("#hours-list");
+    dl.replaceChildren();
+    (branch?.openingHours || [])
+      .slice()
+      .sort((a, b) => a.dayOfWeek - b.dayOfWeek)
+      .forEach((day) => {
+        const row = element("div");
+        row.append(
+          element("dt", "", days[day.dayOfWeek - 1]),
+          element("dd", "", day.closed ? "Cerrado" : hours(day.periods)),
+        );
+        dl.append(row);
       });
-      const location = profile.locations[Number(button.dataset.location)];
-      const status = document.querySelector("#location-status");
-      status.hidden = false;
-      status.textContent = `${location.name}: ${location.address}, ${location.district}, Lima. Local de demostración.`;
+    (branch?.specialHours || []).forEach((day) => {
+      const row = element("div");
+      row.append(
+        element("dt", "", day.date),
+        element("dd", "", day.closed ? "Cerrado" : hours(day.periods)),
+      );
+      dl.append(row);
     });
+    if (!dl.children.length)
+      dl.append(element("p", "muted", "Horarios por confirmar"));
+    const contact = $("#contact-list");
+    contact.replaceChildren();
+    const phone = branch?.contact?.phone;
+    const email = branch?.contact?.email || restaurant.contact?.email;
+    if (phone) {
+      const li = element("li");
+      li.append(external(phone, "tel:" + phone, ["tel:"]));
+      contact.append(li);
+    }
+    if (email) {
+      const li = element("li");
+      li.append(external(email, "mailto:" + email, ["mailto:"]));
+      contact.append(li);
+    }
+    if (restaurant.contact?.website) {
+      const li = element("li");
+      li.append(external("Página web", restaurant.contact.website));
+      contact.append(li);
+    }
+    if (branch?.contact?.whatsapp) {
+      const li = element("li");
+      li.append(
+        external(
+          "WhatsApp",
+          "https://wa.me/" + branch.contact.whatsapp.replace(/\D/g, ""),
+        ),
+      );
+      contact.append(li);
+    }
+    if (!contact.children.length)
+      contact.append(element("li", "", "Contacto por confirmar"));
+    const summary = $("#summary-list");
+    summary.replaceChildren();
+    const values = [
+      ["Tipo de cocina", restaurant.cuisineTypes.map(label).join(", ")],
+      ["Precio por persona", money(branch?.averagePricePerPersonCents)],
+      [
+        "Capacidad",
+        branch?.capacity ? branch.capacity + " personas" : "Por confirmar",
+      ],
+      ["Estacionamiento", branch?.parking?.description || "Por confirmar"],
+    ];
+    values.forEach(([title, value]) => {
+      const row = element("div");
+      row.append(element("dt", "", title), element("dd", "", value));
+      summary.append(row);
+    });
+    renderMap();
+  }
+  function renderLocations() {
+    const list = $("#locations-list");
+    list.replaceChildren();
+    branches.forEach((branch) => {
+      const b = button(
+        "",
+        () => {
+          selectedBranch = branch;
+          renderLocations();
+          practicalInfo();
+          renderGallery();
+          renderMenu();
+        },
+        "location-card",
+      );
+      b.setAttribute(
+        "aria-pressed",
+        String(branch._id === selectedBranch?._id),
+      );
+      b.classList.toggle("selected", branch._id === selectedBranch?._id);
+      const text = element("span");
+      text.append(
+        element(
+          "strong",
+          "",
+          branch.name +
+            (branch._id === restaurant.mainBranchId ? " · Principal" : ""),
+        ),
+        element("span", "", address(branch)),
+      );
+      b.append(text);
+      list.append(b);
+    });
+    if (!branches.length)
+      state(list, "Este restaurante todavía no tiene locales publicados.");
+  }
+  function renderMap() {
+    const panel = $("#panel-location");
+    panel.replaceChildren();
+    const box = element("section", "detail-panel");
+    box.append(
+      element("h2", "", "Ubicación"),
+      element("p", "", address(selectedBranch)),
+    );
+    const coords = selectedBranch?.location?.coordinates;
+    const mapsUrl = selectedBranch?.googleMaps?.mapsUrl;
+    if (coords?.length === 2) {
+      const iframe = element("iframe", "restaurant-map");
+      iframe.title = "Ubicación de " + restaurant.name;
+      iframe.loading = "lazy";
+      iframe.referrerPolicy = "no-referrer-when-downgrade";
+      iframe.src =
+        "https://maps.google.com/maps?q=" +
+        encodeURIComponent(coords[1] + "," + coords[0]) +
+        "&z=16&output=embed";
+      box.append(iframe);
+      box.append(
+        external(
+          "Cómo llegar en Google Maps",
+          "https://www.google.com/maps/dir/?api=1&destination=" +
+            encodeURIComponent(coords[1] + "," + coords[0]),
+        ),
+      );
+    } else if (MesaUI.safeUrl(mapsUrl))
+      box.append(external("Abrir ubicación en Google Maps", mapsUrl));
+    else
+      box.append(
+        element(
+          "p",
+          "muted",
+          "La ubicación en el mapa aún no ha sido confirmada. Consulta la dirección con el restaurante.",
+        ),
+      );
+    (selectedBranch?.arrivalOptions || []).forEach((option) =>
+      box.append(
+        element("h3", "", option.title),
+        element("p", "", option.description),
+      ),
+    );
+    panel.append(box);
+  }
+  let galleryType = "";
+  function renderGallery() {
+    const panel = $("#panel-photos");
+    panel.replaceChildren();
+    const box = element("section", "detail-panel");
+    box.append(element("h2", "", "Galería del restaurante"));
+    const filters = element("div", "categories");
+    const records = photoRecords.filter(
+      (p) => !p.branchId || p.branchId === selectedBranch?._id,
+    );
+    [
+      ["", "Todas"],
+      ...["AMBIENCE", "DISH", "DESSERT", "DRINK", "TERRACE", "OTHER"].map(
+        (code) => [code, label(code)],
+      ),
+    ].forEach(([code, text]) => {
+      const b = button(
+        text +
+          " (" +
+          records.filter((p) => !code || p.type === code).length +
+          ")",
+        () => {
+          galleryType = code;
+          renderGallery();
+        },
+        "category",
+      );
+      b.setAttribute("aria-pressed", String(galleryType === code));
+      filters.append(b);
+    });
+    const grid = element("div", "photo-grid");
+    records
+      .filter((p) => !galleryType || p.type === galleryType)
+      .forEach((photo) => {
+        const figure = element("figure");
+        const open = button(
+          "",
+          () => {
+            const content = MesaUI.modal(photo.title, "wide-modal");
+            content.append(
+              image(photo.url, photo.altText || photo.title, "lightbox-image"),
+            );
+          },
+          "photo-open",
+        );
+        open.setAttribute("aria-label", "Ampliar " + photo.title);
+        open.append(image(photo.url, photo.altText || photo.title));
+        figure.append(
+          open,
+          element("figcaption", "", photo.title + " · " + label(photo.type)),
+        );
+        grid.append(figure);
+      });
+    if (!grid.children.length) state(grid, "No hay fotos en esta categoría.");
+    box.append(filters, grid);
+    panel.append(box);
+  }
+  let menuCategory = "";
+  let promotions = [];
+  function renderMenu() {
+    const panel = $("#panel-menu");
+    panel.replaceChildren();
+    const offers = element("section", "detail-panel");
+    offers.append(element("h2", "", "Promociones"));
+    const promoGrid = element("div", "promo-grid");
+    promotions
+      .filter((p) => p.branchIds.includes(selectedBranch?._id))
+      .forEach((p) => {
+        const article = element("article", "menu-card");
+        article.append(
+          element("h3", "", p.title),
+          element("p", "", p.description || ""),
+          element(
+            "strong",
+            "price",
+            money(p.priceCents) + " " + label(p.pricingUnit),
+          ),
+          element("p", "", p.terms || ""),
+          element(
+            "p",
+            "muted",
+            "Días: " +
+              p.validDays.map((n) => days[n - 1]).join(", ") +
+              ". Horario: " +
+              (p.validTimeRanges.length
+                ? hours(p.validTimeRanges)
+                : "Todo el día"),
+          ),
+          element(
+            "p",
+            "muted",
+            "Hasta " +
+              new Intl.DateTimeFormat("es-PE", {
+                timeZone: "America/Lima",
+              }).format(new Date(p.endsAt)),
+          ),
+          element(
+            "p",
+            "",
+            p.availableNow
+              ? "En horario promocional"
+              : "Fuera del horario promocional",
+          ),
+        );
+        promoGrid.append(article);
+      });
+    if (!promoGrid.children.length)
+      state(promoGrid, "No hay promociones vigentes para este local.");
+    offers.append(promoGrid);
+    panel.append(offers);
+    const box = element("section", "detail-panel");
+    box.append(element("h2", "", "Carta"));
+    const filters = element("div", "categories");
+    [
+      ["", "Todo"],
+      ...["STARTER", "MAIN", "DESSERT", "DRINK", "SIDE", "OTHER"].map((c) => [
+        c,
+        label(c),
+      ]),
+    ].forEach(([code, text]) => {
+      const b = button(
+        text,
+        () => {
+          menuCategory = code;
+          renderMenu();
+        },
+        "category",
+      );
+      b.setAttribute("aria-pressed", String(menuCategory === code));
+      filters.append(b);
+    });
+    box.append(filters);
+    const grid = element("div", "menu-grid");
+    menuRecords
+      .filter(
+        (item) =>
+          (!menuCategory || item.category === menuCategory) &&
+          item.branchOffers.some(
+            (o) => o.branchId === selectedBranch?._id && o.available,
+          ),
+      )
+      .forEach((item) => {
+        const offer = item.branchOffers.find(
+          (o) => o.branchId === selectedBranch._id && o.available,
+        );
+        const article = element("article", "menu-card");
+        const photo = photoRecords.find((p) => p._id === item.photoId);
+        if (photo) article.append(image(photo.url, item.name));
+        article.append(
+          element("h3", "", item.name),
+          element("p", "", item.description || ""),
+          element("strong", "price", money(offer.priceCents)),
+        );
+        if (item.recommendation?.featured)
+          article.append(
+            element("span", "tag", label(item.recommendation.label)),
+          );
+        article.append(
+          element(
+            "p",
+            "muted",
+            item.allergenInformationConfirmed
+              ? "Alérgenos: " +
+                  (item.allergens.join(", ") || "Sin alérgenos declarados")
+              : "Consulta ingredientes y alérgenos con el restaurante.",
+          ),
+        );
+        grid.append(article);
+      });
+    if (!grid.children.length)
+      state(
+        grid,
+        "No hay platos disponibles en esta categoría para el local seleccionado.",
+      );
+    box.append(grid);
+    panel.append(box);
+  }
+  function reviewForm(host, ownReview) {
+    const form = element("form", "review-form modal-form");
+    form.append(
+      element(
+        "h3",
+        "",
+        ownReview ? "Edita tu reseña" : "Cuéntanos tu experiencia",
+      ),
+    );
+    field(
+      form,
+      "branchId",
+      "Local visitado",
+      "select",
+      ownReview?.branchId || selectedBranch?._id,
+      { required: true, choices: branches.map((b) => [b._id, b.name]) },
+    );
+    field(form, "title", "Título", "text", ownReview?.title || "", {
+      required: true,
+      minlength: "3",
+      maxlength: "150",
+    });
+    field(
+      form,
+      "comment",
+      "Tu experiencia",
+      "textarea",
+      ownReview?.comment || "",
+      { required: true, minlength: "10", maxlength: "3000", rows: "4" },
+    );
+    const ratingFields = element("div", "rating-fields");
+    [
+      ["overall", "General"],
+      ["food", "Comida"],
+      ["service", "Servicio"],
+      ["ambience", "Ambiente"],
+      ["valueForMoney", "Calidad/precio"],
+    ].forEach(([key, title]) =>
+      field(
+        ratingFields,
+        key,
+        title,
+        "select",
+        ownReview?.ratings[key] || "5",
+        {
+          required: true,
+          choices: [1, 2, 3, 4, 5].map((n) => [String(n), String(n) + " / 5"]),
+        },
+      ),
+    );
+    form.append(ratingFields);
+    const today = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Lima",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+    field(
+      form,
+      "visitedAt",
+      "Fecha de visita",
+      "date",
+      ownReview?.visitedAt?.slice(0, 10) || "",
+      { required: true, max: today },
+    );
+    const submit = element(
+      "button",
+      "button",
+      ownReview ? "Guardar cambios" : "Publicar reseña",
+    );
+    submit.type = "submit";
+    const status = element("p", "auth-feedback");
+    status.setAttribute("role", "status");
+    form.append(submit, status);
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      submit.disabled = true;
+      try {
+        const values = Object.fromEntries(new FormData(form));
+        const body = {
+          branchId: values.branchId,
+          title: values.title,
+          comment: values.comment,
+          ratings: Object.fromEntries(
+            ["overall", "food", "service", "ambience", "valueForMoney"].map(
+              (k) => [k, Number(values[k])],
+            ),
+          ),
+          visitedAt: new Date(
+            values.visitedAt + "T00:00:00-05:00",
+          ).toISOString(),
+        };
+        await MesaAPI.request(
+          base() + "/reviews" + (ownReview ? "/" + ownReview._id : ""),
+          { method: ownReview ? "PATCH" : "POST", body, authenticated: true },
+        );
+        await refreshRatings();
+        await renderReviews();
+      } catch (error) {
+        feedback(status, error.message, true);
+      } finally {
+        submit.disabled = false;
+      }
+    });
+    host.append(form);
+    if (ownReview)
+      host.append(
+        button(
+          "Eliminar mi reseña",
+          async (event) => {
+            if (!confirm("¿Deseas retirar tu reseña?")) return;
+            event.currentTarget.disabled = true;
+            try {
+              await MesaAPI.request(base() + "/reviews/" + ownReview._id, {
+                method: "DELETE",
+                authenticated: true,
+              });
+              await refreshRatings();
+              await renderReviews();
+            } catch (error) {
+              feedback(status, error.message, true);
+              event.currentTarget.disabled = false;
+            }
+          },
+          "text-link danger",
+        ),
+      );
+  }
+  async function refreshRatings() {
+    const { data } = await MesaAPI.request(base());
+    restaurant.ratingSummary = data.ratingSummary;
+    $("#detail-rating").textContent = data.ratingSummary.reviewCount
+      ? data.ratingSummary.overall.toFixed(1) +
+        " (" +
+        data.ratingSummary.reviewCount +
+        " reseñas)"
+      : "Sin reseñas todavía";
+  }
+  async function renderReviews() {
+    const version = ++reviewVersion;
+    const panel = $("#panel-reviews");
+    state(panel, "Cargando reseñas…");
+    try {
+      const result = await MesaAPI.request(
+        base() +
+          "/reviews" +
+          MesaAPI.query({ page: reviewPage, limit: 5, sort: "recent" }),
+      );
+      if (version !== reviewVersion) return;
+      panel.replaceChildren();
+      const box = element("section", "detail-panel");
+      box.append(
+        element("h2", "", "Reseñas de comensales"),
+        element(
+          "p",
+          "review-summary",
+          restaurant.ratingSummary.reviewCount
+            ? restaurant.ratingSummary.overall.toFixed(1) +
+                " de 5 · " +
+                restaurant.ratingSummary.reviewCount +
+                " reseñas"
+            : "Aún no hay reseñas",
+        ),
+      );
+      if (!result.data.length)
+        box.append(
+          element(
+            "p",
+            "",
+            "Sé la primera persona en compartir su experiencia.",
+          ),
+        );
+      result.data.forEach((review) => {
+        const article = element("article", "review-card");
+        const author = element("div", "review-author");
+        author.append(
+          image(review.user?.avatarUrl, "", "avatar"),
+          element(
+            "strong",
+            "",
+            [review.user?.firstName, review.user?.lastName]
+              .filter(Boolean)
+              .join(" ") || "Cliente de MesaSpot",
+          ),
+          element("span", "rating", "★ " + review.ratings.overall),
+        );
+        article.append(
+          author,
+          element("h3", "", review.title),
+          element("p", "", review.comment),
+          element(
+            "p",
+            "muted",
+            "Visita: " +
+              new Intl.DateTimeFormat("es-PE", {
+                timeZone: "America/Lima",
+              }).format(new Date(review.visitedAt)),
+          ),
+          element(
+            "p",
+            "muted",
+            "Comida " +
+              review.ratings.food +
+              " · Servicio " +
+              review.ratings.service +
+              " · Ambiente " +
+              review.ratings.ambience +
+              " · Calidad/precio " +
+              review.ratings.valueForMoney,
+          ),
+        );
+        if (review.verifiedVisit)
+          article.append(element("span", "tag", "Visita verificada"));
+        if (review.adminReply) {
+          const reply = element("blockquote", "admin-reply");
+          reply.append(
+            element("strong", "", "Respuesta del restaurante"),
+            element("p", "", review.adminReply.comment),
+          );
+          article.append(reply);
+        }
+        box.append(article);
+      });
+      const pager = element("nav", "pagination");
+      paginate(pager, reviewPage, result.meta.totalPages, (value) => {
+        reviewPage = value;
+        renderReviews();
+      });
+      box.append(pager);
+      panel.append(box);
+      const action = element("section", "detail-panel");
+      panel.append(action);
+      const user = MesaAPI.session?.user;
+      if (!user)
+        action.append(
+          element("p", "", "Inicia sesión para publicar una reseña."),
+          button("Iniciar sesión", () => MesaAuth.open("login")),
+        );
+      else if (user.role === "CLIENT") {
+        const mine = await MesaAPI.all(
+          "/users/me/reviews",
+          {},
+          { authenticated: true },
+        );
+        if (version !== reviewVersion) return;
+        if (branches.length)
+          reviewForm(
+            action,
+            mine.find((r) => r.restaurantId === restaurant._id),
+          );
+        else
+          action.append(
+            element(
+              "p",
+              "",
+              "El restaurante necesita un local publicado para recibir nuevas reseñas.",
+            ),
+          );
+      } else
+        action.append(
+          element(
+            "p",
+            "",
+            "Las reseñas son publicadas por clientes. Puedes responder las de tus restaurantes desde Administrar.",
+          ),
+        );
+    } catch (error) {
+      if (version === reviewVersion) state(panel, error.message, renderReviews);
+    }
+  }
+  async function load() {
+    const status = $("#detail-load-status");
+    state(status, "Cargando restaurante…");
+    try {
+      const id = new URLSearchParams(location.search).get("id");
+      if (id && !/^[a-f0-9]{24}$/i.test(id))
+        throw new Error("El identificador del restaurante no es válido.");
+      const { data } = await MesaAPI.request(
+        id ? "/restaurants/" + id : "/restaurants/slug/el-asador-de-surco",
+      );
+      restaurant = data;
+      document.title = restaurant.name + " · MesaSpot";
+      $("#restaurant-title").textContent = restaurant.name;
+      document.querySelector('meta[name="description"]').content =
+        restaurant.shortDescription;
+      $("#detail-description").textContent = restaurant.shortDescription;
+      $("#detail-cuisine").textContent = restaurant.cuisineTypes
+        .map(label)
+        .join(" · ");
+      $("#hero-cuisine").textContent = restaurant.cuisineTypes
+        .map(label)
+        .join(", ");
+      $("#hero-founded").textContent = restaurant.foundedYear
+        ? "Desde " + restaurant.foundedYear
+        : "Conoce el restaurante";
+      const cover = MesaUI.safeUrl(restaurant.coverPhoto?.url);
+      if (cover)
+        $(".detail-hero").style.backgroundImage =
+          "linear-gradient(90deg, #1b120ce0, #1b120c55), url(" +
+          JSON.stringify(cover) +
+          ")";
+      const about = $("#about-copy");
+      about.replaceChildren(
+        ...(restaurant.description.length
+          ? restaurant.description
+          : [restaurant.shortDescription]
+        ).map((text) => element("p", "", text)),
+      );
+      const aboutImage = $(".about-panel img");
+      aboutImage.replaceWith(
+        image(restaurant.thumbnailPhoto?.url, restaurant.name),
+      );
+      await refreshRatings();
+      const results = await Promise.allSettled([
+        MesaAPI.all(base() + "/branches"),
+        MesaAPI.all(base() + "/photos"),
+        MesaAPI.all(base() + "/menu-items"),
+        MesaAPI.all(base() + "/promotions"),
+      ]);
+      if (results[0].status === "rejected") throw results[0].reason;
+      branches = results[0].value;
+      photoRecords = results[1].value || [];
+      menuRecords = results[2].value || [];
+      promotions = results[3].value || [];
+      selectedBranch =
+        branches.find((b) => b._id === restaurant.mainBranchId) || branches[0];
+      renderLocations();
+      practicalInfo();
+      renderGallery();
+      renderMenu();
+      if (results[1].status === "rejected")
+        state($("#panel-photos"), results[1].reason.message, load);
+      if (results[2].status === "rejected" || results[3].status === "rejected")
+        state(
+          $("#panel-menu"),
+          "No pudimos cargar la carta o sus promociones.",
+          load,
+        );
+      status.replaceChildren();
+      initialized = true;
+      await MesaAuth.ready;
+      await renderReviews();
+    } catch (error) {
+      $("#restaurant-title").textContent = "Restaurante no disponible";
+      state(status, error.message, load);
+    }
+  }
+  $("#all-locations")?.addEventListener("click", () => {
+    $("#locations-list").classList.toggle("expanded");
+  });
+  $("#contact-trigger")?.addEventListener("click", () => {
+    selectTab("information");
+    $("#contact-list").scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+  window.addEventListener("mesa:session", () => {
+    if (initialized) renderReviews();
+  });
+  selectTab(
+    ["information", "photos", "menu", "reviews", "location"].includes(
+      location.hash.slice(1),
+    )
+      ? location.hash.slice(1)
+      : "information",
+  );
+  load();
 })();

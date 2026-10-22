@@ -1,0 +1,10 @@
+{
+  "name": "mesaspot-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Frontend estático de MesaSpot conectado a la API Express",
+  "engines": { "node": ">=22" },
+  "scripts": { "test": "node --test tests/integration.test.js" },
+  "devDependencies": { "jsdom": "^26.1.0" }
+}

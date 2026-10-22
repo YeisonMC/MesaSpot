@@ -1,145 +1,121 @@
-/* Formularios de demostración: no almacenan contraseñas ni autentican usuarios. */
 (() => {
-  "use strict";
-  const modal = document.querySelector("#modal");
-  const content = document.querySelector("#modal-content");
-  const eye =
-    '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>';
-
-  function field(name, label, type, placeholder, autocomplete, extra = "") {
-    return `<div class="auth-field"><div class="auth-label-row"><label for="auth-${name}">${label}</label>${extra}</div><div class="auth-input-wrap"><input id="auth-${name}" name="${name}" type="${type}" placeholder="${placeholder}" autocomplete="${autocomplete}" required aria-describedby="error-${name}" ${name === "name" ? 'maxlength="100"' : ""} ${type === "password" ? 'minlength="8"' : ""}>${type === "password" ? `<button class="password-toggle" type="button" data-password="auth-${name}" aria-label="Mostrar ${label.toLowerCase()}" aria-pressed="false">${eye}</button>` : ""}</div><p class="field-error" id="error-${name}" aria-live="polite"></p></div>`;
+  'use strict';
+  const { $, element, button, modal, feedback, field, pageUrl, link } = MesaUI;
+  let validatedUser = false;
+  let formVersion = 0;
+  function renderHeader() {
+    document.querySelectorAll('[data-session-action]').forEach(node => node.remove());
+    const user = MesaAPI.session?.user;
+    document.querySelectorAll('[data-account]').forEach(node => { node.hidden = Boolean(user); });
+    const actions = $('.header-actions');
+    if (!user || !actions) return;
+    const profile = button(user.firstName + ' · Mi perfil', openProfile, 'login');
+    profile.dataset.sessionAction = 'profile'; actions.append(profile);
+    if (user.role === 'RESTAURANT_ADMIN') {
+      const admin = link('Administrar', pageUrl('administracion.html'), 'button');
+      admin.dataset.sessionAction = 'admin'; actions.append(admin);
+    }
+    const logout = button('Salir', () => { MesaAPI.logout(); }, 'text-link');
+    logout.dataset.sessionAction = 'logout'; actions.append(logout);
   }
-
-  function openAuth(mode = "login") {
-    const register = mode === "register";
-    const recovery = mode === "recovery";
-    modal.classList.add("auth-modal");
-    content.innerHTML = `<div class="auth-heading"><span class="brand-icon"><svg aria-hidden="true"><use href="#chef"/></svg></span><h2 id="modal-title">${recovery ? "Recupera tu contraseña" : register ? "Crea tu cuenta" : "Iniciar sesión"}</h2><p>${recovery ? "Introduce tu correo para probar la recuperación de acceso." : register ? "Únete a MesaSpot para descubrir y reservar las mejores experiencias culinarias" : "Accede a tu cuenta para gestionar tus reservas gastronómicas"}</p></div>
-      ${recovery ? "" : `<button type="button" class="google-button" id="auth-google"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12h-8m8 0c0 5-3 8-8 8a8 8 0 1 1 6-13"/></svg>${register ? "Registrarse" : "Continuar"} con Google</button><div class="auth-divider"><span>${register ? "o completa el formulario" : "o usa tu correo"}</span></div>`}
-      <form class="auth-form" id="auth-form" novalidate>
-      ${register ? field("name", "Nombre completo", "text", "Tu nombre y apellidos", "name") : ""}
-      ${field("email", "Correo electrónico", "email", "ejemplo@correo.com", "email")}
-      ${recovery ? "" : field("password", "Contraseña", "password", register ? "Mínimo 8 caracteres" : "••••••••", register ? "new-password" : "current-password", register ? "" : '<button type="button" class="auth-link forgot-password" data-auth-mode="recovery">¿Olvidaste tu contraseña?</button>')}
-      ${register ? field("confirm", "Confirmar contraseña", "password", "Repite tu contraseña", "new-password") : ""}
-      ${recovery ? "" : `<div class="auth-check-group"><label class="auth-checkbox"><input type="checkbox" name="${register ? "terms" : "remember"}" ${register ? 'required aria-describedby="error-terms"' : ""}><span>${register ? 'Acepto los <button type="button" class="auth-link legal-link" data-legal="terms">Términos de Servicio</button> y la <button type="button" class="auth-link legal-link" data-legal="privacy">Política de Privacidad</button> de MesaSpot.' : "Mantener mi sesión iniciada"}</span></label>${register ? '<p class="field-error" id="error-terms" aria-live="polite"></p>' : ""}</div>`}
-      <button class="button auth-submit" type="submit">${recovery ? "Enviar enlace" : register ? "Crear cuenta" : "Iniciar sesión"}</button>
-      <p class="auth-feedback" id="auth-feedback" role="status" hidden></p></form>
-      <p class="auth-switch">${recovery ? "¿Ya recuerdas tu contraseña?" : register ? "¿Ya tienes cuenta?" : "¿No tienes cuenta?"} <button type="button" class="auth-link" data-auth-mode="${register || recovery ? "login" : "register"}">${register || recovery ? "Inicia sesión aquí" : "Regístrate aquí"}</button></p>`;
-    if (!modal.open) modal.showModal();
-    document.body.style.overflow = "hidden";
-    // Keep the heading visible when a long registration modal opens on mobile.
-    modal.scrollTop = 0;
-    const form = content.querySelector("form");
-    const feedback = content.querySelector("#auth-feedback");
-    function message(text) {
-      feedback.textContent = text;
-      feedback.hidden = false;
+  function openAuth(mode = 'login') {
+    const version = ++formVersion;
+    const register = mode === 'register';
+    const content = modal(register ? 'Crea tu cuenta' : 'Iniciar sesión', 'auth-modal');
+    content.append(element('p', 'modal-description', register ? 'Descubre restaurantes y comparte tu experiencia.' : 'Accede a tu perfil de MesaSpot.'));
+    const form = element('form', 'modal-form auth-form');
+    if (register) {
+      field(form, 'firstName', 'Nombre', 'text', '', { required: true, maxlength: '80', autocomplete: 'given-name' });
+      field(form, 'lastName', 'Apellidos', 'text', '', { required: true, maxlength: '80', autocomplete: 'family-name' });
     }
-    function validate(input) {
-      let error = "";
-      if (input.name === "terms") {
-        if (!input.checked)
-          error = "Debes aceptar los términos y la política de privacidad.";
-      } else if (!input.value.trim()) {
-        error = "Completa este campo.";
-      } else if (
-        input.name === "name" &&
-        input.value.trim().split(/\s+/).length < 2
-      ) {
-        error = "Introduce tu nombre y al menos un apellido.";
-      } else if (
-        input.name === "email" &&
-        (input.validity.typeMismatch ||
-          !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value))
-      ) {
-        error = "Introduce un correo electrónico válido.";
-      } else if (
-        input.type === "password" ||
-        input.dataset.visiblePassword === "true"
-      ) {
-        if (input.value.length < 8)
-          error = "La contraseña debe tener al menos 8 caracteres.";
-        else if (
-          input.name === "confirm" &&
-          input.value !== form.elements.password.value
-        )
-          error = "Las contraseñas no coinciden.";
-      }
-      input.setAttribute("aria-invalid", String(Boolean(error)));
-      content.querySelector(`#error-${input.name}`).textContent = error;
-      return !error;
+    field(form, 'email', 'Correo electrónico', 'email', '', { required: true, autocomplete: 'email' });
+    const password = field(form, 'password', 'Contraseña', 'password', '', { required: true, minlength: register ? '8' : '1', maxlength: '72', autocomplete: register ? 'new-password' : 'current-password' });
+    form.append(button('Mostrar contraseña', event => {
+      password.type = password.type === 'password' ? 'text' : 'password';
+      event.currentTarget.textContent = password.type === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña';
+    }, 'auth-link'));
+    let confirm, remember;
+    if (register) {
+      confirm = field(form, 'confirm', 'Confirmar contraseña', 'password', '', { required: true, autocomplete: 'new-password' });
+      const terms = element('label', 'auth-checkbox');
+      const checkbox = element('input'); checkbox.type = 'checkbox'; checkbox.required = true;
+      terms.append(checkbox, element('span', '', 'Acepto los términos de servicio y la política de privacidad.'));
+      form.append(terms);
+    } else {
+      const label = element('label', 'auth-checkbox');
+      remember = element('input'); remember.type = 'checkbox';
+      label.append(remember, element('span', '', 'Mantener mi sesión en este navegador')); form.append(label);
     }
-    const inputs = [...form.querySelectorAll("input[required]")];
-    inputs.forEach((input) => {
-      input.addEventListener("blur", () => validate(input));
-      input.addEventListener("input", () => {
-        feedback.hidden = true;
-        if (input.getAttribute("aria-invalid") === "true") validate(input);
-        if (input.name === "password" && form.elements.confirm?.value)
-          validate(form.elements.confirm);
-      });
-      if (input.type === "checkbox")
-        input.addEventListener("change", () => validate(input));
-    });
-    content.querySelectorAll("[data-password]").forEach((button) =>
-      button.addEventListener("click", () => {
-        const input = document.getElementById(button.dataset.password);
-        const visible = input.type === "password";
-        input.type = visible ? "text" : "password";
-        input.dataset.visiblePassword = String(visible);
-        button.setAttribute("aria-pressed", String(visible));
-        button.setAttribute(
-          "aria-label",
-          `${visible ? "Ocultar" : "Mostrar"} ${input.name === "confirm" ? "confirmación de contraseña" : "contraseña"}`,
-        );
-      }),
-    );
-    content.querySelectorAll("[data-auth-mode]").forEach((button) =>
-      button.addEventListener("click", () => {
-        openAuth(button.dataset.authMode);
-        content.querySelector("input").focus({ preventScroll: true });
-      }),
-    );
-    content.querySelectorAll("[data-legal]").forEach((button) =>
-      button.addEventListener("click", () => {
-        const [title, description] =
-          window.MESA_DATA.information[button.dataset.legal];
-        message(`${title}: ${description}`);
-      }),
-    );
-    content
-      .querySelector("#auth-google")
-      ?.addEventListener("click", () =>
-        message(
-          "El acceso con Google requiere conectar un servicio de autenticación. No está disponible en esta demostración.",
-        ),
-      );
-    form.addEventListener("submit", (event) => {
+    const submit = element('button', 'button auth-submit', register ? 'Crear cuenta' : 'Iniciar sesión'); submit.type = 'submit';
+    const status = element('p', 'auth-feedback'); status.setAttribute('role', 'status'); status.hidden = true;
+    form.append(submit, status);
+    form.addEventListener('submit', async event => {
       event.preventDefault();
-      const valid = inputs.map(validate).every(Boolean);
-      if (!valid) {
-        form.querySelector('[aria-invalid="true"]').focus();
-        return;
-      }
-      message(
-        recovery
-          ? "Validación completada. En esta demostración no se envía un correo de recuperación."
-          : register
-            ? "Formulario válido. Registro de demostración completado; no se ha creado una cuenta."
-            : "Formulario válido. Inicio de sesión de demostración; no se ha autenticado una cuenta.",
-      );
-      form
-        .querySelectorAll(
-          'input[type="password"], input[data-visible-password]',
-        )
-        .forEach((input) => {
-          input.value = "";
-        });
+      if (confirm && confirm.value !== password.value) return feedback(status, 'Las contraseñas no coinciden.', true);
+      submit.disabled = true; feedback(status, 'Conectando…');
+      try {
+        const values = Object.fromEntries(new FormData(form));
+        const body = { email: values.email.trim(), password: values.password };
+        if (register) Object.assign(body, { firstName: values.firstName.trim(), lastName: values.lastName.trim() });
+        const result = await MesaAPI.request(register ? '/auth/register' : '/auth/login', { method: 'POST', body });
+        validatedUser = true;
+        MesaAPI.saveSession(result.data, remember?.checked);
+        if (version === formVersion && $('#modal-content') === content && form.isConnected) $('#modal').close();
+      } catch (error) {
+        if (form.isConnected) feedback(status, error.message, true);
+      } finally { submit.disabled = false; password.value = ''; if (confirm) confirm.value = ''; }
     });
+    content.append(form, button(register ? 'Ya tengo cuenta' : 'Crear una cuenta', () => openAuth(register ? 'login' : 'register'), 'auth-link'));
+    if (!register) content.append(element('p', 'muted', 'La recuperación de contraseña y el acceso con Google todavía no están disponibles.'));
   }
-  document
-    .querySelectorAll("[data-account]")
-    .forEach((button) =>
-      button.addEventListener("click", () => openAuth(button.dataset.account)),
-    );
+  async function openProfile() {
+    const content = modal('Mi perfil', 'auth-modal');
+    const area = element('div'); content.append(area);
+    MesaUI.state(area, 'Cargando perfil…');
+    try {
+      const user = await MesaAPI.refreshUser();
+      if (!user || !area.isConnected) return;
+      area.replaceChildren();
+      const form = element('form', 'modal-form');
+      field(form, 'firstName', 'Nombre', 'text', user.firstName, { required: true, maxlength: '80' });
+      field(form, 'lastName', 'Apellidos', 'text', user.lastName, { required: true, maxlength: '80' });
+      field(form, 'avatarUrl', 'Enlace de tu foto de perfil', 'url', user.avatarUrl || '');
+      field(form, 'phone', 'Teléfono (formato +51…)', 'tel', user.phone || '');
+      area.append(element('p', 'muted', user.email));
+      const save = element('button', 'button', 'Guardar perfil'); save.type = 'submit';
+      const status = element('p', 'auth-feedback'); status.setAttribute('role', 'status');
+      form.append(save, status);
+      form.addEventListener('submit', async event => {
+        event.preventDefault(); save.disabled = true;
+        try {
+          const body = Object.fromEntries(new FormData(form)); body.avatarUrl ||= null; body.phone ||= null;
+          await MesaAPI.request('/users/me', { method: 'PATCH', authenticated: true, body });
+          await MesaAPI.refreshUser(); feedback(status, 'Perfil actualizado.');
+        } catch (error) { feedback(status, error.message, true); } finally { save.disabled = false; }
+      });
+      area.append(form);
+      const myReviews = element('div', 'profile-reviews'); area.append(element('h3', '', 'Mis reseñas'), myReviews);
+      try {
+        const reviews = await MesaAPI.all('/users/me/reviews', {}, { authenticated: true });
+        if (!reviews.length) MesaUI.state(myReviews, 'Todavía no has publicado reseñas.');
+        reviews.forEach(review => myReviews.append(link(review.title, MesaUI.detailUrl({ _id: review.restaurantId }) + '#reviews', 'text-link')));
+      } catch (error) { MesaUI.state(myReviews, error.message); }
+    } catch (error) { MesaUI.state(area, error.message, openProfile); }
+  }
+  document.addEventListener('click', event => {
+    const trigger = event.target.closest('[data-account]');
+    if (trigger) openAuth(trigger.dataset.account);
+  });
+  window.addEventListener('mesa:session', renderHeader);
+  window.MesaAuth = { open: openAuth, profile: openProfile, get ready() { return ready; } };
+  // Se valida el token guardado antes de habilitar acciones privadas.
+  const ready = (async () => {
+    if (MesaAPI.session?.token) {
+      try { await MesaAPI.refreshUser(); validatedUser = true; } catch (error) {
+        if (error.status !== 401) console.warn('No se pudo validar la sesión:', error.message);
+      }
+    }
+    renderHeader();
+    return validatedUser ? MesaAPI.session?.user : null;
+  })();
 })();

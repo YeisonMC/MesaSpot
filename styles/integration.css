@@ -1,0 +1,269 @@
+/* Componentes compartidos de la integración con la API. */
+[hidden] {
+  display: none !important;
+}
+button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+.api-state {
+  padding: 30px 18px;
+  text-align: center;
+  border: 1px solid #eadfd8;
+  border-radius: 14px;
+  background: #fff;
+  grid-column: 1 / -1;
+}
+.api-state p {
+  margin-bottom: 12px;
+}
+.is-error,
+.danger {
+  color: #a52720 !important;
+}
+.muted {
+  color: #6b7079;
+  font-size: 0.9rem;
+  margin-block: 10px;
+}
+.wide-modal {
+  width: min(900px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+}
+.modal-form {
+  display: grid;
+  gap: 16px;
+  margin-block: 20px;
+}
+.form-field {
+  display: grid;
+  gap: 7px;
+  color: #393431;
+  font-weight: 600;
+}
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 11px 12px;
+  background: #fff;
+  color: #302d2a;
+  font: inherit;
+  border: 1px solid #d9c9bf;
+  border-radius: 8px;
+  font-weight: 400;
+}
+.form-field textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+.form-field :focus-visible {
+  outline: 3px solid #e7ad96;
+  outline-offset: 2px;
+}
+.auth-form .auth-link {
+  justify-self: start;
+}
+.auth-feedback {
+  padding: 10px;
+  border-radius: 8px;
+  background: #f8eee7;
+}
+.profile-reviews {
+  display: grid;
+  gap: 12px;
+  margin-block: 16px;
+}
+.header-actions {
+  flex-wrap: wrap;
+}
+.photo-grid,
+.menu-grid,
+.promo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 22px;
+}
+.photo-grid figure {
+  margin: 0;
+  overflow: hidden;
+  background: #faf5f1;
+  border-radius: 12px;
+}
+.photo-grid img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+.photo-open {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  cursor: zoom-in;
+  padding: 0;
+}
+.photo-grid figcaption {
+  padding: 12px;
+  font-size: 0.9rem;
+}
+.lightbox-image {
+  display: block;
+  width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+  margin-top: 20px;
+}
+.menu-card,
+.review-card {
+  border: 1px solid #eadfd8;
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+}
+.menu-card h3,
+.review-card h3 {
+  margin-block: 10px;
+}
+.menu-card > img {
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.menu-card p {
+  margin-block: 10px;
+}
+.menu-card .tag {
+  display: inline-block;
+  margin: 10px;
+}
+.review-card {
+  margin-top: 18px;
+}
+.review-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.review-summary {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.rating-fields {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+.admin-reply {
+  margin: 18px 0 0;
+  background: #faf3ed;
+  padding: 16px;
+  border-left: 3px solid #c95830;
+}
+.restaurant-map {
+  width: 100%;
+  height: 400px;
+  border: 0;
+  border-radius: 12px;
+  margin-block: 18px;
+}
+.contact-list a {
+  overflow-wrap: anywhere;
+  color: #a63e1d;
+}
+.detail-panel {
+  background: #fff;
+  padding: 24px;
+  border-radius: 14px;
+  margin-bottom: 20px;
+}
+.admin-page {
+  padding-block: 38px;
+  min-height: 65vh;
+}
+.admin-page h1 {
+  margin-bottom: 12px;
+}
+.admin-toolbar {
+  display: flex;
+  gap: 18px;
+  align-items: end;
+  flex-wrap: wrap;
+  margin-block: 24px;
+}
+.admin-toolbar .form-field {
+  flex: 1;
+  min-width: 220px;
+}
+.admin-resource-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 22px;
+}
+.admin-resource {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 18px;
+  border: 1px solid #eadfd8;
+  border-radius: 10px;
+}
+.admin-resource > strong {
+  flex: 1;
+}
+.check-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 15px;
+  border: 1px solid #eadfd8;
+  border-radius: 9px;
+}
+.check-fields label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.check-fields input {
+  width: 18px;
+  height: 18px;
+  accent-color: #c95830;
+}
+.admin-page .categories,
+#panel-photos .categories,
+#panel-menu .categories {
+  margin-block: 20px;
+}
+#detail-load-status:empty {
+  display: none;
+}
+@media (max-width: 650px) {
+  .photo-grid,
+  .menu-grid,
+  .promo-grid {
+    grid-template-columns: 1fr;
+  }
+  .rating-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .header-actions {
+    gap: 10px;
+  }
+  .header-actions [data-session-action] {
+    font-size: 0.8rem;
+  }
+  .detail-panel {
+    padding: 18px;
+  }
+}

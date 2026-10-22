@@ -1,276 +1,203 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="Descubre restaurantes, encuentra nuevos sabores y prepara tu próxima reserva con MesaSpot."
-    />
-    <meta name="theme-color" content="#c95830" />
-    <title>MesaSpot · Encuentra tu próxima mesa</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css"
-    />
-    <link rel="stylesheet" href="styles/main.css" />
-    <script
-      defer
-      src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"
-    ></script>
-    <script defer src="data/restaurants.js"></script>
-    <script defer src="js/app.js"></script>
-    <script defer src="js/auth.js"></script>
-    <link rel="stylesheet" href="styles/auth.css" />
-  </head>
-  <body>
-    <a class="skip-link" href="#restaurantes">Saltar a restaurantes</a>
-    <svg
-      class="svg-library"
-      xmlns="http://www.w3.org/2000/svg"
-      aria-hidden="true"
-    >
-      <defs>
-        <symbol id="chef" viewBox="0 0 24 24">
-          <path
-            d="M7 14a4 4 0 0 1-2-7 4 4 0 0 1 4-3 4 4 0 0 1 6 0 4 4 0 0 1 4 3 4 4 0 0 1-2 7v6H7zM7 16h10"
-          />
-        </symbol>
-        <symbol id="search" viewBox="0 0 24 24">
-          <circle cx="10.5" cy="10.5" r="6.5" />
-          <path d="m16 16 5 5" />
-        </symbol>
-        <symbol id="pin" viewBox="0 0 24 24">
-          <path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z" />
-          <circle cx="12" cy="10" r="2.5" />
-        </symbol>
-        <symbol id="calendar" viewBox="0 0 24 24">
-          <rect x="3" y="5" width="18" height="16" rx="2" />
-          <path d="M7 2v6m10-6v6M3 11h18" />
-        </symbol>
-        <symbol id="bell" viewBox="0 0 24 24">
-          <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" />
-        </symbol>
-        <symbol id="star" viewBox="0 0 24 24">
-          <path
-            d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2-5.5-2.9-5.5 2.9 1-6.2L3 9.6l6.2-.9z"
-          />
-        </symbol>
-        <symbol id="arrow" viewBox="0 0 24 24">
-          <path d="M4 12h16m-6-6 6 6-6 6" />
-        </symbol>
-      </defs>
-    </svg>
-    <header class="header" id="inicio">
-      <div class="container header-inner">
-        <a class="brand" href="#inicio" aria-label="MesaSpot, inicio"
-          ><span class="brand-icon"
-            ><svg><use href="#chef" /></svg></span
-          >MesaSpot</a
-        >
-        <button
-          class="menu-toggle icon-button"
-          aria-label="Abrir menú"
-          aria-expanded="false"
-          aria-controls="navigation"
-        >
-          <span></span><span></span><span></span>
-        </button>
-        <nav
-          class="navigation"
-          id="navigation"
-          aria-label="Navegación principal"
-        >
-          <a class="active" href="#inicio">Inicio</a
-          ><a href="pages/restaurantes.html">Restaurantes</a
-          ><button data-info="promotions">Promociones</button>
-        </nav>
-        <div class="header-actions">
-          <button
-            class="icon-button notifications"
-            aria-label="Notificaciones"
-            data-info="notifications"
-          >
-            <svg><use href="#bell" /></svg></button
-          ><span class="header-divider"></span
-          ><button class="login" data-account="login">Iniciar sesión</button
-          ><button class="button register" data-account="register">
-            Registrarse
-          </button>
-        </div>
-      </div>
-    </header>
-    <main>
-      <section class="hero" aria-labelledby="hero-title">
-        <div class="container hero-inner">
-          <div class="hero-copy">
-            <h1 id="hero-title">
-              Descubre la verdadera<br class="desktop-break" />
-              esencia de la cocina<br class="desktop-break" />
-              tradicional
-            </h1>
-            <p>
-              Encuentra y reserva al instante en los mejores rincones
-              gastronómicos de Lima, Perú. Mesas exclusivas y sabores que
-              cuentan historias.
-            </p>
-          </div>
-          <form class="search-bar" id="search-form" role="search">
-            <label class="search-field keyword"
-              ><svg><use href="#search" /></svg
-              ><span class="sr-only">Restaurante o tipo de cocina</span
-              ><input
-                id="query"
-                type="search"
-                placeholder="¿Qué te apetece comer hoy?"
-                autocomplete="off"
-            /></label>
-            <label class="search-field"
-              ><svg><use href="#pin" /></svg
-              ><span class="sr-only">Distrito de Lima</span
-              ><select id="district">
-                <option value="">Lima, Perú</option>
-                <option value="Miraflores">Miraflores</option>
-                <option value="Barranco">Barranco</option>
-                <option value="San Isidro">San Isidro</option>
-                <option value="Surco">Surco</option>
-                <option value="Pueblo Libre">Pueblo Libre</option>
-                <option value="San Miguel">San Miguel</option>
-              </select></label
-            >
-            <button
-              class="search-field date-trigger"
-              type="button"
-              id="date-trigger"
-            >
-              <svg><use href="#calendar" /></svg
-              ><span id="date-summary">Hoy, 2 pers.</span>
-            </button>
-            <button class="button explore" type="submit">Explorar ahora</button>
-          </form>
-        </div>
-      </section>
-      <section
-        class="discovery container"
-        id="restaurantes"
-        aria-labelledby="categories-title"
-      >
-        <div data-aos="fade-up">
-          <h2 id="categories-title">Explorar por categorías</h2>
-          <div
-            class="categories"
-            id="categories"
-            role="group"
-            aria-label="Filtrar por categoría"
-          ></div>
-        </div>
-        <div class="section-heading">
-          <h2 id="results-title">Restaurantes destacados</h2>
-          <a class="text-link" id="show-all" href="pages/restaurantes.html">
-            Ver todos los destacados <svg><use href="#arrow" /></svg>
-          </a>
-        </div>
-        <p
-          class="sr-only"
-          id="result-count"
-          role="status"
-          aria-live="polite"
-        ></p>
-        <div class="restaurant-grid" id="restaurant-grid"></div>
-        <div class="empty-state" id="empty-state" hidden>
-          <h3>No encontramos una mesa por aquí</h3>
-          <p>Prueba con otra categoría, otro nombre o un distrito diferente.</p>
-          <button class="button" id="reset-filters">
-            Ver todos los restaurantes
-          </button>
-        </div>
-        <noscript
-          ><p>
-            Activa JavaScript para ver los restaurantes y utilizar los filtros.
-          </p></noscript
-        >
-      </section>
-    </main>
-    <footer class="footer">
-      <div class="container">
-        <div class="footer-grid">
-          <div class="footer-about">
-            <a class="brand" href="#inicio"
-              ><span class="brand-icon"
-                ><svg><use href="#chef" /></svg></span
-              >MesaSpot</a
-            >
-            <p>
-              La plataforma líder de reservas y descubrimiento gastronómico en
-              Lima, Perú. Encuentra tu próxima experiencia culinaria
-              inolvidable.
-            </p>
-            <div class="socials" aria-label="Redes sociales">
-              <a
-                href="https://www.facebook.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Facebook"
-                >f</a
-              ><a
-                href="https://www.instagram.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram"
-                >◎</a
-              ><a
-                href="https://www.youtube.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="YouTube"
-                >▷</a
-              >
-            </div>
-          </div>
-          <div>
-            <h3>Descubre</h3>
-            <a href="#restaurantes">Restaurantes destacados</a
-            ><button data-info="favorites">Favoritos del mes</button
-            ><button data-info="experiences">Experiencias culinarias</button
-            ><button data-info="promotions">Promociones activas</button>
-          </div>
-          <div>
-            <h3>Legal</h3>
-            <button data-info="terms">Términos de servicio</button
-            ><button data-info="privacy">Política de privacidad</button
-            ><button data-info="cookies">Política de cookies</button
-            ><button data-info="conditions">Condiciones de reserva</button>
-          </div>
-          <div>
-            <h3>Contacto</h3>
-            <button data-info="support">Soporte al cliente</button
-            ><button data-info="join">Únete como restaurante</button
-            ><button data-info="faq">Preguntas frecuentes</button
-            ><button data-info="press">Prensa y media</button>
-          </div>
-        </div>
-        <div class="footer-bottom">
-          <p>© 2026 MesaSpot. Diseñado con pasión gastronómica.</p>
-          <p>Hecho en la clase :3</p>
-        </div>
-      </div>
-    </footer>
-    <dialog id="modal" aria-labelledby="modal-title">
-      <button
-        class="modal-close icon-button"
-        id="close-modal"
-        aria-label="Cerrar ventana"
-      >
-        ×
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="Descubre restaurantes, encuentra nuevos sabores y prepara tu próxima reserva con MesaSpot." />
+  <meta name="theme-color" content="#c95830" />
+  <title>MesaSpot · Encuentra tu próxima mesa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" />
+  <link rel="stylesheet" href="styles/main.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+  <link rel="stylesheet" href="styles/auth.css" />
+  <link rel="stylesheet" href="styles/integration.css" />
+  <script defer src="js/config.js"></script>
+  <script defer src="js/api.js"></script>
+  <script defer src="js/ui.js"></script>
+  <script defer src="js/app.js"></script>
+  <script defer src="js/auth.js"></script>
+  <script defer src="js/restaurants.js"></script>
+</head>
+
+<body>
+  <a class="skip-link" href="#restaurantes">Saltar a restaurantes</a>
+  <svg class="svg-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <defs>
+      <symbol id="chef" viewBox="0 0 24 24">
+        <path d="M7 14a4 4 0 0 1-2-7 4 4 0 0 1 4-3 4 4 0 0 1 6 0 4 4 0 0 1 4 3 4 4 0 0 1-2 7v6H7zM7 16h10" />
+      </symbol>
+      <symbol id="search" viewBox="0 0 24 24">
+        <circle cx="10.5" cy="10.5" r="6.5" />
+        <path d="m16 16 5 5" />
+      </symbol>
+      <symbol id="pin" viewBox="0 0 24 24">
+        <path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z" />
+        <circle cx="12" cy="10" r="2.5" />
+      </symbol>
+      <symbol id="calendar" viewBox="0 0 24 24">
+        <rect x="3" y="5" width="18" height="16" rx="2" />
+        <path d="M7 2v6m10-6v6M3 11h18" />
+      </symbol>
+      <symbol id="bell" viewBox="0 0 24 24">
+        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" />
+      </symbol>
+      <symbol id="star" viewBox="0 0 24 24">
+        <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2-5.5-2.9-5.5 2.9 1-6.2L3 9.6l6.2-.9z" />
+      </symbol>
+      <symbol id="arrow" viewBox="0 0 24 24">
+        <path d="M4 12h16m-6-6 6 6-6 6" />
+      </symbol>
+    </defs>
+  </svg>
+  <header class="header" id="inicio">
+    <div class="container header-inner">
+      <a class="brand" href="#inicio" aria-label="MesaSpot, inicio"><span class="brand-icon"><svg>
+            <use href="#chef" />
+          </svg></span>MesaSpot</a>
+      <button class="menu-toggle icon-button" aria-label="Abrir menú" aria-expanded="false" aria-controls="navigation">
+        <span></span><span></span><span></span>
       </button>
-      <div id="modal-content"></div>
-    </dialog>
-    <div class="toast" id="toast" role="status" hidden></div>
-  </body>
+      <nav class="navigation" id="navigation" aria-label="Navegación principal">
+        <a class="active" href="#inicio">Inicio</a><a href="pages/restaurantes.html">Restaurantes</a><button
+          data-info="promotions">Promociones</button>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-button notifications" aria-label="Notificaciones" data-info="notifications">
+          <svg>
+            <use href="#bell" />
+          </svg></button><span class="header-divider"></span><button class="login" data-account="login">Iniciar
+          sesión</button><button class="button register" data-account="register">
+          Registrarse
+        </button>
+      </div>
+    </div>
+  </header>
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="container hero-inner">
+        <div class="hero-copy">
+          <h1 id="hero-title">
+            Descubre la verdadera<br class="desktop-break" />
+            esencia de la cocina<br class="desktop-break" />
+            tradicional
+          </h1>
+          <p>
+            Descubre restaurantes y sus sabores en los mejores rincones
+            gastronómicos de Lima, Perú. Mesas exclusivas y sabores que
+            cuentan historias.
+          </p>
+        </div>
+        <form class="search-bar" id="search-form" role="search">
+          <label class="search-field keyword"><svg>
+              <use href="#search" />
+            </svg><span class="sr-only">Restaurante o tipo de cocina</span><input id="query" type="search"
+              placeholder="¿Qué te apetece comer hoy?" autocomplete="off" /></label>
+          <label class="search-field"><svg>
+              <use href="#pin" />
+            </svg><span class="sr-only">Distrito de Lima</span><select id="district">
+              <option value="">Lima, Perú</option>
+              <option value="Miraflores">Miraflores</option>
+              <option value="Barranco">Barranco</option>
+              <option value="San Isidro">San Isidro</option>
+              <option value="Surco">Surco</option>
+              <option value="Pueblo Libre">Pueblo Libre</option>
+              <option value="San Miguel">San Miguel</option>
+            </select></label>
+          <button class="search-field date-trigger" type="button" id="date-trigger">
+            <svg>
+              <use href="#calendar" />
+            </svg><span id="date-summary">Planea tu visita</span>
+          </button>
+          <button class="button explore" type="submit">Explorar ahora</button>
+        </form>
+      </div>
+    </section>
+    <section class="discovery container" id="restaurantes" aria-labelledby="categories-title">
+      <div data-aos="fade-up">
+        <h2 id="categories-title">Explorar por categorías</h2>
+        <div class="categories" id="categories" role="group" aria-label="Filtrar por categoría"></div>
+      </div>
+      <div class="section-heading">
+        <h2 id="results-title">Descubre restaurantes</h2>
+        <a class="text-link" id="show-all" href="pages/restaurantes.html">
+          Ver todos los destacados <svg>
+            <use href="#arrow" />
+          </svg>
+        </a>
+      </div>
+      <p class="sr-only" id="result-count" role="status" aria-live="polite"></p>
+      <div class="restaurant-grid" id="restaurant-grid"></div>
+      <div class="empty-state" id="empty-state" hidden>
+        <h3>No encontramos una mesa por aquí</h3>
+        <p>Prueba con otra categoría, otro nombre o un distrito diferente.</p>
+        <button class="button" id="reset-filters">
+          Ver todos los restaurantes
+        </button>
+      </div>
+      <noscript>
+        <p>
+          Activa JavaScript para ver los restaurantes y utilizar los filtros.
+        </p>
+      </noscript>
+    </section>
+  </main>
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <a class="brand" href="#inicio"><span class="brand-icon"><svg>
+                <use href="#chef" />
+              </svg></span>MesaSpot</a>
+          <p>
+            Tu plataforma de descubrimiento gastronómico en
+            Lima, Perú. Encuentra tu próxima experiencia culinaria
+            inolvidable.
+          </p>
+          <div class="socials" aria-label="Redes sociales">
+            <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook">f</a><a
+              href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">◎</a><a
+              href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer" aria-label="YouTube">▷</a>
+          </div>
+        </div>
+        <div>
+          <h3>Descubre</h3>
+          <a href="#restaurantes">Restaurantes destacados</a><button data-info="favorites">Favoritos del
+            mes</button><button data-info="experiences">Experiencias culinarias</button><button
+            data-info="promotions">Promociones activas</button>
+        </div>
+        <div>
+          <h3>Legal</h3>
+          <button data-info="terms">Términos de servicio</button><button data-info="privacy">Política de
+            privacidad</button><button data-info="cookies">Política de cookies</button><button
+            data-info="conditions">Condiciones de reserva</button>
+        </div>
+        <div>
+          <h3>Contacto</h3>
+          <button data-info="support">Soporte al cliente</button><button data-info="join">Únete como
+            restaurante</button><button data-info="faq">Preguntas frecuentes</button><button data-info="press">Prensa y
+            media</button>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 MesaSpot. Diseñado con pasión gastronómica.</p>
+        <p>Hecho en la clase :3</p>
+      </div>
+    </div>
+  </footer>
+  <dialog id="modal" aria-labelledby="modal-title">
+    <button class="modal-close icon-button" id="close-modal" aria-label="Cerrar ventana">
+      ×
+    </button>
+    <div id="modal-content"></div>
+  </dialog>
+  <div class="toast" id="toast" role="status" hidden></div>
+</body>
+
 </html>

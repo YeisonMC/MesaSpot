@@ -1,0 +1,189 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
+import { JSDOM } from 'jsdom';
+import { fileURLToPath } from 'node:url';
+const root = fileURLToPath(new URL('../', import.meta.url));
+const rid = '111111111111111111111111', bid = '222222222222222222222222', pid = '333333333333333333333333', mid = '444444444444444444444444';
+const user = role => ({ _id: '999999999999999999999999', firstName: 'Usuario', lastName: 'Prueba', email: 'demo@example.com', role });
+function fixtures() {
+  const restaurant = { _id: rid, name: 'Restaurante API', slug: 'restaurante-api', shortDescription: 'Información desde MongoDB', description: ['Descripción del restaurante'], foundedYear: 2020, cuisineTypes: ['CARNES'], status: 'PUBLISHED', featured: true, mainBranchId: bid, contact: {}, ratingSummary: { reviewCount: 3, overall: 4.67 } };
+  const branch = { _id: bid, restaurantId: rid, name: 'Sede Surco', status: 'ACTIVE', address: { street: 'Dirección de prueba', district: 'Santiago de Surco', province: 'Lima' }, contact: {}, averagePricePerPersonCents: 8500, openingHours: Array.from({ length: 7 }, (_, i) => ({ dayOfWeek: i + 1, closed: false, periods: [{ opens: '13:00', closes: '23:00' }] })), specialHours: [], services: ['FREE_WIFI'] };
+  restaurant.displayBranch = branch;
+  const photos = [{ _id: pid, restaurantId: rid, branchId: bid, type: 'DISH', title: 'Asado', url: 'https://example.com/photo.png', status: 'PUBLISHED' }];
+  const menu = [{ _id: mid, restaurantId: rid, name: 'Asado de prueba', category: 'MAIN', photoId: pid, branchOffers: [{ branchId: bid, priceCents: 6500, available: true }], status: 'ACTIVE', recommendation: { featured: true, label: 'CHEF_FAVORITE' }, allergens: [], allergenInformationConfirmed: false }];
+  const reviews = [1, 2, 3].map(i => ({ _id: String(i).repeat(24), restaurantId: rid, branchId: bid, user: { _id: 'a'.repeat(24), firstName: 'Cliente ' + i, lastName: 'Demo' }, title: 'Reseña ' + i, comment: 'Una experiencia de prueba excelente.', ratings: { overall: 5, food: 5, service: 5, ambience: 4, valueForMoney: 4 }, visitedAt: '2026-10-20T15:00:00Z', verifiedVisit: false }));
+  return { restaurant, restaurants: [restaurant], branches: [branch], photos, 'menu-items': menu, reviews, mine: [], promotions: [], requests: [], fail: false, logged: user('CLIENT') };
+}
+async function until(predicate) {
+  for (let i = 0; i < 100; i++) { if (predicate()) return; await new Promise(r => setTimeout(r, 10)); }
+  assert.fail('La interfaz no alcanzó el estado esperado');
+}
+async function open(file, { role, data = fixtures() } = {}) {
+  const html = await readFile(path.join(root, file), 'utf8');
+  const dom = new JSDOM(html, { url: 'http://127.0.0.1:5500/' + file + (file.includes('restaurante.html') ? '?id=' + rid : ''), runScripts: 'outside-only', pretendToBeVisual: true });
+  const w = dom.window;
+  const errors = [];
+  w.addEventListener('error', event => errors.push(event.error));
+  w.matchMedia = () => ({ matches: true }); w.HTMLElement.prototype.scrollIntoView = () => {};
+  w.HTMLDialogElement.prototype.showModal = function () { this.open = true; };
+  w.HTMLDialogElement.prototype.close = function () { this.open = false; this.dispatchEvent(new w.Event('close')); };
+  w.confirm = () => true; w.AbortSignal = globalThis.AbortSignal; w.AbortController = globalThis.AbortController;
+  if (role) { data.logged = user(role); w.sessionStorage.setItem('mesaspot.session', JSON.stringify({ token: 'test', user: data.logged })); }
+  w.fetch = async (url, options = {}) => {
+    if (data.fail) throw new TypeError('offline');
+    const endpoint = new URL(url); const route = endpoint.pathname.replace('/api', ''); const method = options.method || 'GET';
+    const body = options.body ? JSON.parse(options.body) : undefined; data.requests.push({ route, method, body, headers: options.headers });
+    const response = (content, status = 200, meta) => ({ ok: status < 400, status, json: async () => status < 400 ? { success: true, data: content, meta } : { success: false, message: content } });
+    const list = records => response(records, 200, { page: 1, limit: 100, total: records.length, totalPages: records.length ? 1 : 0 });
+    if (route === '/auth/login' || route === '/auth/register') {
+      if (body.password === 'incorrecta') return response('Correo o contraseña incorrectos', 401);
+      return response({ token: 'test', user: data.logged, tokenType: 'Bearer' }, route.endsWith('register') ? 201 : 200);
+    }
+    if (route === '/users/me') { if (method === 'PATCH') Object.assign(data.logged, body); return response(data.logged); }
+    if (route === '/users/me/reviews') return list(data.mine);
+    if (route === '/metadata') return response({ cuisines: ['CARNES'], services: ['FREE_WIFI'], photoTypes: ['AMBIENCE', 'DISH'], menuCategories: ['STARTER', 'MAIN'], recommendations: ['CHEF_FAVORITE', 'RECOMMENDED'] });
+    if (route === '/restaurants') return list(data.restaurants.filter(r => !endpoint.searchParams.get('q') || r.name.includes(endpoint.searchParams.get('q'))));
+    if (route === '/promotions') return list(data.promotions);
+    if (route === '/admin/restaurants' && method === 'GET') return list(data.restaurants);
+    if (route === '/admin/restaurants' && method === 'POST') { const item = { ...data.restaurant, ...body, _id: 'b'.repeat(24) }; data.restaurants.push(item); return response(item, 201); }
+    if (route === '/admin/restaurants/' + rid && method === 'PATCH') { Object.assign(data.restaurant, body); return response(data.restaurant); }
+    if (route === '/restaurants/' + rid || route.startsWith('/restaurants/slug/')) return response(data.restaurant);
+    if (route.includes('/reviews')) {
+      if (route.endsWith('/reviews') && method === 'GET') return list(data.reviews);
+      if (method === 'POST') { const item = { ...body, _id: 'e'.repeat(24), restaurantId: rid, user: data.logged }; data.mine = [item]; data.reviews.push(item); data.restaurant.ratingSummary.reviewCount++; return response(item, 201); }
+      if (method === 'PATCH') { Object.assign(data.mine[0], body); return response(data.mine[0]); }
+      if (method === 'DELETE') { data.reviews = data.reviews.filter(r => r._id !== data.mine[0]?._id); data.mine = []; return response({}); }
+      if (method === 'PUT') return response({});
+    }
+    const type = ['branches', 'photos', 'menu-items', 'promotions'].find(t => route.includes('/' + t));
+    if (type) {
+      if (method === 'GET') return list(data[type]);
+      if (method === 'PATCH') { Object.assign(data[type][0], body); return response(data[type][0]); }
+      if (method === 'POST') { const item = { ...body, _id: 'f'.repeat(24), restaurantId: rid }; data[type].push(item); return response(item, 201); }
+      if (method === 'DELETE') return response({});
+    }
+    throw new Error('Endpoint no contemplado: ' + method + ' ' + route);
+  };
+  for (const script of w.document.querySelectorAll('script[src]')) {
+    const src = script.getAttribute('src'); if (/^https?:/.test(src)) continue;
+    w.eval(await readFile(path.resolve(path.dirname(path.join(root, file)), src), 'utf8'));
+  }
+  const $ = selector => w.document.querySelector(selector);
+  const submit = selector => $(selector).dispatchEvent(new w.Event('submit', { bubbles: true, cancelable: true }));
+  return { dom, w, data, $, submit, errors };
+}
+test('inicio obtiene datos, enlaza IDs reales y evita interpretar contenido del servidor como HTML', async t => {
+  const data = fixtures(); data.restaurant.name = '<img src=x onerror=alert(1)>';
+  const page = await open('index.html', { data }); t.after(() => page.dom.window.close());
+  await until(() => page.$('.restaurant-card'));
+  assert.equal(page.$('.restaurant-card h3').textContent, data.restaurant.name);
+  assert.equal(page.$('.restaurant-card h3 img'), null);
+  assert.ok(page.$('.reserve').href.includes('?id=' + rid));
+  assert.equal(page.errors.length, 0);
+});
+test('catálogo conserva filtros, vacíos, paginación y recuperación de fallos', async t => {
+  const page = await open('pages/restaurantes.html'); t.after(() => page.dom.window.close());
+  await until(() => page.$('.restaurant-card'));
+  page.$('[name=query]').value = 'inexistente'; page.submit('#filters-form');
+  await until(() => !page.$('#empty-state').hidden);
+  assert.equal(page.$('.restaurant-card'), null);
+  page.$('#reset-filters').click(); await until(() => page.$('.restaurant-card'));
+  page.data.fail = true; page.submit('#filters-form'); await until(() => page.$('.api-state')?.textContent.includes('CORS_ORIGINS'));
+  page.data.fail = false; page.$('.api-state button').click(); await until(() => page.$('.restaurant-card'));
+});
+test('login real, errores, perfil y cierre de sesión', async t => {
+  const page = await open('index.html'); t.after(() => page.dom.window.close());
+  page.$('[data-account=login]').click();
+  page.$('[name=email]').value = 'demo@example.com'; page.$('[name=password]').value = 'incorrecta'; page.submit('#modal form');
+  await until(() => page.$('.auth-feedback').textContent.includes('incorrectos'));
+  page.$('[name=password]').value = 'Password123'; page.submit('#modal form');
+  await until(() => page.$('[data-session-action=profile]'));
+  assert.equal(page.$('#modal').open, false);
+  assert.equal(page.$('[data-account=login]').hidden, true);
+  page.$('[data-session-action=profile]').click(); await until(() => page.$('[name=firstName]'));
+  page.$('[name=firstName]').value = 'Nombre actualizado'; page.submit('#modal form');
+  await until(() => page.$('.auth-feedback').textContent === 'Perfil actualizado.');
+  assert.equal(page.data.logged.firstName, 'Nombre actualizado');
+  page.$('#modal').close(); page.$('[data-session-action=logout]').click();
+  assert.equal(page.w.MesaAPI.session, null);
+});
+test('registro separa nombres y apellidos y no envía rol ni confirmación', async t => {
+  const page = await open('index.html'); t.after(() => page.dom.window.close());
+  page.$('[data-account=register]').click();
+  for (const [name, value] of Object.entries({ firstName: 'Ana', lastName: 'Pérez', email: 'ana@example.com', password: 'Password123', confirm: 'Password123' })) page.$('[name=' + name + ']').value = value;
+  page.submit('#modal form'); await until(() => page.data.requests.some(r => r.route === '/auth/register'));
+  const body = page.data.requests.find(r => r.route === '/auth/register').body;
+  assert.deepEqual(Object.keys(body).sort(), ['email', 'firstName', 'lastName', 'password']);
+  await until(() => page.$('[data-session-action=profile]') && !page.$('#modal').open);
+});
+test('detalle muestra carta, galería, reseñas y permite publicar y editar una reseña propia', async t => {
+  const page = await open('pages/restaurante.html', { role: 'CLIENT' }); t.after(() => page.dom.window.close());
+  await until(() => page.$('.review-form'));
+  assert.equal(page.$('#restaurant-title').textContent, 'Restaurante API');
+  assert.equal(page.$('#panel-photos figure').textContent, 'Asado · Platos');
+  assert.ok(page.$('#panel-menu').textContent.includes('Asado de prueba'));
+  assert.equal(page.w.document.querySelectorAll('.review-card').length, 3);
+  assert.ok(page.$('#panel-location').textContent.includes('aún no ha sido confirmada'));
+  page.$('.review-form [name=title]').value = 'Mi reseña'; page.$('.review-form [name=comment]').value = 'Una visita excelente de prueba.'; page.$('[name=visitedAt]').value = '2026-10-20'; page.submit('.review-form');
+  await until(() => page.data.mine.length === 1 && page.$('.review-form h3')?.textContent.includes('Edita'));
+  const body = page.data.requests.find(r => r.route.endsWith('/reviews') && r.method === 'POST').body;
+  assert.equal(body.visitedAt, '2026-10-20T05:00:00.000Z');
+  assert.equal(body.userId, undefined); assert.equal(body.verifiedVisit, undefined);
+  page.$('.review-form [name=title]').value = 'Opinión actualizada'; page.submit('.review-form');
+  await until(() => page.data.mine[0].title === 'Opinión actualizada');
+  assert.equal(page.errors.length, 0);
+});
+test('administración restringe clientes y admite crear un restaurante con formulario', async t => {
+  const client = await open('pages/administracion.html', { role: 'CLIENT' }); t.after(() => client.dom.window.close());
+  await until(() => client.$('#admin-workspace').textContent.includes('disponible para administradores'));
+  assert.ok(!client.data.requests.some(r => r.route.startsWith('/admin')));
+  const page = await open('pages/administracion.html', { role: 'RESTAURANT_ADMIN' }); t.after(() => page.dom.window.close());
+  await until(() => page.$('.admin-toolbar'));
+  [...page.w.document.querySelectorAll('button')].find(b => b.textContent === 'Crear restaurante').click();
+  for (const [key, value] of Object.entries({ name: 'Nuevo restaurante', slug: 'nuevo-restaurante', shortDescription: 'Restaurante nuevo de prueba' })) page.$('[name=' + key + ']').value = value;
+  page.$('[name=cuisine]').checked = true; page.submit('#modal form');
+  await until(() => page.data.requests.some(r => r.route === '/admin/restaurants' && r.method === 'POST'));
+  const body = page.data.requests.find(r => r.route === '/admin/restaurants' && r.method === 'POST').body;
+  assert.equal(body.name, 'Nuevo restaurante'); assert.deepEqual(body.cuisineTypes, ['CARNES']);
+  await until(() => !page.$('#modal').open && page.$('.admin-toolbar') && page.$('[name=restaurant]').value === 'b'.repeat(24));
+});
+test('edición de plato convierte soles a céntimos y usa su endpoint administrativo', async t => {
+  const page = await open('pages/administracion.html', { role: 'RESTAURANT_ADMIN' }); t.after(() => page.dom.window.close());
+  await until(() => page.$('.admin-toolbar'));
+  [...page.w.document.querySelectorAll('.category')].find(b => b.textContent === 'Carta').click(); page.$('.admin-resource .text-link').click();
+  page.$('[name=price_' + bid + ']').value = '70.50'; page.submit('#modal form');
+  await until(() => page.data.requests.some(r => r.route.endsWith('/menu-items/' + mid) && r.method === 'PATCH'));
+  const body = page.data.requests.find(r => r.route.endsWith('/menu-items/' + mid) && r.method === 'PATCH').body;
+  assert.equal(body.branchOffers[0].priceCents, 7050); assert.equal(body.branchOffers[0].branchId, bid);
+  await until(() => !page.$('#modal').open && page.$('.admin-toolbar'));
+  assert.equal(page.errors.length, 0);
+});
+test('paginación del catálogo y filtro de cocina múltiple', async t => {
+  const data = fixtures(); data.restaurants = Array.from({ length: 13 }, (_, i) => ({ ...data.restaurant, _id: i.toString(16).padStart(24, '0'), name: 'Restaurante ' + i }));
+  const page = await open('pages/restaurantes.html', { data }); t.after(() => page.dom.window.close());
+  await until(() => page.$('.restaurant-card'));
+  assert.equal(page.w.document.querySelectorAll('.restaurant-card').length, 6);
+  page.$('#pagination button[aria-label="Página siguiente"]').click();
+  assert.equal(page.$('#pagination [aria-current=page]').textContent, '2');
+  page.$('#pagination button[aria-label="Página siguiente"]').click();
+  assert.equal(page.w.document.querySelectorAll('.restaurant-card').length, 1);
+  page.$('[name=cuisine][value=Carnes]').checked = true; page.submit('#filters-form');
+  await until(() => page.$('#pagination [aria-current=page]')?.textContent === '1');
+  assert.equal(page.w.document.querySelectorAll('.restaurant-card').length, 6);
+});
+test('administrador crea local y conserva los dos periodos de cada día', async t => {
+  const page = await open('pages/administracion.html', { role: 'RESTAURANT_ADMIN' }); t.after(() => page.dom.window.close());
+  await until(() => page.$('.admin-toolbar'));
+  [...page.w.document.querySelectorAll('.category')].find(b => b.textContent === 'Locales').click();
+  [...page.w.document.querySelectorAll('button')].find(b => b.textContent === 'Agregar local').click();
+  for (const [key, value] of Object.entries({ name: 'Nueva sede', street: 'Dirección de prueba', district: 'Miraflores', averagePrice: '35.50', day1: '13:00-16:30,20:00-23:00' })) page.$('[name=' + key + ']').value = value;
+  page.submit('#modal form');
+  await until(() => !page.$('#modal').open && page.$('.admin-toolbar'));
+  const body = page.data.requests.find(r => r.route.endsWith('/branches') && r.method === 'POST').body;
+  assert.equal(body.openingHours[0].periods.length, 2);
+  assert.equal(body.averagePricePerPersonCents, 3550);
+  assert.equal(body.location, null);
+});
+

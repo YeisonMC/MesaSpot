@@ -7,7 +7,7 @@
   <meta name="description"
     content="Conoce El Asador de Surco en Lima: información, servicios, horarios y precios en soles." />
   <meta name="theme-color" content="#c95830" />
-  <title>El Asador de Surco · MesaSpot</title>
+  <title>Restaurante · MesaSpot</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -16,13 +16,15 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" />
   <link rel="stylesheet" href="../styles/main.css" />
   <script defer src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
-  <script defer src="../data/restaurants.js"></script>
-  <script defer src="../data/asador.js"></script>
-  <script defer src="../js/app.js"></script>
-  <script defer src="../js/restaurant-detail.js"></script>
-  <script defer src="../js/auth.js"></script>
   <link rel="stylesheet" href="../styles/auth.css" />
   <link rel="stylesheet" href="../styles/restaurant-detail.css" />
+  <link rel="stylesheet" href="../styles/integration.css" />
+  <script defer src="../js/config.js"></script>
+  <script defer src="../js/api.js"></script>
+  <script defer src="../js/ui.js"></script>
+  <script defer src="../js/app.js"></script>
+  <script defer src="../js/auth.js"></script>
+  <script defer src="../js/restaurant-detail.js"></script>
 </head>
 
 <body class="detail-page" data-page="detail">
@@ -143,33 +145,20 @@
     <section class="detail-hero" aria-labelledby="restaurant-title">
       <div class="container detail-hero-inner">
         <div class="detail-badges">
-          <span class="tag">Tradicional</span><span class="rating"><svg aria-hidden="true">
+          <span class="tag" id="detail-cuisine"></span><span class="rating"><svg aria-hidden="true">
               <use href="#star" />
-            </svg><span id="detail-rating">4.7 (124 reseñas)</span></span>
+            </svg><span id="detail-rating">Cargando valoración…</span></span>
         </div>
-        <h1 id="restaurant-title">El Asador de Surco</h1>
+        <h1 id="restaurant-title">Cargando restaurante…</h1>
         <p class="detail-address">
           <svg aria-hidden="true">
             <use href="#pin" />
-          </svg><span id="detail-address"></span><span aria-hidden="true">·</span><span>Rango de precios: S/ 85</span>
+          </svg><span id="detail-address"></span><span aria-hidden="true">·</span><span id="detail-price"></span>
         </p>
         <p id="detail-description"></p>
         <div class="hero-features">
-          <div>
-            <svg aria-hidden="true">
-              <use href="#cutlery" />
-            </svg><span><strong>Cocina peruana</strong><small>Especialidad en asados</small></span>
-          </div>
-          <div>
-            <svg aria-hidden="true">
-              <use href="#users" />
-            </svg><span><strong>Desde 1982</strong><small>Más de 40 años</small></span>
-          </div>
-          <div>
-            <svg aria-hidden="true">
-              <use href="#heart" />
-            </svg><span><strong>Experiencia única</strong><small>Tradición y sabor</small></span>
-          </div>
+          <div><span><strong id="hero-cuisine"></strong><small>Tipos de cocina</small></span></div>
+          <div><span><strong id="hero-founded"></strong><small>Información del restaurante</small></span></div>
         </div>
       </div>
     </section>
@@ -198,13 +187,14 @@
           </svg>Ubicación
         </button>
       </div>
-      <button class="button detail-reserve" data-reserve="4">
+      <button class="button detail-reserve" id="contact-trigger">
         <svg aria-hidden="true">
           <use href="#calendar" />
-        </svg>Reservar mesa
+        </svg>Consultar contacto
       </button>
     </div>
     <div class="container detail-content">
+      <div id="detail-load-status" role="status" aria-live="polite"></div>
       <section role="tabpanel" id="panel-information" aria-labelledby="tab-information" tabindex="0">
         <div class="detail-columns">
           <div class="detail-main-column">
@@ -218,8 +208,8 @@
                 </div>
                 <div class="about-copy" id="about-copy"></div>
               </div>
-              <img src="https://images.unsplash.com/photo-1546833999-b9f581a1996d?auto=format&fit=crop&w=500&q=85"
-                alt="Carne asada con guarnición, especialidad de la casa" width="500" height="650" />
+              <img src="../assets/restaurant-placeholder.svg" alt="Carne asada con guarnición, especialidad de la casa"
+                width="500" height="650" />
             </article>
             <section class="detail-panel" data-aos="fade-up">
               <div class="panel-heading">
@@ -282,8 +272,8 @@
           </aside>
         </div>
         <p class="detail-demo-note">
-          Perfil de demostración: historia, reseñas, horarios, direcciones y
-          datos de contacto ficticios. Precio aproximado por persona en soles.
+          Información proporcionada por el restaurante. Confirma horarios, precios e ingredientes directamente con el
+          local.
         </p>
       </section>
       <section role="tabpanel" id="panel-photos" aria-labelledby="tab-photos" tabindex="0" hidden>
@@ -332,7 +322,7 @@
                 <use href="#chef" />
               </svg></span>MesaSpot</a>
           <p>
-            La plataforma líder de reservas y descubrimiento gastronómico en
+            Tu plataforma de descubrimiento gastronómico en
             Lima, Perú. Encuentra tu próxima experiencia culinaria
             inolvidable.
           </p>
