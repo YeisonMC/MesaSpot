@@ -3,23 +3,57 @@
   const { $, element, button, modal, feedback, field, pageUrl, link } = MesaUI;
   let validatedUser = false;
   let formVersion = 0;
+  // El avatar comparte el mismo fallback de iniciales en el header y en el perfil.
+  function avatar(user, className = "account-avatar") {
+    const node = element('span', className);
+    const initials = [user?.firstName?.[0], user?.lastName?.[0]].filter(Boolean).join('').toUpperCase() || 'MS';
+    node.textContent = initials;
+    const url = MesaUI.safeUrl(user?.avatarUrl);
+    if (url) {
+      const img = element('img'); img.src = url; img.alt = '';
+      img.addEventListener('error', () => node.replaceChildren(document.createTextNode(initials)), { once: true });
+      node.replaceChildren(img);
+    }
+    return node;
+  }
+  function closeAccountMenu(focus = false) {
+    const menu = $('#account-dropdown'), trigger = $('#account-trigger');
+    if (!menu || !trigger) return;
+    menu.hidden = true; trigger.setAttribute('aria-expanded', 'false');
+    if (focus) trigger.focus();
+  }
+  // Las opciones de cuenta se muestran en un desplegable compacto, accesible con teclado.
   function renderHeader() {
     document.querySelectorAll('[data-session-action]').forEach(node => node.remove());
     const user = MesaAPI.session?.user;
     document.querySelectorAll('[data-account]').forEach(node => { node.hidden = Boolean(user); });
     const actions = $('.header-actions');
     if (!user || !actions) return;
-    const profile = button(user.firstName + ' · Mi perfil', openProfile, 'login');
-    profile.prepend(MesaIcons.icon('user-round'));
-    profile.dataset.sessionAction = 'profile'; actions.append(profile);
+    const account = element('div', 'header-account'); account.dataset.sessionAction = 'account';
+    const trigger = button('', () => {
+      const menu = $('#account-dropdown'); menu.hidden = !menu.hidden;
+      trigger.setAttribute('aria-expanded', String(!menu.hidden));
+    }, 'account-trigger');
+    trigger.id = 'account-trigger'; trigger.setAttribute('aria-expanded', 'false');
+    trigger.setAttribute('aria-controls', 'account-dropdown'); trigger.setAttribute('aria-label', user.firstName + ', menú de cuenta');
+    trigger.append(avatar(user), element('span', 'account-name', user.firstName), MesaIcons.icon('chevron-down'));
+    const menu = element('div', 'account-dropdown'); menu.id = 'account-dropdown'; menu.hidden = true;
+    const profile = user.role === 'CLIENT' ? link('Mi perfil', pageUrl('perfil.html'), 'account-option') : button('Mi perfil', () => { closeAccountMenu(); openProfile(); }, 'account-option');
+    profile.prepend(MesaIcons.icon('user-round')); profile.dataset.sessionAction = 'profile';
+    const logout = button('Cerrar sesión', () => { closeAccountMenu(); MesaAPI.logout(); }, 'account-option account-logout');
+    logout.dataset.sessionAction = 'logout'; logout.prepend(MesaIcons.icon('log-out'));
+    menu.append(profile, logout); account.append(trigger, menu);
     if (user.role === 'RESTAURANT_ADMIN') {
-      const admin = link('Administrar', pageUrl('administracion.html'), 'button');
-      admin.prepend(MesaIcons.icon('layout-dashboard'));
-      admin.dataset.sessionAction = 'admin'; actions.append(admin);
+      // En móvil el acceso administrativo permanece dentro del menú de cuenta.
+      const compactAdmin = link('Administrar', pageUrl('administracion.html'), 'account-option account-admin-option');
+      compactAdmin.prepend(MesaIcons.icon('layout-dashboard')); menu.insertBefore(compactAdmin, logout);
+      const admin = link('Administrar', pageUrl('administracion.html'), 'button header-admin');
+      admin.prepend(MesaIcons.icon('layout-dashboard')); admin.dataset.sessionAction = 'admin'; actions.append(admin);
     }
-    const logout = button('Salir', () => { MesaAPI.logout(); }, 'text-link');
-    logout.dataset.sessionAction = 'logout'; actions.append(logout);
+    actions.append(account);
   }
+  document.addEventListener('click', event => { if (!event.target.closest('.header-account')) closeAccountMenu(); });
+  document.addEventListener('keydown', event => { if (event.key === 'Escape') closeAccountMenu(true); });
   function openAuth(mode = 'login') {
     const version = ++formVersion;
     const register = mode === 'register';
@@ -110,7 +144,7 @@
     if (trigger) openAuth(trigger.dataset.account);
   });
   window.addEventListener('mesa:session', renderHeader);
-  window.MesaAuth = { open: openAuth, profile: openProfile, get ready() { return ready; } };
+  window.MesaAuth = { avatar, open: openAuth, profile: openProfile, get ready() { return ready; } };
   // Se valida el token guardado antes de habilitar acciones privadas.
   const ready = (async () => {
     if (MesaAPI.session?.token) {
@@ -122,3 +156,4 @@
     return validatedUser ? MesaAPI.session?.user : null;
   })();
 })();
+

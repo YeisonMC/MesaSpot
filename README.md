@@ -155,3 +155,19 @@ Se crearon ambas ramas `develop/redisenar-resenas`. La cuenta de demostración p
 
 La suite del frontend contiene 20 pruebas. Incluye sesión y roles, publicación y edición, validación de tres criterios, palabras y fecha, conservación de datos ante errores, ordenación y carga adicional.
 
+## Perfil de cliente y menú de cuenta
+
+Rama del avance: `develop/perfil-cliente` en frontend y backend. La pantalla `pages/perfil.html` usa `js/profile.js` y `styles/profile.css`, con comentarios en español. Permite modificar nombres, apellidos y celular peruano opcional de 9 dígitos; el correo es de solo lectura. Al guardar correctamente muestra **¡Cambios guardados!** y actualiza el header y la sesión.
+
+- El header compartido muestra un avatar circular y solo el nombre. Su desplegable incluye **Mi perfil** y **Cerrar sesión**, se cierra con Escape o al pulsar fuera y respeta movimiento reducido. Si no hay avatar, usa iniciales.
+- **Mi perfil** abre la nueva página para `CLIENT`. Las cuentas administrativas conservan el editor previo y su acceso a Administrar. La pantalla de cliente está protegida por sesión y rol.
+- **Mis reseñas** consulta `/users/me/reviews` y muestra solo las opiniones del usuario, con enlaces al restaurante para editar o retirarlas. **Ayuda** contiene preguntas frecuentes. Reservas, favoritos y métodos de pago quedan deshabilitados como pendientes; no existen Inicio, Preferencias ni etiqueta Consumidor en la navegación de cuenta.
+- La foto se elige mediante un archivo JPG, PNG o WebP de hasta 5 MB. Elegirla muestra una vista previa local; Cancelar revierte los cambios y no sube el archivo.
+- Al guardar se solicita `POST /users/me/avatar/signature`, se envía la imagen directamente a Cloudinary sin el token de MesaSpot y se guarda el `avatarPublicId` mediante `PATCH /users/me`. El backend verifica la imagen antes de aceptar su URL. Las claves privadas permanecen en el backend.
+- Para probar la foto real, completa `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` y `CLOUDINARY_API_SECRET` en `.env` y en Vercel, y despliega el backend actualizado. Las variables se dejaron vacías para que el propietario las reemplace. Sin ellas se pueden guardar los datos personales, pero la foto devuelve un mensaje de configuración pendiente.
+- Los errores conservan el formulario. Si la subida fue exitosa y falla el guardado, el reintento reutiliza el recurso ya subido. No se eliminan imágenes anteriores automáticamente.
+
+No se añadió AOS a este formulario: el menú usa una animación CSS breve y las actualizaciones mantienen el foco de edición. Los iconos son Lucide. El diseño tiene variantes para móvil, laptop y escritorio.
+
+Se verificaron 26 pruebas del frontend y la suite del backend, con Cloudinary simulado y MongoDB temporal. La subida real a Cloudinary queda pendiente de configurar credenciales. No se modificaron cuentas de Atlas durante estas pruebas.
+

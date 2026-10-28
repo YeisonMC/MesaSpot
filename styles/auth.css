@@ -1,3 +1,22 @@
+/* Cuenta compartida por todas las pantallas: avatar, nombre y opciones de sesión. */
+.header-account { position: relative; }
+.account-trigger { display: flex; align-items: center; gap: 9px; padding: 4px 0 4px 4px; min-height: 44px; color: var(--ink); font-weight: 600; }
+.account-avatar { width: 38px; height: 38px; display: inline-grid; place-items: center; flex-shrink: 0; overflow: hidden; border-radius: 50%; background: #fff0e7; color: var(--accent); border: 2px solid #d3653b; font-size: 12px; }
+.account-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.account-name { font-size: 13px; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.account-trigger > .lucide { width: 16px; height: 16px; transition: transform .2s; }
+.account-trigger[aria-expanded="true"] > .lucide { transform: rotate(180deg); }
+.account-dropdown { position: absolute; top: calc(100% + 10px); right: 0; z-index: 30; width: 200px; border: 1px solid var(--line); background: white; border-radius: 12px; padding: 6px; box-shadow: 0 12px 35px #38231318; animation: account-open .18s ease-out; }
+.account-option { display: flex; gap: 10px; align-items: center; padding: 12px; width: 100%; text-align: left; font-size: 13px; font-weight: 500; border-radius: 7px; }
+.account-option:hover, .account-option:focus-visible { background: #fbf3ed; color: var(--accent); }
+.account-option .lucide { width: 17px; height: 17px; }
+.account-logout { color: var(--accent); }
+.header-admin { font-size: 12px; padding: 10px; }
+.header .account-dropdown .account-admin-option { display: none; }
+@keyframes account-open { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 520px) { .account-trigger { gap: 6px; } .account-name { max-width: 74px; font-size: 12px; } .account-avatar { width: 32px; height: 32px; } .header-admin { display: none; } .header .account-dropdown .account-admin-option { display: flex; } }
+@media (max-width: 800px) { .header .header-actions .notifications { display: none; } }
+@media (prefers-reduced-motion: reduce) { .account-dropdown { animation: none; } }
 dialog.auth-modal {
   width: min(430px, calc(100% - 32px));
   max-height: calc(100dvh - 32px);

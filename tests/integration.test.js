@@ -30,18 +30,27 @@ async function open(file, { role, data = fixtures() } = {}) {
   w.HTMLDialogElement.prototype.showModal = function () { this.open = true; };
   w.HTMLDialogElement.prototype.close = function () { this.open = false; this.dispatchEvent(new w.Event('close')); };
   w.confirm = () => true; w.AbortSignal = globalThis.AbortSignal; w.AbortController = globalThis.AbortController;
+  w.URL.createObjectURL = () => 'blob:http://127.0.0.1:5500/profile-preview'; w.URL.revokeObjectURL = () => {};
   if (role) { data.logged = user(role); w.sessionStorage.setItem('mesaspot.session', JSON.stringify({ token: 'test', user: data.logged })); }
   w.fetch = async (url, options = {}) => {
     if (data.fail) throw new TypeError('offline');
     const endpoint = new URL(url); const route = endpoint.pathname.replace('/api', ''); const method = options.method || 'GET';
-    const body = options.body ? JSON.parse(options.body) : undefined; data.requests.push({ route, method, body, headers: options.headers, query: Object.fromEntries(endpoint.searchParams) });
+    const body = options.body instanceof w.FormData ? options.body : options.body ? JSON.parse(options.body) : undefined; data.requests.push({ route, method, body, headers: options.headers, query: Object.fromEntries(endpoint.searchParams) });
     const response = (content, status = 200, meta) => ({ ok: status < 400, status, json: async () => status < 400 ? { success: true, data: content, meta } : { success: false, message: content } });
     const list = records => response(records, 200, { page: 1, limit: 100, total: records.length, totalPages: records.length ? 1 : 0 });
+    if (endpoint.hostname === 'api.cloudinary.com') {
+      if (data.failPhoto) return { ok:false, json:async()=>({error:{message:'Upload failed'}}) };
+      return { ok:true, json:async()=>({ public_id:'mesaspot/avatars/'+data.logged._id+'/test-photo' }) };
+    }
+    if (route === '/users/me/avatar/signature') {
+      if (data.noCloudinary) return response('La subida de fotos todavía no está configurada.',503);
+      return response({ uploadUrl:'https://api.cloudinary.com/v1_1/test/image/upload', apiKey:'public-test-key', signature:'signed-test', maxBytes:5*1024*1024, params:{public_id:'mesaspot/avatars/'+data.logged._id+'/test-photo',timestamp:1,overwrite:false} });
+    }
     if (route === '/auth/login' || route === '/auth/register') {
       if (body.password === 'incorrecta') return response('Correo o contraseña incorrectos', 401);
       return response({ token: 'test', user: data.logged, tokenType: 'Bearer' }, route.endsWith('register') ? 201 : 200);
     }
-    if (route === '/users/me') { if (method === 'PATCH') Object.assign(data.logged, body); return response(data.logged); }
+    if (route === '/users/me') { if (method === 'PATCH') { Object.assign(data.logged, body); if(body.avatarPublicId) data.logged.avatarUrl='https://res.cloudinary.com/test/image/upload/profile.png'; } return response(data.logged); }
     if (route === '/users/me/reviews') return list(data.mine);
     if (route === '/metadata') return response({ cuisines: ['CARNES'], services: ['FREE_WIFI'], photoTypes: ['AMBIENCE', 'DISH'], menuCategories: ['STARTER', 'MAIN'], recommendations: ['CHEF_FAVORITE', 'RECOMMENDED'] });
     if (route === '/restaurants') return list(data.restaurants.filter(r => (!endpoint.searchParams.get('q') || r.name.includes(endpoint.searchParams.get('q'))) && r.displayBranch.averagePricePerPersonCents >= Number(endpoint.searchParams.get('minPriceCents') || 0) && (endpoint.searchParams.get('maxPriceCents') === null || r.displayBranch.averagePricePerPersonCents <= Number(endpoint.searchParams.get('maxPriceCents')))));
@@ -106,11 +115,12 @@ test('login real, errores, perfil y cierre de sesión', async t => {
   await until(() => page.$('[data-session-action=profile]'));
   assert.equal(page.$('#modal').open, false);
   assert.equal(page.$('[data-account=login]').hidden, true);
-  page.$('[data-session-action=profile]').click(); await until(() => page.$('[name=firstName]'));
-  page.$('[name=firstName]').value = 'Nombre actualizado'; page.submit('#modal form');
-  await until(() => page.$('.auth-feedback').textContent === 'Perfil actualizado.');
-  assert.equal(page.data.logged.firstName, 'Nombre actualizado');
-  page.$('#modal').close(); page.$('[data-session-action=logout]').click();
+  assert.ok(page.$('[data-session-action=profile]').href.endsWith('/pages/perfil.html'));
+  page.$('#account-trigger').click();
+  assert.equal(page.$('#account-dropdown').hidden,false);
+  page.w.document.dispatchEvent(new page.w.KeyboardEvent('keydown',{key:'Escape'}));
+  assert.equal(page.$('#account-dropdown').hidden,true);
+  page.$('#account-trigger').click(); page.$('[data-session-action=logout]').click();
   assert.equal(page.w.MesaAPI.session, null);
 });
 test('registro separa nombres y apellidos y no envía rol ni confirmación', async t => {
@@ -380,6 +390,86 @@ test('Ver más reseñas agrega la siguiente página y cambiar el orden reinicia 
   await until(()=>page.w.document.querySelectorAll('.customer-review').length===3);
   assert.equal(page.$('.customer-review h3').textContent,'Otra opinión 0');
   assert.equal(page.data.requests.filter(r=>r.route.endsWith('/reviews')&&r.method==='GET').at(-1).query.sort,'lowest');
+});
+
+test('perfil guarda datos personales, normaliza celular y actualiza el header y la sesión', async t => {
+  const page=await open('pages/perfil.html',{role:'CLIENT'}); t.after(()=>page.dom.window.close());
+  await until(()=>page.$('.profile-form'));
+  assert.equal(page.$('[name=email]').readOnly,true);
+  page.$('[name=firstName]').value='Ana'; page.$('[name=lastName]').value='Pérez'; page.$('[name=phone]').value='987654321';
+  page.submit('.profile-form'); await until(()=>page.$('#modal-title')?.textContent==='¡Cambios guardados!');
+  const body=page.data.requests.find(r=>r.route==='/users/me'&&r.method==='PATCH').body;
+  assert.equal(body.phone,'+51987654321'); assert.equal(body.email,undefined);
+  assert.equal(page.$('.account-name').textContent,'Ana');
+  assert.equal(page.w.MesaAPI.session.user.lastName,'Pérez');
+  assert.equal(page.$('.profile-identity strong').textContent,'Ana Pérez');
+});
+
+test('foto se previsualiza, firma y sube sin token; se vincula al guardar el perfil', async t => {
+  const page=await open('pages/perfil.html',{role:'CLIENT'}); t.after(()=>page.dom.window.close());
+  await until(()=>page.$('.profile-form'));
+  const file=new page.w.File(['png'],'avatar.png',{type:'image/png'});
+  Object.defineProperty(page.$('#profile-photo-input'),'files',{configurable:true,value:[file]});
+  page.$('#profile-photo-input').dispatchEvent(new page.w.Event('change'));
+  assert.ok(page.$('.profile-portrait > img').src.startsWith('blob:'));
+  assert.ok(!page.data.requests.some(r=>r.route.includes('signature')));
+  page.submit('.profile-form'); await until(()=>page.$('#modal-title')?.textContent==='¡Cambios guardados!');
+  const uploaded=page.data.requests.find(r=>r.route.includes('/v1_1/'));
+  assert.equal(uploaded.headers,undefined);
+  assert.equal(uploaded.body.get('signature'),'signed-test');
+  const patch=page.data.requests.find(r=>r.route==='/users/me'&&r.method==='PATCH').body;
+  assert.ok(patch.avatarPublicId.startsWith('mesaspot/avatars/'));
+  assert.equal(patch.avatarUrl,undefined);
+  assert.ok(page.$('.account-avatar img').src.includes('res.cloudinary.com'));
+});
+
+test('perfil rechaza tamaño y formato inválidos y conserva datos si Cloudinary no está configurado', async t => {
+  const data=fixtures(); data.noCloudinary=true;
+  const page=await open('pages/perfil.html',{role:'CLIENT',data}); t.after(()=>page.dom.window.close());
+  await until(()=>page.$('.profile-form'));
+  function choose(file) { Object.defineProperty(page.$('#profile-photo-input'),'files',{configurable:true,value:[file]}); page.$('#profile-photo-input').dispatchEvent(new page.w.Event('change')); }
+  choose(new page.w.File(['<svg/>'],'avatar.svg',{type:'image/svg+xml'}));
+  assert.ok(page.$('.profile-photo-status').classList.contains('is-error'));
+  choose(new page.w.File([new Uint8Array(5*1024*1024+1)],'grande.png',{type:'image/png'}));
+  assert.ok(page.$('.profile-photo-status').textContent.includes('5 MB'));
+  choose(new page.w.File(['png'],'avatar.png',{type:'image/png'}));
+  page.$('[name=firstName]').value='Nombre sin guardar'; page.submit('.profile-form');
+  await until(()=>page.$('.profile-save-status').textContent.includes('no está configurada'));
+  assert.equal(page.$('[name=firstName]').value,'Nombre sin guardar');
+  assert.ok(!page.data.requests.some(r=>r.route==='/users/me'&&r.method==='PATCH'));
+  assert.equal(page.$('#modal').open,false);
+});
+
+test('Mis reseñas solo consulta al autor autenticado y enlaza el restaurante correcto', async t => {
+  const data=fixtures(); data.mine=[data.reviews[0]];
+  const page=await open('pages/perfil.html',{role:'CLIENT',data}); t.after(()=>page.dom.window.close());
+  await until(()=>page.$('.profile-form')); page.w.location.hash='#reviews';
+  await until(()=>page.$('.profile-review-card'));
+  assert.ok(page.$('.profile-review-card a').href.includes('?id='+rid+'#reviews'));
+  assert.ok(page.data.requests.some(r=>r.route==='/users/me/reviews'));
+  page.w.location.hash='#help'; await until(()=>page.$('.profile-help-item'));
+  assert.equal(page.w.document.querySelectorAll('.profile-help-item').length,4);
+});
+
+test('perfil privado solicita sesión y no muestra formulario a administradores', async t => {
+  const visitor=await open('pages/perfil.html'); t.after(()=>visitor.dom.window.close());
+  await until(()=>visitor.$('#profile-status').textContent.includes('Inicia sesión'));
+  assert.equal(visitor.$('.profile-form'),null);
+  const admin=await open('pages/perfil.html',{role:'RESTAURANT_ADMIN'}); t.after(()=>admin.dom.window.close());
+  await until(()=>admin.$('#profile-status').textContent.includes('cuentas de cliente'));
+  assert.equal(admin.$('.profile-form'),null);
+  assert.ok(admin.$('.account-admin-option').href.endsWith('/pages/administracion.html'));
+});
+
+test('Cancelar revierte campos y celular inválido impide guardar', async t => {
+  const page=await open('pages/perfil.html',{role:'CLIENT'}); t.after(()=>page.dom.window.close());
+  await until(()=>page.$('.profile-form'));
+  page.$('[name=firstName]').value='Cambio descartado';
+  [...page.w.document.querySelectorAll('button')].find(button=>button.textContent==='Cancelar').click();
+  assert.equal(page.$('[name=firstName]').value,'Usuario');
+  page.$('[name=phone]').value='123'; page.submit('.profile-form');
+  assert.ok(!page.data.requests.some(r=>r.route==='/users/me'&&r.method==='PATCH'));
+  assert.equal(page.errors.length,0);
 });
 
 
