@@ -124,3 +124,17 @@ Referencias:
 - [Swiper desde CDN](https://swiperjs.com/get-started#use-swiper-from-cdn)
 - [AOS en GitHub](https://github.com/michalsnik/aos)
 
+## Pestañas Platos y Ubicación
+
+`js/restaurant-tabs.js` renderiza ambos paneles con datos reales de la API; `styles/restaurant-tabs.css` define los diseños para móvil, laptop y escritorio. Se carga en la ficha genérica y en la dirección antigua de El Asador de Surco. La pestaña «Menú» ahora se llama «Platos»; se conserva `#menu` para no romper enlaces existentes.
+
+- **Platos:** promociones destacadas vigentes del local, carta filtrable por categoría y hasta tres sugerencias según `recommendation.featured` y `sortOrder`. Los precios usan PEN y céntimos recibidos de la API. Las tarjetas normales no tienen botón de detalles.
+- **Ver detalles:** solo aparece en promociones destacadas. Por ahora muestra un aviso de próxima disponibilidad; el contenido completo se implementará en otro avance.
+- **Ubicación:** Google Maps junto a dirección y contacto, con acciones para obtener indicaciones y compartir el enlace. El selector de local actualiza también la carta, la galería y la información de la ficha. Los horarios permanecen únicamente en Información.
+- **Mapa:** usa coordenadas si existen, o busca la dirección publicada como referencia. No agrega coordenadas inventadas. Los datos comerciales de esta demostración siguen siendo ficticios.
+- **Accesibilidad:** categorías y locales operables con teclado, imágenes con texto alternativo, enlaces de contacto seguros y animaciones AOS que respetan movimiento reducido.
+
+No fue necesario modificar el backend: ya expone `promotions.featured`, `items`, `pricingUnit`, `peopleCount`, recomendaciones de platos, fotos y datos de cada sede. No se modificaron registros en Atlas para este rediseño.
+
+La suite actual contiene 16 pruebas, incluyendo promociones vigentes, categorías, cambio de local, contacto, coordenadas y estados vacíos.
+

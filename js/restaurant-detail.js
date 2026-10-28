@@ -209,176 +209,21 @@
     if (!branches.length)
       state(list, "Este restaurante todavía no tiene locales publicados.");
   }
-  // Solo incrusta un mapa cuando la API proporciona coordenadas verificadas.
+  // La pestaña de ubicación comparte el local activo con toda la ficha.
   function renderMap() {
-    const panel = $("#panel-location");
-    panel.replaceChildren();
-    const box = element("section", "detail-panel");
-    box.append(
-      element("h2", "", "Ubicación"),
-      element("p", "", address(selectedBranch)),
-    );
-    const coords = selectedBranch?.location?.coordinates;
-    const mapsUrl = selectedBranch?.googleMaps?.mapsUrl;
-    if (coords?.length === 2) {
-      const iframe = element("iframe", "restaurant-map");
-      iframe.title = "Ubicación de " + restaurant.name;
-      iframe.loading = "lazy";
-      iframe.referrerPolicy = "no-referrer-when-downgrade";
-      iframe.src =
-        "https://maps.google.com/maps?q=" +
-        encodeURIComponent(coords[1] + "," + coords[0]) +
-        "&z=16&output=embed";
-      box.append(iframe);
-      box.append(
-        external(
-          "Cómo llegar en Google Maps",
-          "https://www.google.com/maps/dir/?api=1&destination=" +
-            encodeURIComponent(coords[1] + "," + coords[0]),
-        ),
-      );
-    } else if (MesaUI.safeUrl(mapsUrl))
-      box.append(external("Abrir ubicación en Google Maps", mapsUrl));
-    else
-      box.append(
-        element(
-          "p",
-          "muted",
-          "La ubicación en el mapa aún no ha sido confirmada. Consulta la dirección con el restaurante.",
-        ),
-      );
-    (selectedBranch?.arrivalOptions || []).forEach((option) =>
-      box.append(
-        element("h3", "", option.title),
-        element("p", "", option.description),
-      ),
-    );
-    panel.append(box);
+    MesaRestaurantTabs.renderLocation({ panel: $("#panel-location"), restaurant, branch: selectedBranch, branches, onBranchChange: id => {
+      selectedBranch = branches.find(branch => branch._id === id) || selectedBranch;
+      renderLocations(); practicalInfo(); renderGallery(); renderMenu();
+    } });
   }
   // La galería y el visor comparten las fotos y el local seleccionados.
   function renderGallery() {
     MesaGallery.render({ panel: $("#panel-photos"), restaurant, branch: selectedBranch, photos: photoRecords, menu: menuRecords });
   }
-  let menuCategory = "";
   let promotions = [];
-  // Filtra platos y promociones por el local activo, respetando disponibilidad.
+  // Compone promociones, categorías y sugerencias a partir de los recursos de la API.
   function renderMenu() {
-    const panel = $("#panel-menu");
-    panel.replaceChildren();
-    const offers = element("section", "detail-panel");
-    offers.append(element("h2", "", "Promociones"));
-    const promoGrid = element("div", "promo-grid");
-    promotions
-      .filter((p) => p.branchIds.includes(selectedBranch?._id))
-      .forEach((p) => {
-        const article = element("article", "menu-card");
-        article.append(
-          element("h3", "", p.title),
-          element("p", "", p.description || ""),
-          element(
-            "strong",
-            "price",
-            money(p.priceCents) + " " + label(p.pricingUnit),
-          ),
-          element("p", "", p.terms || ""),
-          element(
-            "p",
-            "muted",
-            "Días: " +
-              p.validDays.map((n) => days[n - 1]).join(", ") +
-              ". Horario: " +
-              (p.validTimeRanges.length
-                ? hours(p.validTimeRanges)
-                : "Todo el día"),
-          ),
-          element(
-            "p",
-            "muted",
-            "Hasta " +
-              new Intl.DateTimeFormat("es-PE", {
-                timeZone: "America/Lima",
-              }).format(new Date(p.endsAt)),
-          ),
-          element(
-            "p",
-            "",
-            p.availableNow
-              ? "En horario promocional"
-              : "Fuera del horario promocional",
-          ),
-        );
-        promoGrid.append(article);
-      });
-    if (!promoGrid.children.length)
-      state(promoGrid, "No hay promociones vigentes para este local.");
-    offers.append(promoGrid);
-    panel.append(offers);
-    const box = element("section", "detail-panel");
-    box.append(element("h2", "", "Carta"));
-    const filters = element("div", "categories");
-    [
-      ["", "Todo"],
-      ...["STARTER", "MAIN", "DESSERT", "DRINK", "SIDE", "OTHER"].map((c) => [
-        c,
-        label(c),
-      ]),
-    ].forEach(([code, text]) => {
-      const b = button(
-        text,
-        () => {
-          menuCategory = code;
-          renderMenu();
-        },
-        "category",
-      );
-      b.setAttribute("aria-pressed", String(menuCategory === code));
-      filters.append(b);
-    });
-    box.append(filters);
-    const grid = element("div", "menu-grid");
-    menuRecords
-      .filter(
-        (item) =>
-          (!menuCategory || item.category === menuCategory) &&
-          item.branchOffers.some(
-            (o) => o.branchId === selectedBranch?._id && o.available,
-          ),
-      )
-      .forEach((item) => {
-        const offer = item.branchOffers.find(
-          (o) => o.branchId === selectedBranch._id && o.available,
-        );
-        const article = element("article", "menu-card");
-        const photo = photoRecords.find((p) => p._id === item.photoId);
-        if (photo) article.append(image(photo.url, item.name));
-        article.append(
-          element("h3", "", item.name),
-          element("p", "", item.description || ""),
-          element("strong", "price", money(offer.priceCents)),
-        );
-        if (item.recommendation?.featured)
-          article.append(
-            element("span", "tag", label(item.recommendation.label)),
-          );
-        article.append(
-          element(
-            "p",
-            "muted",
-            item.allergenInformationConfirmed
-              ? "Alérgenos: " +
-                  (item.allergens.join(", ") || "Sin alérgenos declarados")
-              : "Consulta ingredientes y alérgenos con el restaurante.",
-          ),
-        );
-        grid.append(article);
-      });
-    if (!grid.children.length)
-      state(
-        grid,
-        "No hay platos disponibles en esta categoría para el local seleccionado.",
-      );
-    box.append(grid);
-    panel.append(box);
+    MesaRestaurantTabs.renderDishes({ panel: $("#panel-menu"), restaurant, branch: selectedBranch, photos: photoRecords, menu: menuRecords, promotions });
   }
   // El autor de una reseña se obtiene de la sesión, nunca de un campo editable.
   function reviewForm(host, ownReview) {
@@ -749,3 +594,4 @@
   );
   load();
 })();
+

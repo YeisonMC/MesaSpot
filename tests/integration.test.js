@@ -126,7 +126,8 @@ test('detalle muestra carta, galería, reseñas y permite publicar y editar una 
   assert.equal(page.$('#panel-photos .gallery-photo-button').getAttribute('aria-label'), 'Ampliar Asado');
   assert.ok(page.$('#panel-menu').textContent.includes('Asado de prueba'));
   assert.equal(page.w.document.querySelectorAll('.review-card').length, 3);
-  assert.ok(page.$('#panel-location').textContent.includes('aún no ha sido confirmada'));
+  assert.ok(page.$('#panel-location iframe').src.includes('output=embed'));
+  assert.ok(page.$('#panel-location').textContent.includes('Mapa de referencia'));
   page.$('.review-form [name=title]').value = 'Mi reseña'; page.$('.review-form [name=comment]').value = 'Una visita excelente de prueba.'; page.$('[name=visitedAt]').value = '2026-10-20'; page.submit('.review-form');
   await until(() => page.data.mine.length === 1 && page.$('.review-form h3')?.textContent.includes('Edita'));
   const body = page.data.requests.find(r => r.route.endsWith('/reviews') && r.method === 'POST').body;
@@ -265,4 +266,56 @@ test('el mosaico muestra ocho fotos y permite ver las restantes', async t => {
   assert.equal(page.w.document.querySelectorAll('.gallery-tile').length, 10);
   assert.equal(page.$('.gallery-show-more'), null);
 });
+
+test('Platos reserva los detalles a promociones destacadas vigentes y filtra la carta', async t => {
+  const data = fixtures();
+  data['menu-items'].push({ ...data['menu-items'][0], _id: '7'.repeat(24), name: 'Postre de prueba', category: 'DESSERT', recommendation: { featured: false } });
+  const promo = { _id: '8'.repeat(24), title: 'Cena para dos', description: 'Selección especial', photoId: pid, branchIds: [bid], featured: true, startsAt: '2020-01-01T00:00:00Z', endsAt: '2099-01-01T00:00:00Z', priceCents: 11900, pricingUnit: 'COUPLE', peopleCount: 2, items: [{ menuItemId: mid, quantity: 2 }] };
+  data.promotions = [promo, { ...promo, _id: 'a'.repeat(24), title: 'No destacada', featured: false }, { ...promo, title: 'Caducada', endsAt: '2020-01-02T00:00:00Z' }];
+  const page = await open('pages/restaurante.html', { data }); t.after(() => page.dom.window.close());
+  await until(() => page.$('.dish-item'));
+  assert.equal(page.$('#tab-menu').textContent.trim(), 'Platos');
+  assert.equal(page.w.document.querySelectorAll('.promo-details').length, 1);
+  assert.equal(page.$('.dish-item button'), null);
+  assert.equal(page.w.document.querySelectorAll('.suggested-dish').length, 1);
+  assert.ok(page.$('.promo-price').textContent.includes('119.00'));
+  page.$('.promo-details').click();
+  assert.equal(page.$('#toast').hidden, false);
+  assert.ok(page.$('#toast').textContent.includes('próximamente'));
+  page.$('.dish-filter[data-category=DESSERT]').click();
+  assert.equal(page.w.document.querySelectorAll('.dish-item').length, 1);
+  assert.ok(page.$('.dish-item').textContent.includes('Postre de prueba'));
+  assert.equal(page.$('.dish-filter[data-category=DESSERT]').getAttribute('aria-pressed'), 'true');
+  assert.equal(page.errors.length, 0);
+});
+
+test('Ubicación cambia local, carta y contacto conservando el orden de coordenadas', async t => {
+  const data = fixtures();
+  const secondId = '5'.repeat(24);
+  data.branches.push({ ...data.branches[0], _id: secondId, name: 'Sede Miraflores', address: { street: 'Av. de Prueba 200', district: 'Miraflores', province: 'Lima' }, location: { type: 'Point', coordinates: [-77.03, -12.12] }, contact: { phone: '+5110000001', email: 'sede@example.com' } });
+  data['menu-items'].push({ ...data['menu-items'][0], _id: '6'.repeat(24), name: 'Exclusivo Miraflores', branchOffers: [{ branchId: secondId, priceCents: 9900, available: true }] });
+  const page = await open('pages/restaurante.html', { data }); t.after(() => page.dom.window.close());
+  await until(() => page.$('.map-branch-select select'));
+  const select = page.$('.map-branch-select select'); select.value = secondId; select.dispatchEvent(new page.w.Event('change'));
+  assert.ok(decodeURIComponent(page.$('#panel-location iframe').src).includes('-12.12,-77.03'));
+  assert.equal(page.$('#panel-location a[href^="tel:"]').textContent, '+5110000001');
+  assert.ok(page.$('.location-directions').href.includes('destination=-12.12%2C-77.03'));
+  assert.equal(page.$('#panel-location #hours-list'), null);
+  assert.ok(page.$('#hours-list'));
+  assert.equal(page.w.document.querySelectorAll('.dish-item').length, 1);
+  assert.ok(page.$('.dish-item').textContent.includes('Exclusivo Miraflores'));
+  assert.equal(page.$('.location-card.selected strong').textContent, 'Sede Miraflores');
+  assert.equal(page.errors.length, 0);
+});
+
+test('platos y ubicación presentan estados vacíos sin inventar datos', async t => {
+  const data = fixtures(); data.branches = []; data['menu-items'] = []; data.photos = [];
+  const page = await open('pages/restaurante.html', { data }); t.after(() => page.dom.window.close());
+  await until(() => page.$('#panel-location .api-state'));
+  assert.equal(page.$('#panel-location iframe'), null);
+  assert.equal(page.$('.promo-details'), null);
+  assert.ok(page.$('#panel-menu').textContent.includes('No hay platos disponibles'));
+  assert.equal(page.errors.length, 0);
+});
+
 

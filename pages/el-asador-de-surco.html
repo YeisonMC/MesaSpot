@@ -28,9 +28,11 @@
   <script defer src="../js/auth.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/swiper@12.0.3/swiper-bundle.min.js"></script>
   <script defer src="../js/gallery.js"></script>
+  <script defer src="../js/restaurant-tabs.js"></script>
   <script defer src="../js/restaurant-detail.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@12.0.3/swiper-bundle.min.css" />
   <link rel="stylesheet" href="../styles/gallery.css" />
+  <link rel="stylesheet" href="../styles/restaurant-tabs.css" />
 </head>
 
 <body class="detail-page" data-page="detail">
@@ -87,7 +89,7 @@
           id="tab-photos" role="tab" aria-controls="panel-photos" aria-selected="false" tabindex="-1">
           <i data-lucide="camera" aria-hidden="true"></i>Fotos</button><button type="button" class="detail-tab"
           id="tab-menu" role="tab" aria-controls="panel-menu" aria-selected="false" tabindex="-1">
-          <i data-lucide="book-open" aria-hidden="true"></i>Menú</button><button type="button" class="detail-tab"
+          <i data-lucide="book-open" aria-hidden="true"></i>Platos</button><button type="button" class="detail-tab"
           id="tab-reviews" role="tab" aria-controls="panel-reviews" aria-selected="false" tabindex="-1">
           <i data-lucide="star" aria-hidden="true"></i>Reseñas</button><button type="button" class="detail-tab"
           id="tab-location" role="tab" aria-controls="panel-location" aria-selected="false" tabindex="-1">
@@ -178,7 +180,7 @@
       <section role="tabpanel" id="panel-menu" aria-labelledby="tab-menu" tabindex="0" hidden>
         <div class="detail-panel pending-panel">
           <span class="panel-icon"><i data-lucide="book-open" aria-hidden="true"></i></span>
-          <h2>Menú</h2>
+          <h2>Platos</h2>
           <p>Cargando información del restaurante…</p>
         </div>
       </section>
