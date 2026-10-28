@@ -51,8 +51,12 @@ async function open(file, { role, data = fixtures() } = {}) {
     if (route === '/admin/restaurants/' + rid && method === 'PATCH') { Object.assign(data.restaurant, body); return response(data.restaurant); }
     if (route === '/restaurants/' + rid || route.startsWith('/restaurants/slug/')) return response(data.restaurant);
     if (route.includes('/reviews')) {
-      if (route.endsWith('/reviews') && method === 'GET') return list(data.reviews);
-      if (method === 'POST') { const item = { ...body, _id: 'e'.repeat(24), restaurantId: rid, user: data.logged }; data.mine = [item]; data.reviews.push(item); data.restaurant.ratingSummary.reviewCount++; return response(item, 201); }
+      if (route.endsWith('/reviews') && method === 'GET') {
+        const page = Number(endpoint.searchParams.get('page') || 1), limit = Number(endpoint.searchParams.get('limit') || 3);
+        const sorted = [...data.reviews].sort((a,b) => endpoint.searchParams.get('sort') === 'highest' ? b.ratings.overall - a.ratings.overall : endpoint.searchParams.get('sort') === 'lowest' ? a.ratings.overall - b.ratings.overall : 0);
+        return response(sorted.slice((page-1)*limit,page*limit), 200, { page, limit, total:sorted.length, totalPages:Math.ceil(sorted.length/limit) });
+      }
+      if (method === 'POST') { if (data.rejectReview) return response('No se pudo publicar la reseña', 422); const item = { ...body, ratings: { ...body.ratings, overall: Math.round((body.ratings.food + body.ratings.service + body.ratings.ambience) / 3 * 100) / 100 }, _id: 'e'.repeat(24), restaurantId: rid, user: data.logged }; data.mine = [item]; data.reviews.push(item); data.restaurant.ratingSummary.reviewCount++; return response(item, 201); }
       if (method === 'PATCH') { Object.assign(data.mine[0], body); return response(data.mine[0]); }
       if (method === 'DELETE') { data.reviews = data.reviews.filter(r => r._id !== data.mine[0]?._id); data.mine = []; return response({}); }
       if (method === 'PUT') return response({});
@@ -120,7 +124,7 @@ test('registro separa nombres y apellidos y no envía rol ni confirmación', asy
 });
 test('detalle muestra carta, galería, reseñas y permite publicar y editar una reseña propia', async t => {
   const page = await open('pages/restaurante.html', { role: 'CLIENT' }); t.after(() => page.dom.window.close());
-  await until(() => page.$('.review-form'));
+  await until(() => page.$('.review-write'));
   assert.equal(page.$('#restaurant-title').textContent, 'Restaurante API');
   assert.equal(page.$('#panel-photos figure').textContent, 'Plato estrella');
   assert.equal(page.$('#panel-photos .gallery-photo-button').getAttribute('aria-label'), 'Ampliar Asado');
@@ -128,13 +132,19 @@ test('detalle muestra carta, galería, reseñas y permite publicar y editar una 
   assert.equal(page.w.document.querySelectorAll('.review-card').length, 3);
   assert.ok(page.$('#panel-location iframe').src.includes('output=embed'));
   assert.ok(page.$('#panel-location').textContent.includes('Mapa de referencia'));
-  page.$('.review-form [name=title]').value = 'Mi reseña'; page.$('.review-form [name=comment]').value = 'Una visita excelente de prueba.'; page.$('[name=visitedAt]').value = '2026-10-20'; page.submit('.review-form');
-  await until(() => page.data.mine.length === 1 && page.$('.review-form h3')?.textContent.includes('Edita'));
+  page.$('.review-write').click();
+  page.$('.review-form [name=comment]').value = 'Una visita excelente de prueba.'; page.$('[name=visitedAt]').value = '2026-10-20';
+  for (const criterion of ['food','service','ambience']) page.$('.review-form [name='+criterion+'][value="5"]').click();
+  page.submit('.review-form');
+  await until(() => page.data.mine.length === 1 && page.$('.review-write')?.textContent.includes('Editar'));
+  assert.equal(page.$('#modal-title').textContent, '¡Reseña publicada!');
   const body = page.data.requests.find(r => r.route.endsWith('/reviews') && r.method === 'POST').body;
   assert.equal(body.visitedAt, '2026-10-20T05:00:00.000Z');
   assert.equal(body.userId, undefined); assert.equal(body.verifiedVisit, undefined);
-  page.$('.review-form [name=title]').value = 'Opinión actualizada'; page.submit('.review-form');
-  await until(() => page.data.mine[0].title === 'Opinión actualizada');
+  assert.deepEqual(Object.keys(body.ratings).sort(), ['ambience','food','service']);
+  page.$('#modal').close(); page.$('.review-write').click();
+  page.$('.review-form [name=comment]').value = 'Opinión actualizada de nuestra visita.'; page.submit('.review-form');
+  await until(() => page.data.mine[0].comment === 'Opinión actualizada de nuestra visita.');
   assert.equal(page.errors.length, 0);
 });
 test('administración restringe clientes y admite crear un restaurante con formulario', async t => {
@@ -316,6 +326,60 @@ test('platos y ubicación presentan estados vacíos sin inventar datos', async t
   assert.equal(page.$('.promo-details'), null);
   assert.ok(page.$('#panel-menu').textContent.includes('No hay platos disponibles'));
   assert.equal(page.errors.length, 0);
+});
+
+test('Reseñas ofrece login al visitante y bloquea la publicación del administrador', async t => {
+  const visitor = await open('pages/restaurante.html'); t.after(() => visitor.dom.window.close());
+  await until(() => visitor.$('.review-login'));
+  assert.equal(visitor.$('.review-write'), null);
+  assert.equal(visitor.$('.review-person-name .lucide-badge-check'), null);
+  visitor.$('.review-login').click();
+  assert.equal(visitor.$('#modal-title').textContent, 'Iniciar sesión');
+  const admin = await open('pages/restaurante.html', { role:'RESTAURANT_ADMIN' }); t.after(() => admin.dom.window.close());
+  await until(() => admin.$('.review-action-card'));
+  assert.equal(admin.$('.review-write'), null);
+  assert.equal(admin.$('.review-form'), null);
+  assert.ok(admin.$('.review-action-card').textContent.includes('no pueden publicar reseñas'));
+});
+
+test('modal exige tres puntuaciones, visita válida y máximo 500 palabras antes de enviar', async t => {
+  const page = await open('pages/restaurante.html', { role:'CLIENT' }); t.after(() => page.dom.window.close());
+  await until(() => page.$('.review-write')); page.$('.review-write').click();
+  assert.equal(page.w.document.querySelectorAll('.review-rating-group').length, 3);
+  page.$('[name=comment]').value = 'Una experiencia muy agradable.'; page.$('[name=comment]').dispatchEvent(new page.w.Event('input'));
+  page.$('[name=visitedAt]').value = '2026-10-20'; page.submit('.review-form');
+  assert.ok(!page.data.requests.some(r=>r.route.endsWith('/reviews')&&r.method==='POST'));
+  for (const criterion of ['food','service','ambience']) page.$('.review-form [name='+criterion+'][value="4"]').click();
+  page.$('[name=comment]').value = 'palabra '.repeat(501); page.$('[name=comment]').dispatchEvent(new page.w.Event('input')); page.submit('.review-form');
+  assert.ok(page.$('.review-word-count').textContent.includes('501/500'));
+  assert.ok(!page.data.requests.some(r=>r.route.endsWith('/reviews')&&r.method==='POST'));
+  page.$('[name=comment]').value = 'Buen restaurante para compartir.'; page.$('[name=comment]').dispatchEvent(new page.w.Event('input'));
+  page.$('[name=visitedAt]').value = '2099-01-01'; page.submit('.review-form');
+  assert.ok(!page.data.requests.some(r=>r.route.endsWith('/reviews')&&r.method==='POST'));
+});
+
+test('un fallo de publicación conserva el comentario y no muestra una confirmación falsa', async t => {
+  const data = fixtures(); data.rejectReview = true;
+  const page = await open('pages/restaurante.html', { role:'CLIENT', data }); t.after(() => page.dom.window.close());
+  await until(() => page.$('.review-write')); page.$('.review-write').click();
+  page.$('[name=comment]').value = 'Comentario que debe mantenerse al fallar.'; page.$('[name=visitedAt]').value = '2026-10-20';
+  for (const criterion of ['food','service','ambience']) page.$('.review-form [name='+criterion+'][value="5"]').click();
+  page.submit('.review-form'); await until(()=>page.$('.review-form .auth-feedback')?.textContent.includes('No se pudo'));
+  assert.equal(page.$('#modal-title').textContent, 'Escribir una reseña');
+  assert.equal(page.$('[name=comment]').value, 'Comentario que debe mantenerse al fallar.');
+  assert.equal(page.$('.review-form button[type=submit]').disabled, false);
+});
+
+test('Ver más reseñas agrega la siguiente página y cambiar el orden reinicia el listado', async t => {
+  const data=fixtures(); data.reviews.push(...data.reviews.map((r,i)=>({...r,_id:'p'+i,title:'Otra opinión '+i,ratings:{...r.ratings,overall:i+1}})));
+  const page=await open('pages/restaurante.html',{data}); t.after(()=>page.dom.window.close());
+  await until(()=>page.w.document.querySelectorAll('.customer-review').length===3);
+  page.$('.reviews-load-more').click(); await until(()=>page.w.document.querySelectorAll('.customer-review').length===6);
+  assert.equal(page.$('.reviews-load-more').hidden,true);
+  page.$('.reviews-toolbar select').value='lowest'; page.$('.reviews-toolbar select').dispatchEvent(new page.w.Event('change'));
+  await until(()=>page.w.document.querySelectorAll('.customer-review').length===3);
+  assert.equal(page.$('.customer-review h3').textContent,'Otra opinión 0');
+  assert.equal(page.data.requests.filter(r=>r.route.endsWith('/reviews')&&r.method==='GET').at(-1).query.sort,'lowest');
 });
 
 

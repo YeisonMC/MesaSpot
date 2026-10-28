@@ -8,18 +8,13 @@
     image,
     button,
     state,
-    field,
     external,
-    feedback,
-    paginate,
   } = MesaUI;
   let restaurant,
     branches = [],
     selectedBranch,
     photoRecords = [],
     menuRecords = [],
-    reviewPage = 1,
-    reviewVersion = 0,
     initialized = false;
   const days = [
     "Lunes",
@@ -225,277 +220,16 @@
   function renderMenu() {
     MesaRestaurantTabs.renderDishes({ panel: $("#panel-menu"), restaurant, branch: selectedBranch, photos: photoRecords, menu: menuRecords, promotions });
   }
-  // El autor de una reseña se obtiene de la sesión, nunca de un campo editable.
-  function reviewForm(host, ownReview) {
-    const form = element("form", "review-form modal-form");
-    form.append(
-      element(
-        "h3",
-        "",
-        ownReview ? "Edita tu reseña" : "Cuéntanos tu experiencia",
-      ),
-    );
-    field(
-      form,
-      "branchId",
-      "Local visitado",
-      "select",
-      ownReview?.branchId || selectedBranch?._id,
-      { required: true, choices: branches.map((b) => [b._id, b.name]) },
-    );
-    field(form, "title", "Título", "text", ownReview?.title || "", {
-      required: true,
-      minlength: "3",
-      maxlength: "150",
-    });
-    field(
-      form,
-      "comment",
-      "Tu experiencia",
-      "textarea",
-      ownReview?.comment || "",
-      { required: true, minlength: "10", maxlength: "3000", rows: "4" },
-    );
-    const ratingFields = element("div", "rating-fields");
-    [
-      ["overall", "General"],
-      ["food", "Comida"],
-      ["service", "Servicio"],
-      ["ambience", "Ambiente"],
-      ["valueForMoney", "Calidad/precio"],
-    ].forEach(([key, title]) =>
-      field(
-        ratingFields,
-        key,
-        title,
-        "select",
-        ownReview?.ratings[key] || "5",
-        {
-          required: true,
-          choices: [1, 2, 3, 4, 5].map((n) => [String(n), String(n) + " / 5"]),
-        },
-      ),
-    );
-    form.append(ratingFields);
-    const today = new Intl.DateTimeFormat("en-CA", {
-      timeZone: "America/Lima",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }).format(new Date());
-    field(
-      form,
-      "visitedAt",
-      "Fecha de visita",
-      "date",
-      ownReview?.visitedAt?.slice(0, 10) || "",
-      { required: true, max: today },
-    );
-    const submit = element(
-      "button",
-      "button",
-      ownReview ? "Guardar cambios" : "Publicar reseña",
-    );
-    submit.type = "submit";
-    const status = element("p", "auth-feedback");
-    status.setAttribute("role", "status");
-    form.append(submit, status);
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      submit.disabled = true;
-      try {
-        const values = Object.fromEntries(new FormData(form));
-        const body = {
-          branchId: values.branchId,
-          title: values.title,
-          comment: values.comment,
-          ratings: Object.fromEntries(
-            ["overall", "food", "service", "ambience", "valueForMoney"].map(
-              (k) => [k, Number(values[k])],
-            ),
-          ),
-          visitedAt: new Date(
-            values.visitedAt + "T00:00:00-05:00",
-          ).toISOString(),
-        };
-        await MesaAPI.request(
-          base() + "/reviews" + (ownReview ? "/" + ownReview._id : ""),
-          { method: ownReview ? "PATCH" : "POST", body, authenticated: true },
-        );
-        await refreshRatings();
-        await renderReviews();
-      } catch (error) {
-        feedback(status, error.message, true);
-      } finally {
-        submit.disabled = false;
-      }
-    });
-    host.append(form);
-    if (ownReview)
-      host.append(
-        button(
-          "Eliminar mi reseña",
-          async (event) => {
-            if (!confirm("¿Deseas retirar tu reseña?")) return;
-            event.currentTarget.disabled = true;
-            try {
-              await MesaAPI.request(base() + "/reviews/" + ownReview._id, {
-                method: "DELETE",
-                authenticated: true,
-              });
-              await refreshRatings();
-              await renderReviews();
-            } catch (error) {
-              feedback(status, error.message, true);
-              event.currentTarget.disabled = false;
-            }
-          },
-          "text-link danger",
-        ),
-      );
+  // El módulo de reseñas administra listado, sesión, modal y confirmación de publicación.
+  async function renderReviews() {
+    await MesaReviews.render({ panel: $("#panel-reviews"), restaurant, branches, selectedBranch, onPublished: refreshRatings });
   }
   async function refreshRatings() {
     const { data } = await MesaAPI.request(base());
     restaurant.ratingSummary = data.ratingSummary;
     $("#detail-rating").textContent = data.ratingSummary.reviewCount
-      ? data.ratingSummary.overall.toFixed(1) +
-        " (" +
-        data.ratingSummary.reviewCount +
-        " reseñas)"
+      ? data.ratingSummary.overall.toFixed(1) + " (" + data.ratingSummary.reviewCount + " reseñas)"
       : "Sin reseñas todavía";
-  }
-  // Carga opiniones paginadas y habilita la edición únicamente para su autor.
-  async function renderReviews() {
-    const version = ++reviewVersion;
-    const panel = $("#panel-reviews");
-    state(panel, "Cargando reseñas…");
-    try {
-      const result = await MesaAPI.request(
-        base() +
-          "/reviews" +
-          MesaAPI.query({ page: reviewPage, limit: 5, sort: "recent" }),
-      );
-      if (version !== reviewVersion) return;
-      panel.replaceChildren();
-      const box = element("section", "detail-panel");
-      box.append(
-        element("h2", "", "Reseñas de comensales"),
-        element(
-          "p",
-          "review-summary",
-          restaurant.ratingSummary.reviewCount
-            ? restaurant.ratingSummary.overall.toFixed(1) +
-                " de 5 · " +
-                restaurant.ratingSummary.reviewCount +
-                " reseñas"
-            : "Aún no hay reseñas",
-        ),
-      );
-      if (!result.data.length)
-        box.append(
-          element(
-            "p",
-            "",
-            "Sé la primera persona en compartir su experiencia.",
-          ),
-        );
-      result.data.forEach((review) => {
-        const article = element("article", "review-card");
-        const author = element("div", "review-author");
-        author.append(
-          image(review.user?.avatarUrl, "", "avatar"),
-          element(
-            "strong",
-            "",
-            [review.user?.firstName, review.user?.lastName]
-              .filter(Boolean)
-              .join(" ") || "Cliente de MesaSpot",
-          ),
-          (() => { const rating = element('span', 'rating', String(review.ratings.overall)); rating.prepend(MesaIcons.icon('star')); return rating; })(),
-        );
-        article.append(
-          author,
-          element("h3", "", review.title),
-          element("p", "", review.comment),
-          element(
-            "p",
-            "muted",
-            "Visita: " +
-              new Intl.DateTimeFormat("es-PE", {
-                timeZone: "America/Lima",
-              }).format(new Date(review.visitedAt)),
-          ),
-          element(
-            "p",
-            "muted",
-            "Comida " +
-              review.ratings.food +
-              " · Servicio " +
-              review.ratings.service +
-              " · Ambiente " +
-              review.ratings.ambience +
-              " · Calidad/precio " +
-              review.ratings.valueForMoney,
-          ),
-        );
-        if (review.verifiedVisit)
-          article.append(element("span", "tag", "Visita verificada"));
-        if (review.adminReply) {
-          const reply = element("blockquote", "admin-reply");
-          reply.append(
-            element("strong", "", "Respuesta del restaurante"),
-            element("p", "", review.adminReply.comment),
-          );
-          article.append(reply);
-        }
-        box.append(article);
-      });
-      const pager = element("nav", "pagination");
-      paginate(pager, reviewPage, result.meta.totalPages, (value) => {
-        reviewPage = value;
-        renderReviews();
-      });
-      box.append(pager);
-      panel.append(box);
-      const action = element("section", "detail-panel");
-      panel.append(action);
-      const user = MesaAPI.session?.user;
-      if (!user)
-        action.append(
-          element("p", "", "Inicia sesión para publicar una reseña."),
-          button("Iniciar sesión", () => MesaAuth.open("login")),
-        );
-      else if (user.role === "CLIENT") {
-        const mine = await MesaAPI.all(
-          "/users/me/reviews",
-          {},
-          { authenticated: true },
-        );
-        if (version !== reviewVersion) return;
-        if (branches.length)
-          reviewForm(
-            action,
-            mine.find((r) => r.restaurantId === restaurant._id),
-          );
-        else
-          action.append(
-            element(
-              "p",
-              "",
-              "El restaurante necesita un local publicado para recibir nuevas reseñas.",
-            ),
-          );
-      } else
-        action.append(
-          element(
-            "p",
-            "",
-            "Las reseñas son publicadas por clientes. Puedes responder las de tus restaurantes desde Administrar.",
-          ),
-        );
-    } catch (error) {
-      if (version === reviewVersion) state(panel, error.message, renderReviews);
-    }
   }
   // Recupera el restaurante y sus recursos desde la API antes de mostrar la ficha.
   async function load() {
@@ -594,4 +328,5 @@
   );
   load();
 })();
+
 

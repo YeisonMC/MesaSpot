@@ -61,7 +61,8 @@ Los datos que devuelve el seed son de demostración: imágenes placeholder, dire
 - `js/app.js`: navegación, diálogo y contenido informativo.
 - `js/auth.js`: login, registro, sesión y perfil.
 - `js/restaurants.js`: inicio y catálogo.
-- `js/restaurant-detail.js`: detalle genérico y reseñas.
+- `js/restaurant-detail.js`: controlador de la ficha genérica.
+- `js/reviews.js`: listado, sesión, formulario modal y confirmación de reseñas.
 - `js/admin.js`: formularios administrativos.
 - `styles/integration.css`: estilos de los nuevos componentes y estados.
 - `assets/restaurant-placeholder.svg`: imagen local de respaldo.
@@ -137,4 +138,20 @@ Referencias:
 No fue necesario modificar el backend: ya expone `promotions.featured`, `items`, `pricingUnit`, `peopleCount`, recomendaciones de platos, fotos y datos de cada sede. No se modificaron registros en Atlas para este rediseño.
 
 La suite actual contiene 16 pruebas, incluyendo promociones vigentes, categorías, cambio de local, contacto, coordenadas y estados vacíos.
+
+## Reseñas y formulario modal
+
+`js/reviews.js` y `styles/reviews.css` implementan el resumen de valoraciones, listado con ordenación, carga de tres opiniones por página, tarjetas de sesión y políticas. Las tarjetas usan nombres e iniciales del perfil; la insignia de visita verificada solo aparece cuando la API confirma `verifiedVisit`.
+
+- Sin sesión se muestra **Iniciar sesión**. Un cliente (`CLIENT`) puede **Escribir una reseña**, o editar y retirar la suya si ya publicó una. Un administrador (`RESTAURANT_ADMIN`) recibe un mensaje explicativo y no ve el formulario.
+- El modal solicita local y fecha de visita, tres calificaciones obligatorias de 1 a 5 (comida, servicio y ambiente) y comentario de 10 a 5000 caracteres y máximo 500 palabras. El título se obtiene de las primeras palabras del comentario. No se envían autor, verificación ni puntuación general desde el navegador.
+- El contador se actualiza al escribir. No se permiten fechas futuras; el límite también se valida en el backend. Los errores conservan el texto para poder reintentar.
+- **¡Reseña publicada!** solo aparece tras una escritura exitosa. Un fallo posterior al refrescar el listado no invita a volver a publicar una reseña que ya se guardó.
+- Los controles de estrellas son radios nativos utilizables con teclado. El diseño se adapta a móvil, laptop y escritorio, con iconos Lucide y AOS respetando movimiento reducido.
+
+**Despliegue requerido:** integra y despliega primero la rama `develop/redisenar-resenas` del backend. Su validador acepta las tres calificaciones y calcula el promedio general. El backend antiguo exige cinco campos y rechazará el nuevo formulario. No se han enviado ramas a GitHub ni se ha desplegado automáticamente.
+
+Se crearon ambas ramas `develop/redisenar-resenas`. La cuenta de demostración para verificar el flujo tiene correo `resenas.prueba@example.com` y rol `CLIENT`; la contraseña se entrega por el chat y no se guarda en este repositorio. La cuenta de Atlas empieza sin reseñas; las publicaciones de comprobación se hicieron únicamente en una base local temporal.
+
+La suite del frontend contiene 20 pruebas. Incluye sesión y roles, publicación y edición, validación de tres criterios, palabras y fecha, conservación de datos ante errores, ordenación y carga adicional.
 
