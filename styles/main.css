@@ -95,12 +95,6 @@ h3,
   width: min(1280px, 89%);
   margin-inline: auto;
 }
-.svg-library {
-  position: absolute;
-  width: 0;
-  height: 0;
-  overflow: hidden;
-}
 .sr-only {
   position: absolute;
   width: 1px;
@@ -695,12 +689,6 @@ body:not(.aos-ready) [data-aos] {
     justify-content: center;
     gap: 5px;
     margin-left: auto;
-  }
-  .menu-toggle span {
-    display: block;
-    width: 21px;
-    height: 2px;
-    background: var(--ink);
   }
   .header-actions {
     gap: 12px;

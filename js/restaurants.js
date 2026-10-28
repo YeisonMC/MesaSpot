@@ -76,18 +76,10 @@
         ? [category]
         : []
       : values.getAll("cuisine").map((v) => aliases[v] || v);
-    const bounds =
-      {
-        1: [undefined, 4000],
-        2: [4001, 7500],
-        3: [7501, 10000],
-        4: [10001, undefined],
-      }[values.get("price")] || [];
     const params = {
       q: query,
       district,
-      minPriceCents: bounds[0],
-      maxPriceCents: bounds[1],
+      ...window.MesaPriceRange?.params(),
     };
     const normalize = (value) =>
       value
@@ -172,6 +164,7 @@
   $("#sort")?.addEventListener("change", load);
   $("#reset-filters").addEventListener("click", () => {
     form.reset();
+    window.MesaPriceRange?.reset();
     category = "";
     if (home)
       $("#categories")
@@ -179,24 +172,8 @@
         .forEach((node, i) =>
           node.setAttribute("aria-pressed", String(i === 0)),
         );
-    document
-      .querySelectorAll("[data-price]")
-      .forEach((node) => node.setAttribute("aria-pressed", "false"));
     load();
   });
-  document.querySelectorAll("[data-price]").forEach((b) =>
-    b.addEventListener("click", () => {
-      form.elements.price.value =
-        form.elements.price.value === b.dataset.price ? "" : b.dataset.price;
-      document
-        .querySelectorAll("[data-price]")
-        .forEach((node) =>
-          node.setAttribute(
-            "aria-pressed",
-            String(node.dataset.price === form.elements.price.value),
-          ),
-        );
-    }),
-  );
+  document.querySelectorAll('.price-range-track input[type="range"]').forEach(slider => slider.addEventListener('change', load));
   load();
 })();

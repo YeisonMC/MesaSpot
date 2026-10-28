@@ -34,7 +34,7 @@ async function open(file, { role, data = fixtures() } = {}) {
   w.fetch = async (url, options = {}) => {
     if (data.fail) throw new TypeError('offline');
     const endpoint = new URL(url); const route = endpoint.pathname.replace('/api', ''); const method = options.method || 'GET';
-    const body = options.body ? JSON.parse(options.body) : undefined; data.requests.push({ route, method, body, headers: options.headers });
+    const body = options.body ? JSON.parse(options.body) : undefined; data.requests.push({ route, method, body, headers: options.headers, query: Object.fromEntries(endpoint.searchParams) });
     const response = (content, status = 200, meta) => ({ ok: status < 400, status, json: async () => status < 400 ? { success: true, data: content, meta } : { success: false, message: content } });
     const list = records => response(records, 200, { page: 1, limit: 100, total: records.length, totalPages: records.length ? 1 : 0 });
     if (route === '/auth/login' || route === '/auth/register') {
@@ -44,7 +44,7 @@ async function open(file, { role, data = fixtures() } = {}) {
     if (route === '/users/me') { if (method === 'PATCH') Object.assign(data.logged, body); return response(data.logged); }
     if (route === '/users/me/reviews') return list(data.mine);
     if (route === '/metadata') return response({ cuisines: ['CARNES'], services: ['FREE_WIFI'], photoTypes: ['AMBIENCE', 'DISH'], menuCategories: ['STARTER', 'MAIN'], recommendations: ['CHEF_FAVORITE', 'RECOMMENDED'] });
-    if (route === '/restaurants') return list(data.restaurants.filter(r => !endpoint.searchParams.get('q') || r.name.includes(endpoint.searchParams.get('q'))));
+    if (route === '/restaurants') return list(data.restaurants.filter(r => (!endpoint.searchParams.get('q') || r.name.includes(endpoint.searchParams.get('q'))) && r.displayBranch.averagePricePerPersonCents >= Number(endpoint.searchParams.get('minPriceCents') || 0) && (endpoint.searchParams.get('maxPriceCents') === null || r.displayBranch.averagePricePerPersonCents <= Number(endpoint.searchParams.get('maxPriceCents')))));
     if (route === '/promotions') return list(data.promotions);
     if (route === '/admin/restaurants' && method === 'GET') return list(data.restaurants);
     if (route === '/admin/restaurants' && method === 'POST') { const item = { ...data.restaurant, ...body, _id: 'b'.repeat(24) }; data.restaurants.push(item); return response(item, 201); }
@@ -122,7 +122,8 @@ test('detalle muestra carta, galería, reseñas y permite publicar y editar una 
   const page = await open('pages/restaurante.html', { role: 'CLIENT' }); t.after(() => page.dom.window.close());
   await until(() => page.$('.review-form'));
   assert.equal(page.$('#restaurant-title').textContent, 'Restaurante API');
-  assert.equal(page.$('#panel-photos figure').textContent, 'Asado · Platos');
+  assert.equal(page.$('#panel-photos figure').textContent, 'Plato estrella');
+  assert.equal(page.$('#panel-photos .gallery-photo-button').getAttribute('aria-label'), 'Ampliar Asado');
   assert.ok(page.$('#panel-menu').textContent.includes('Asado de prueba'));
   assert.equal(page.w.document.querySelectorAll('.review-card').length, 3);
   assert.ok(page.$('#panel-location').textContent.includes('aún no ha sido confirmada'));
@@ -185,5 +186,83 @@ test('administrador crea local y conserva los dos periodos de cada día', async 
   assert.equal(body.openingHours[0].periods.length, 2);
   assert.equal(body.averagePricePerPersonCents, 3550);
   assert.equal(body.location, null);
+});
+
+
+test('slider consulta céntimos, impide cruzar extremos y restablece sin límite', async t => {
+  const page = await open('pages/restaurantes.html'); t.after(() => page.dom.window.close());
+  await until(() => page.$('.restaurant-card'));
+  const min = page.$('#price-min'), max = page.$('#price-max');
+  assert.equal(max.type, 'range');
+  assert.equal(page.w.MesaPriceRange.params().maxPriceCents, undefined);
+  max.value = '60'; max.dispatchEvent(new page.w.Event('input')); max.dispatchEvent(new page.w.Event('change'));
+  await until(() => !page.$('#empty-state').hidden);
+  assert.equal(page.data.requests.filter(r => r.route === '/restaurants').at(-1).query.maxPriceCents, '6000');
+  assert.ok(page.$('#price-max-label').textContent.includes('60'));
+  min.value = '90'; min.dispatchEvent(new page.w.Event('input'));
+  assert.equal(min.value, '60');
+  page.$('#reset-price').click();
+  await until(() => page.$('.restaurant-card'));
+  assert.equal(min.value, '0');
+  assert.equal(page.$('#price-max-label').textContent, 'Sin límite');
+  assert.equal(page.data.requests.filter(r => r.route === '/restaurants').at(-1).query.maxPriceCents, undefined);
+});
+
+test('Lucide renderiza iconos estáticos y tarjetas creadas por la API', async t => {
+  const page = await open('index.html'); t.after(() => page.dom.window.close());
+  await until(() => page.$('.restaurant-card'));
+  assert.equal(page.$('svg.svg-library'), null);
+  assert.equal(page.$('use'), null);
+  assert.equal(page.$('i[data-lucide]'), null);
+  assert.ok(page.$('.brand-icon svg.lucide-chef-hat'));
+  assert.ok(page.$('.restaurant-card .rating svg.lucide-star'));
+  assert.ok(page.$('.restaurant-card .card-location svg.lucide-map-pin'));
+  assert.ok(page.$('.restaurant-card a.reserve svg.lucide-arrow-right'));
+  page.$('.menu-toggle').click();
+  assert.ok(page.$('.menu-toggle svg.lucide-x'));
+  assert.equal(page.$('.menu-toggle').getAttribute('aria-expanded'), 'true');
+  assert.equal(page.errors.length, 0);
+});
+
+
+test('galería filtra por categoría y abre el visor en la foto pulsada', async t => {
+  const data = fixtures();
+  data.photos.push(
+    { _id:'5'.repeat(24), type:'AMBIENCE', title:'Salón principal', url:'https://example.com/salon.jpg', sortOrder:1 },
+    { _id:'6'.repeat(24), type:'DESSERT', title:'Postre de la casa', url:'https://example.com/postre.jpg', sortOrder:2 }
+  );
+  const page = await open('pages/restaurante.html', { data }); t.after(() => page.dom.window.close());
+  await until(() => page.$('.gallery-mosaic'));
+  assert.equal(page.w.document.querySelectorAll('.gallery-tile').length, 3);
+  assert.ok(page.$('.gallery-summary').textContent.includes('3 fotos'));
+  page.w.document.querySelectorAll('.gallery-photo-button')[1].click();
+  assert.equal(page.$('.photo-viewer').open, true);
+  assert.equal(page.$('.viewer-counter').textContent, '2 / 3');
+  assert.equal(page.$('.viewer-thumb[aria-current=true]').getAttribute('aria-label'), 'Ver foto 2: Salón principal');
+  page.$('.viewer-next').click();
+  assert.equal(page.$('.viewer-counter').textContent, '3 / 3');
+  page.$('.viewer-prev').click();
+  assert.equal(page.$('.viewer-counter').textContent, '2 / 3');
+  page.$('.viewer-close').click();
+  assert.equal(page.$('.photo-viewer'), null);
+  [...page.w.document.querySelectorAll('.gallery-filter')].find(b=>b.textContent.includes('Postres')).click();
+  assert.equal(page.w.document.querySelectorAll('.gallery-tile').length, 1);
+  page.$('.gallery-photo-button').click();
+  assert.equal(page.$('.viewer-counter').textContent, '1 / 1');
+  assert.equal(page.$('.viewer-next').disabled, true);
+  page.$('.viewer-close').click();
+  assert.equal(page.errors.length, 0);
+});
+
+test('el mosaico muestra ocho fotos y permite ver las restantes', async t => {
+  const data = fixtures();
+  data.photos = Array.from({length:10}, (_,i)=>({ _id:String(i).repeat(24), title:'Foto '+i, type:'AMBIENCE', url:'https://example.com/'+i+'.jpg', sortOrder:i }));
+  const page = await open('pages/restaurante.html', { data }); t.after(() => page.dom.window.close());
+  await until(() => page.$('.gallery-mosaic'));
+  assert.equal(page.w.document.querySelectorAll('.gallery-tile').length, 8);
+  assert.ok(page.$('.gallery-show-more').textContent.includes('10'));
+  page.$('.gallery-show-more').click();
+  assert.equal(page.w.document.querySelectorAll('.gallery-tile').length, 10);
+  assert.equal(page.$('.gallery-show-more'), null);
 });
 

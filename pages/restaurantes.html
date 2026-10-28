@@ -19,61 +19,34 @@
   <link rel="stylesheet" href="../styles/auth.css" />
   <link rel="stylesheet" href="../styles/restaurants.css" />
   <link rel="stylesheet" href="../styles/integration.css" />
+  <script defer src="../vendor/lucide-1.61.0.min.js"></script>
+  <script defer src="../js/icons.js"></script>
   <script defer src="../js/config.js"></script>
   <script defer src="../js/api.js"></script>
   <script defer src="../js/ui.js"></script>
   <script defer src="../js/app.js"></script>
   <script defer src="../js/auth.js"></script>
+  <script defer src="../js/price-range.js"></script>
   <script defer src="../js/restaurants.js"></script>
 </head>
 
 <body class="catalog-page" data-page="restaurants">
   <a class="skip-link" href="#restaurantes">Saltar a restaurantes</a>
-  <svg class="svg-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <defs>
-      <symbol id="chef" viewBox="0 0 24 24">
-        <path d="M7 14a4 4 0 0 1-2-7 4 4 0 0 1 4-3 4 4 0 0 1 6 0 4 4 0 0 1 4 3 4 4 0 0 1-2 7v6H7zM7 16h10" />
-      </symbol>
-      <symbol id="search" viewBox="0 0 24 24">
-        <circle cx="10.5" cy="10.5" r="6.5" />
-        <path d="m16 16 5 5" />
-      </symbol>
-      <symbol id="pin" viewBox="0 0 24 24">
-        <path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z" />
-        <circle cx="12" cy="10" r="2.5" />
-      </symbol>
-      <symbol id="calendar" viewBox="0 0 24 24">
-        <rect x="3" y="5" width="18" height="16" rx="2" />
-        <path d="M7 2v6m10-6v6M3 11h18" />
-      </symbol>
-      <symbol id="bell" viewBox="0 0 24 24">
-        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" />
-      </symbol>
-      <symbol id="star" viewBox="0 0 24 24">
-        <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2-5.5-2.9-5.5 2.9 1-6.2L3 9.6l6.2-.9z" />
-      </symbol>
-      <symbol id="arrow" viewBox="0 0 24 24">
-        <path d="M4 12h16m-6-6 6 6-6 6" />
-      </symbol>
-    </defs>
-  </svg>
+
   <header class="header" id="inicio">
     <div class="container header-inner">
-      <a class="brand" href="../index.html" aria-label="MesaSpot, inicio"><span class="brand-icon"><svg>
-            <use href="#chef" />
-          </svg></span>MesaSpot</a>
-      <button class="menu-toggle icon-button" aria-label="Abrir menú" aria-expanded="false" aria-controls="navigation">
-        <span></span><span></span><span></span>
-      </button>
+      <a class="brand" href="../index.html" aria-label="MesaSpot, inicio"><span class="brand-icon"><i
+            data-lucide="chef-hat" aria-hidden="true"></i></span>MesaSpot</a>
+      <button class="menu-toggle icon-button" aria-label="Abrir menú" aria-expanded="false"
+        aria-controls="navigation"><i data-lucide="menu" aria-hidden="true"></i></button>
       <nav class="navigation" id="navigation" aria-label="Navegación principal">
         <a href="../index.html">Inicio</a><a class="active" aria-current="page"
           href="restaurantes.html">Restaurantes</a><button data-info="promotions">Promociones</button>
       </nav>
       <div class="header-actions">
         <button class="icon-button notifications" aria-label="Notificaciones" data-info="notifications">
-          <svg>
-            <use href="#bell" />
-          </svg></button><span class="header-divider"></span><button class="login" data-account="login">Iniciar
+          <i data-lucide="bell" aria-hidden="true"></i></button><span class="header-divider"></span><button
+          class="login" data-account="login">Iniciar
           sesión</button><button class="button register" data-account="register">
           Registrarse
         </button>
@@ -87,18 +60,14 @@
         <div class="filter-field">
           <label for="filter-query">Buscar por nombre</label>
           <div class="filter-input">
-            <svg aria-hidden="true">
-              <use href="#search" />
-            </svg><input type="search" id="filter-query" name="query" placeholder="Ej. La Trattoria…"
-              autocomplete="off" />
+            <i data-lucide="search" aria-hidden="true"></i><input type="search" id="filter-query" name="query"
+              placeholder="Ej. La Trattoria…" autocomplete="off" />
           </div>
         </div>
         <div class="filter-field">
           <label for="filter-district">Ubicación</label>
           <div class="filter-input">
-            <svg aria-hidden="true">
-              <use href="#pin" />
-            </svg><select id="filter-district" name="district">
+            <i data-lucide="map-pin" aria-hidden="true"></i><select id="filter-district" name="district">
               <option value="">Lima, Perú</option>
               <option>Miraflores</option>
               <option>Barranco</option>
@@ -121,20 +90,21 @@
                 type="checkbox" name="cuisine" value="Desayunos" />Desayunos</label>
           </div>
         </fieldset>
-        <fieldset class="filter-group">
-          <legend>Rango de Precios</legend>
-          <input type="hidden" name="price" value="" />
-          <div class="price-options">
-            <button type="button" data-price="1" aria-pressed="false">
-              ≤ S/ 40</button><button type="button" data-price="2" aria-pressed="false">
-              S/ 41–75</button><button type="button" data-price="3" aria-pressed="false">
-              S/ 76–100</button><button type="button" data-price="4" aria-pressed="false">
-              > S/ 100
-            </button>
+        <fieldset class="filter-group price-filter">
+          <legend>Rango de precios</legend>
+          <div class="price-range-heading"><span>Por persona</span><button type="button" class="text-link"
+              id="reset-price"><i data-lucide="rotate-ccw" aria-hidden="true"></i>Restablecer</button></div>
+          <div class="price-range-values">
+            <div><span>Mínimo</span><output id="price-min-label" for="price-min">S/ 0</output></div>
+            <div><span>Máximo</span><output id="price-max-label" for="price-max">Sin límite</output></div>
           </div>
-          <p class="price-hint">
-            Precio aproximado por persona. Selecciona un rango para filtrar.
-          </p>
+          <div class="price-range-track"><span class="price-range-fill" aria-hidden="true"></span><label class="sr-only"
+              for="price-min">Precio mínimo por persona</label><input id="price-min" name="priceMin" type="range"
+              min="0" max="300" step="1" value="0" aria-describedby="price-hint"><label class="sr-only"
+              for="price-max">Precio máximo por persona</label><input id="price-max" name="priceMax" type="range"
+              min="0" max="300" step="1" value="300" aria-describedby="price-hint"></div>
+          <p class="price-hint" id="price-hint">Desliza para elegir el rango en soles. Lleva el máximo al extremo
+            derecho para buscar sin límite.</p>
         </fieldset>
         <button class="button filters-submit" type="submit">
           Buscar ahora
@@ -172,18 +142,19 @@
     <div class="container">
       <div class="footer-grid">
         <div class="footer-about">
-          <a class="brand" href="../index.html"><span class="brand-icon"><svg>
-                <use href="#chef" />
-              </svg></span>MesaSpot</a>
+          <a class="brand" href="../index.html"><span class="brand-icon"><i data-lucide="chef-hat"
+                aria-hidden="true"></i></span>MesaSpot</a>
           <p>
             Tu plataforma de descubrimiento gastronómico en
             Lima, Perú. Encuentra tu próxima experiencia culinaria
             inolvidable.
           </p>
           <div class="socials" aria-label="Redes sociales">
-            <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook">f</a><a
-              href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">◎</a><a
-              href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer" aria-label="YouTube">▷</a>
+            <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i
+                data-lucide="external-link" aria-hidden="true"></i></a><a href="https://www.instagram.com/"
+              target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i data-lucide="camera"
+                aria-hidden="true"></i></a><a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer"
+              aria-label="YouTube"><i data-lucide="circle-play" aria-hidden="true"></i></a>
           </div>
         </div>
         <div>
@@ -212,9 +183,8 @@
     </div>
   </footer>
   <dialog id="modal" aria-labelledby="modal-title">
-    <button class="modal-close icon-button" id="close-modal" aria-label="Cerrar ventana">
-      ×
-    </button>
+    <button class="modal-close icon-button" id="close-modal" aria-label="Cerrar ventana"><i data-lucide="x"
+        aria-hidden="true"></i></button>
     <div id="modal-content"></div>
   </dialog>
   <div class="toast" id="toast" role="status" hidden></div>

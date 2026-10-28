@@ -10,9 +10,11 @@
     const actions = $('.header-actions');
     if (!user || !actions) return;
     const profile = button(user.firstName + ' · Mi perfil', openProfile, 'login');
+    profile.prepend(MesaIcons.icon('user-round'));
     profile.dataset.sessionAction = 'profile'; actions.append(profile);
     if (user.role === 'RESTAURANT_ADMIN') {
       const admin = link('Administrar', pageUrl('administracion.html'), 'button');
+      admin.prepend(MesaIcons.icon('layout-dashboard'));
       admin.dataset.sessionAction = 'admin'; actions.append(admin);
     }
     const logout = button('Salir', () => { MesaAPI.logout(); }, 'text-link');
@@ -33,6 +35,7 @@
     form.append(button('Mostrar contraseña', event => {
       password.type = password.type === 'password' ? 'text' : 'password';
       event.currentTarget.textContent = password.type === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña';
+      event.currentTarget.prepend(MesaIcons.icon(password.type === 'password' ? 'eye' : 'eye-off'));
     }, 'auth-link'));
     let confirm, remember;
     if (register) {

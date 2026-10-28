@@ -83,25 +83,6 @@
   height: 18px;
   accent-color: var(--accent);
 }
-.price-options {
-  clear: both;
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-}
-.price-options button {
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  min-height: 38px;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 5px 2px;
-}
-.price-options button[aria-pressed="true"] {
-  color: var(--accent);
-  background: var(--soft);
-  border-color: var(--accent);
-}
 .price-hint {
   font-size: 11px;
   line-height: 1.5;
@@ -249,9 +230,6 @@
     flex-direction: column;
     gap: 14px;
   }
-  .price-options {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 @media (max-width: 560px) {
   .catalog-layout {
@@ -268,9 +246,6 @@
   }
   .filter-options label {
     font-size: 13px;
-  }
-  .price-options {
-    grid-template-columns: repeat(4, 1fr);
   }
   .results-toolbar {
     gap: 16px;

@@ -51,6 +51,7 @@
       )
       .join(", ");
   const base = () => "/restaurants/" + restaurant._id;
+  // Cambia las pestañas y conserva la navegación accesible mediante teclado.
   function selectTab(name, focus = false) {
     document.querySelectorAll('[role="tab"]').forEach((tab) => {
       const selected = tab.id === "tab-" + name;
@@ -83,6 +84,7 @@
       }
     });
   });
+  // Actualiza dirección, servicios, horarios y contacto al elegir una sede.
   function practicalInfo() {
     const branch = selectedBranch;
     $("#detail-address").textContent = address(branch);
@@ -90,24 +92,26 @@
       money(branch?.averagePricePerPersonCents) + " aprox. por persona";
     const services = $("#services-list");
     services.replaceChildren();
-    (branch?.services || []).forEach((code) =>
-      services.append(element("li", "", label(code))),
-    );
+    (branch?.services || []).forEach(code => {
+      const symbols = { TERRACE: "umbrella", FREE_WIFI: "wifi", WHEELCHAIR_ACCESS: "accessibility", VEGETARIAN_OPTIONS: "leaf", CARD_PAYMENT: "credit-card", DELIVERY: "bike", TAKEAWAY: "shopping-bag" };
+      const item = element("li", "", label(code)); item.prepend(MesaIcons.icon(symbols[code] || "check")); services.append(item);
+    });
     if (!services.children.length)
       services.append(element("li", "", "Servicios por confirmar"));
     const dl = $("#hours-list");
     dl.replaceChildren();
-    (branch?.openingHours || [])
-      .slice()
-      .sort((a, b) => a.dayOfWeek - b.dayOfWeek)
-      .forEach((day) => {
-        const row = element("div");
-        row.append(
-          element("dt", "", days[day.dayOfWeek - 1]),
-          element("dd", "", day.closed ? "Cerrado" : hours(day.periods)),
-        );
-        dl.append(row);
-      });
+    // Agrupa días consecutivos con el mismo horario, sin perder los turnos partidos.
+    const weeklyGroups = [];
+    (branch?.openingHours || []).slice().sort((a,b) => a.dayOfWeek - b.dayOfWeek).forEach(day => {
+      const text = day.closed ? "Cerrado" : hours(day.periods);
+      const previous = weeklyGroups.at(-1);
+      if (previous && previous.last + 1 === day.dayOfWeek && previous.text === text) previous.last = day.dayOfWeek;
+      else weeklyGroups.push({ first: day.dayOfWeek, last: day.dayOfWeek, text });
+    });
+    weeklyGroups.forEach(group => {
+      const title = group.first === group.last ? days[group.first-1] : days[group.first-1] + " a " + days[group.last-1];
+      const row = element("div"); row.append(element("dt", "", title), element("dd", "", group.text)); dl.append(row);
+    });
     (branch?.specialHours || []).forEach((day) => {
       const row = element("div");
       row.append(
@@ -167,6 +171,7 @@
     });
     renderMap();
   }
+  // Cada local mantiene sus propios horarios, precios y datos de contacto.
   function renderLocations() {
     const list = $("#locations-list");
     list.replaceChildren();
@@ -197,12 +202,14 @@
         ),
         element("span", "", address(branch)),
       );
+      b.prepend(MesaIcons.icon("map-pin"));
       b.append(text);
       list.append(b);
     });
     if (!branches.length)
       state(list, "Este restaurante todavía no tiene locales publicados.");
   }
+  // Solo incrusta un mapa cuando la API proporciona coordenadas verificadas.
   function renderMap() {
     const panel = $("#panel-location");
     panel.replaceChildren();
@@ -248,65 +255,13 @@
     );
     panel.append(box);
   }
-  let galleryType = "";
+  // La galería y el visor comparten las fotos y el local seleccionados.
   function renderGallery() {
-    const panel = $("#panel-photos");
-    panel.replaceChildren();
-    const box = element("section", "detail-panel");
-    box.append(element("h2", "", "Galería del restaurante"));
-    const filters = element("div", "categories");
-    const records = photoRecords.filter(
-      (p) => !p.branchId || p.branchId === selectedBranch?._id,
-    );
-    [
-      ["", "Todas"],
-      ...["AMBIENCE", "DISH", "DESSERT", "DRINK", "TERRACE", "OTHER"].map(
-        (code) => [code, label(code)],
-      ),
-    ].forEach(([code, text]) => {
-      const b = button(
-        text +
-          " (" +
-          records.filter((p) => !code || p.type === code).length +
-          ")",
-        () => {
-          galleryType = code;
-          renderGallery();
-        },
-        "category",
-      );
-      b.setAttribute("aria-pressed", String(galleryType === code));
-      filters.append(b);
-    });
-    const grid = element("div", "photo-grid");
-    records
-      .filter((p) => !galleryType || p.type === galleryType)
-      .forEach((photo) => {
-        const figure = element("figure");
-        const open = button(
-          "",
-          () => {
-            const content = MesaUI.modal(photo.title, "wide-modal");
-            content.append(
-              image(photo.url, photo.altText || photo.title, "lightbox-image"),
-            );
-          },
-          "photo-open",
-        );
-        open.setAttribute("aria-label", "Ampliar " + photo.title);
-        open.append(image(photo.url, photo.altText || photo.title));
-        figure.append(
-          open,
-          element("figcaption", "", photo.title + " · " + label(photo.type)),
-        );
-        grid.append(figure);
-      });
-    if (!grid.children.length) state(grid, "No hay fotos en esta categoría.");
-    box.append(filters, grid);
-    panel.append(box);
+    MesaGallery.render({ panel: $("#panel-photos"), restaurant, branch: selectedBranch, photos: photoRecords, menu: menuRecords });
   }
   let menuCategory = "";
   let promotions = [];
+  // Filtra platos y promociones por el local activo, respetando disponibilidad.
   function renderMenu() {
     const panel = $("#panel-menu");
     panel.replaceChildren();
@@ -425,6 +380,7 @@
     box.append(grid);
     panel.append(box);
   }
+  // El autor de una reseña se obtiene de la sesión, nunca de un campo editable.
   function reviewForm(host, ownReview) {
     const form = element("form", "review-form modal-form");
     form.append(
@@ -563,6 +519,7 @@
         " reseñas)"
       : "Sin reseñas todavía";
   }
+  // Carga opiniones paginadas y habilita la edición únicamente para su autor.
   async function renderReviews() {
     const version = ++reviewVersion;
     const panel = $("#panel-reviews");
@@ -609,7 +566,7 @@
               .filter(Boolean)
               .join(" ") || "Cliente de MesaSpot",
           ),
-          element("span", "rating", "★ " + review.ratings.overall),
+          (() => { const rating = element('span', 'rating', String(review.ratings.overall)); rating.prepend(MesaIcons.icon('star')); return rating; })(),
         );
         article.append(
           author,
@@ -695,6 +652,7 @@
       if (version === reviewVersion) state(panel, error.message, renderReviews);
     }
   }
+  // Recupera el restaurante y sus recursos desde la API antes de mostrar la ficha.
   async function load() {
     const status = $("#detail-load-status");
     state(status, "Cargando restaurante…");
@@ -745,7 +703,7 @@
         MesaAPI.all(base() + "/promotions"),
       ]);
       if (results[0].status === "rejected") throw results[0].reason;
-      branches = results[0].value;
+      branches = results[0].value.sort((a, b) => Number(b._id === restaurant.mainBranchId) - Number(a._id === restaurant.mainBranchId) || a.name.localeCompare(b.name, 'es'));
       photoRecords = results[1].value || [];
       menuRecords = results[2].value || [];
       promotions = results[3].value || [];

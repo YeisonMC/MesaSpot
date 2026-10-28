@@ -4,8 +4,10 @@
   $('.menu-toggle')?.addEventListener('click', event => {
     const open = $('.header').classList.toggle('menu-open');
     event.currentTarget.setAttribute('aria-expanded', String(open));
+    event.currentTarget.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+    event.currentTarget.replaceChildren(MesaIcons.icon(open ? 'x' : 'menu'));
   });
-  $('.navigation')?.addEventListener('click', () => { $('.header').classList.remove('menu-open'); $('.menu-toggle')?.setAttribute('aria-expanded', 'false'); });
+  $('.navigation')?.addEventListener('click', () => { $('.header').classList.remove('menu-open'); const toggle = $('.menu-toggle'); toggle?.setAttribute('aria-expanded', 'false'); toggle?.setAttribute('aria-label', 'Abrir menú'); toggle?.replaceChildren(MesaIcons.icon('menu')); });
   const dialog = $('#modal');
   $('#close-modal')?.addEventListener('click', () => dialog.close());
   dialog?.addEventListener('close', () => { document.body.style.overflow = ''; });

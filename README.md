@@ -81,7 +81,7 @@ npm test
 
 No se necesitan paquetes para servir la página. jsdom se usa únicamente como herramienta de pruebas.
 
-Se verificaron nueve escenarios: catálogo seguro, filtros/errores/reintento, login/perfil/logout, registro, detalle y reseñas, acceso administrativo, precios de platos, paginación y horarios de locales. Se usa una API controlada y no se escriben datos en Atlas.
+Se verificaron once escenarios: catálogo seguro, filtros/errores/reintento, login/perfil/logout, registro, detalle y reseñas, acceso administrativo, precios de platos, paginación y horarios de locales. Se usa una API controlada y no se escriben datos en Atlas.
 
 También se verificó en navegador la API publicada: catálogo, detalle, carta, promociones, reseñas y acceso del administrador de demostración. Los formularios de escritura se probaron con datos aislados.
 
@@ -90,4 +90,37 @@ También se verificó en navegador la API publicada: catálogo, detalle, carta, 
 Publica la carpeta como sitio estático. El frontend no necesita variables secretas ni un proceso de build. Ajusta js/config.js si cambia el backend y autoriza el dominio definitivo en CORS_ORIGINS del backend. No publiques node_modules.
 
 No se ha desplegado esta versión del frontend ni se han enviado cambios a un repositorio remoto automáticamente.
+
+
+## Tarjetas, precios e iconos
+
+Las tarjetas comparten un diseño flexible, con etiquetas que pueden ocupar varias líneas y una acción de ancho completo. El filtro de precios utiliza dos controles nativos de rango (mínimo y máximo), compatibles con teclado. Los valores se muestran en soles y se convierten a céntimos al consultar la API. El extremo derecho del máximo significa «Sin límite». Se actualiza el texto al deslizar y se consulta al terminar el movimiento; Restablecer elimina los límites.
+
+Los iconos utilizan Lucide 1.61.0, fijado en package.json. Se incluye una copia local de producción en vendor/lucide-1.61.0.min.js y su licencia ISC en vendor/lucide-LICENSE.txt, por lo que no depende de un CDN. js/icons.js inicializa los iconos estáticos y proporciona la fábrica para tarjetas, paginación, reseñas, sesión y otros componentes dinámicos. Los SVG de iconos se generan mediante Lucide; la ilustración SVG de respaldo de fotografías permanece como imagen.
+
+Las pruebas adicionales verifican los límites de precio, su conversión, el restablecimiento y la generación de iconos.
+
+## Ficha completa y galería con Swiper
+
+La ficha de El Asador de Surco se completó como demostración: descripción en tres párrafos, tres sedes, horarios con dos turnos, servicios, capacidad, contacto de muestra, carta descriptiva y diez fotografías referenciales. Las cuentas y las tres reseñas originales se conservan. Los datos se guardan en la API; no son una sustitución local del catálogo.
+
+La galería sigue la composición de referencia: cabecera y filtros, resumen lateral y un mosaico con tres fotos grandes y cinco secundarias. «Ver las 10 fotos» amplía el mosaico. El resumen utiliza «Plato destacado», porque el backend todavía no mide visualizaciones.
+
+Al pulsar una foto:
+- Se abre un diálogo a pantalla completa desde esa misma imagen.
+- Swiper 12.0.3 se carga mediante CDN, con flechas, teclado y gestos táctiles.
+- El visor incluye contador, título, descripción y una tira de miniaturas sincronizadas.
+- Escape y el botón de cierre restauran el foco y el desplazamiento de la página.
+- Si falla el CDN, continúa disponible una navegación básica con flechas y miniaturas.
+- Las animaciones respetan la preferencia de movimiento reducido.
+
+Nuevos archivos: `js/gallery.js` y `styles/gallery.css`. La lógica de la ficha se encuentra en `js/restaurant-detail.js`, con comentarios de los bloques en español. AOS 2.3.4 se conserva y se actualiza al cambiar pestañas o categorías.
+
+Las fotos proceden de Unsplash y son referenciales; las sedes, el teléfono de muestra y los dominios `.example` no representan contactos comerciales verificados. No se añadieron reseñas ficticias para imitar las cantidades de la referencia.
+
+Se verificaron 13 pruebas automáticas y el visor real en navegador. La actualización de los datos se ejecutó con `scripts/complete-demo-profile.js` del backend; creó un respaldo previo en `mesaspot-profile-backups` del área de trabajo. No vuelvas a ejecutar ese script sobre contenido ya personalizado: actualiza directamente desde Administrar.
+
+Referencias:
+- [Swiper desde CDN](https://swiperjs.com/get-started#use-swiper-from-cdn)
+- [AOS en GitHub](https://github.com/michalsnik/aos)
 
