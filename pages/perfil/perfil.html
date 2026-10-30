@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,7 +8,9 @@
   <title>Mi perfil · MesaSpot</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="../../styles/main.css" />
   <link rel="stylesheet" href="../../styles/auth.css" />
   <link rel="stylesheet" href="../../styles/integration.css" />
@@ -18,22 +21,23 @@
   <script defer src="../../js/api.js"></script>
   <script defer src="../../js/ui.js"></script>
   <script defer src="../../js/navbar.js"></script>
-<script defer src="../../js/app.js"></script>
+  <script defer src="../../js/app.js"></script>
   <script defer src="../../js/auth.js"></script>
   <script defer src="../../js/profile.js"></script>
   <link rel="stylesheet" href="../../styles/navbar.css" />
 </head>
+
 <body class="profile-page" data-page="profile">
-<a class="skip-link" href="#profile-main">Saltar a mi perfil</a>
-<header class="header" id="inicio">
+  <a class="skip-link" href="#profile-main">Saltar a mi perfil</a>
+  <header class="header" id="inicio">
     <div class="container header-inner">
       <a class="brand" href="../../index.html" aria-label="MesaSpot, inicio"><span class="brand-icon"><i
             data-lucide="chef-hat" aria-hidden="true"></i></span>MesaSpot</a>
       <button class="menu-toggle icon-button" aria-label="Abrir menú" aria-expanded="false"
         aria-controls="navigation"><i data-lucide="menu" aria-hidden="true"></i></button>
       <nav class="navigation" id="navigation" aria-label="Navegación principal">
-        <a href="../../index.html">Inicio</a><a
-          href="../restaurantes/restaurantes.html">Restaurantes</a><button data-info="promotions">Promociones</button>
+        <a href="../../index.html">Inicio</a><a href="../restaurantes/restaurantes.html">Restaurantes</a><button
+          data-info="promotions">Promociones</button>
       </nav>
       <div class="header-actions">
         <button class="icon-button notifications" aria-label="Notificaciones" data-info="notifications">
@@ -45,26 +49,32 @@
       </div>
     </div>
   </header>
-<main id="profile-main" class="container profile-main" tabindex="-1">
-  <div id="profile-status" role="status" aria-live="polite"></div>
-  <div class="profile-shell" id="profile-shell" hidden>
-    <aside class="profile-sidebar" aria-label="Mi cuenta">
-      <div id="profile-identity" class="profile-identity"></div>
-      <nav class="profile-nav" aria-label="Opciones de mi cuenta">
-        <button type="button" disabled title="Próximamente"><i data-lucide="calendar-days" aria-hidden="true"></i>Mis reservas<span>Pronto</span></button>
-        <button type="button" disabled title="Próximamente"><i data-lucide="heart" aria-hidden="true"></i>Favoritos<span>Pronto</span></button>
-        <a href="#reviews" data-profile-view="reviews"><i data-lucide="message-square" aria-hidden="true"></i>Mis reseñas</a>
-        <span class="profile-nav-divider" aria-hidden="true"></span>
-        <a href="#profile" data-profile-view="profile"><i data-lucide="user-round" aria-hidden="true"></i>Mi perfil</a>
-        <button type="button" disabled title="Próximamente"><i data-lucide="credit-card" aria-hidden="true"></i>Métodos de pago<span>Pronto</span></button>
-        <a href="#help" data-profile-view="help"><i data-lucide="circle-help" aria-hidden="true"></i>Ayuda</a>
-      </nav>
-      <button type="button" id="profile-logout" class="profile-logout"><i data-lucide="log-out" aria-hidden="true"></i>Cerrar sesión</button>
-    </aside>
-    <section class="profile-content" id="profile-content" aria-live="polite"></section>
-  </div>
-</main>
-<footer class="footer">
+  <main id="profile-main" class="container profile-main" tabindex="-1">
+    <div id="profile-status" role="status" aria-live="polite"></div>
+    <div class="profile-shell" id="profile-shell" hidden>
+      <aside class="profile-sidebar" aria-label="Mi cuenta">
+        <div id="profile-identity" class="profile-identity"></div>
+        <nav class="profile-nav" aria-label="Opciones de mi cuenta">
+          <button type="button" disabled title="Próximamente"><i data-lucide="calendar-days" aria-hidden="true"></i>Mis
+            reservas<span>Pronto</span></button>
+          <button type="button" disabled title="Próximamente"><i data-lucide="heart"
+              aria-hidden="true"></i>Favoritos<span>Pronto</span></button>
+          <a href="#reviews" data-profile-view="reviews"><i data-lucide="message-square" aria-hidden="true"></i>Mis
+            reseñas</a>
+          <span class="profile-nav-divider" aria-hidden="true"></span>
+          <a href="#profile" data-profile-view="profile"><i data-lucide="user-round" aria-hidden="true"></i>Mi
+            perfil</a>
+          <button type="button" disabled title="Próximamente"><i data-lucide="credit-card"
+              aria-hidden="true"></i>Métodos de pago<span>Pronto</span></button>
+          <a href="#help" data-profile-view="help"><i data-lucide="circle-help" aria-hidden="true"></i>Ayuda</a>
+        </nav>
+        <button type="button" id="profile-logout" class="profile-logout"><i data-lucide="log-out"
+            aria-hidden="true"></i>Cerrar sesión</button>
+      </aside>
+      <section class="profile-content" id="profile-content" aria-live="polite"></section>
+    </div>
+  </main>
+  <footer class="footer">
     <div class="container">
       <div class="footer-grid">
         <div class="footer-about">
@@ -108,10 +118,12 @@
       </div>
     </div>
   </footer>
-<dialog id="modal" aria-labelledby="modal-title">
-  <button class="modal-close icon-button" id="close-modal" aria-label="Cerrar ventana"><i data-lucide="x" aria-hidden="true"></i></button>
-  <div id="modal-content"></div>
-</dialog>
-<div class="toast" id="toast" role="status" hidden></div>
+  <dialog id="modal" aria-labelledby="modal-title">
+    <button class="modal-close icon-button" id="close-modal" aria-label="Cerrar ventana"><i data-lucide="x"
+        aria-hidden="true"></i></button>
+    <div id="modal-content"></div>
+  </dialog>
+  <div class="toast" id="toast" role="status" hidden></div>
 </body>
+
 </html>

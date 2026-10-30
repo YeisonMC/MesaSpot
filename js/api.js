@@ -108,7 +108,8 @@
     logout: () => saveSession(null),
     // Conserva el tipo de sesión al actualizar los datos del perfil y del avatar.
     updateUser(user) {
-      if (session?.token) saveSession({ ...session, user }, Boolean(localStorage.getItem(key)));
+      if (session?.token)
+        saveSession({ ...session, user }, Boolean(localStorage.getItem(key)));
     },
     async refreshUser() {
       if (!session?.token) return null;
