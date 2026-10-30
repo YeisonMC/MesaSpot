@@ -6,22 +6,22 @@ Este documento describe el producto, las decisiones técnicas y los criterios de
 
 ## 2. Datos del proyecto
 
-| Dato | Definición |
-| --- | --- |
-| Startup | MesaSpot |
-| Ámbito | Restaurantes de Lima Metropolitana, Perú |
-| Producto | Plataforma web para descubrir y promocionar restaurantes y consultar su oferta gastronómica |
-| Diseño de referencia | Figma de MesaSpot; enlace pendiente de reemplazar por el responsable |
-| Herramienta de asistencia | Codex, con revisión y ajustes de cada integrante |
-| Frontend | HTML5, CSS3 y JavaScript, sin framework de interfaz ni compilación |
-| Bibliotecas de interfaz | Lucide, AOS y Swiper donde corresponde |
-| Backend | API REST independiente con Node.js, Express y MongoDB mediante Mongoose |
-| Moneda y contexto horario | Sol peruano (`PEN`, `S/`) y `America/Lima` |
-| Repositorio del frontend | https://github.com/YeisonMC/MesaSpot |
-| Repositorio del backend | https://github.com/YeisonMC/mesaspot-backend |
-| API configurada | `https://mesaspot-backend.vercel.app/api` |
+| Dato                      | Definición                                                                                  |
+| ------------------------- | ------------------------------------------------------------------------------------------- |
+| Startup                   | MesaSpot                                                                                    |
+| Ámbito                    | Restaurantes de Lima Metropolitana, Perú                                                    |
+| Producto                  | Plataforma web para descubrir y promocionar restaurantes y consultar su oferta gastronómica |
+| Diseño de referencia      | Figma de MesaSpot; enlace pendiente de reemplazar por el responsable                        |
+| Herramienta de asistencia | Codex, con revisión y ajustes de cada integrante                                            |
+| Frontend                  | HTML5, CSS3 y JavaScript, sin framework de interfaz ni compilación                          |
+| Bibliotecas de interfaz   | Lucide, AOS y Swiper donde corresponde                                                      |
+| Backend                   | API REST independiente con Node.js, Express y MongoDB mediante Mongoose                     |
+| Moneda y contexto horario | Sol peruano (`PEN`, `S/`) y `America/Lima`                                                  |
+| Repositorio del frontend  | https://github.com/YeisonMC/MesaSpot                                                        |
+| Repositorio del backend   | https://github.com/YeisonMC/mesaspot-backend                                                |
+| API configurada           | `https://mesaspot-backend.vercel.app/api`                                                   |
 
-**URL de Figma para completar:** `REEMPLAZAR_POR_URL_DEL_FIGMA_DE_MESASPOT`.
+**URL de Figma para completar:** `https://www.figma.com/design/Ad7zEWWuaAWZCpZUgw57rP/MesaSpot?node-id=0-1&t=7a8a0b05KmnobKxR-1`.
 
 Este marcador no corresponde a un archivo consultado. Al sustituirlo, se podrán registrar los frames de escritorio y móvil de cada pantalla sin inventar enlaces ni identificadores.
 
@@ -39,18 +39,18 @@ Los nombres de roles anteriores son los códigos del sistema; los textos de la i
 
 ### 3.2. Funcionalidades disponibles
 
-| Área | Comportamiento implementado |
-| --- | --- |
-| Inicio | Presentación de MesaSpot, búsqueda, categorías y tarjetas obtenidas de la API. |
-| Restaurantes | Filtros por nombre, distrito, tipo de comida y precio; ordenación y paginación. |
-| Información | Descripción, servicios, locales, horarios, contactos y resumen del restaurante. |
-| Fotos | Galería por categorías y local, mosaico y visor ampliado con navegación y miniaturas. |
-| Platos | Carta por categorías, precios, disponibilidad, sugerencias y promociones destacadas. |
-| Reseñas | Resumen de puntuaciones, listado, ordenación y formulario modal para comida, servicio, ambiente y comentario. |
-| Ubicación | Google Maps y datos de dirección y contacto del local seleccionado. |
-| Acceso | Registro e inicio de sesión conectados al backend mediante formularios modales. |
-| Perfil | Edición de datos del cliente, avatar, reseñas propias y ayuda sencilla. |
-| Administración | Gestión de restaurantes, locales, fotografías, platos y promociones, y respuesta a reseñas. |
+| Área           | Comportamiento implementado                                                                                   |
+| -------------- | ------------------------------------------------------------------------------------------------------------- |
+| Inicio         | Presentación de MesaSpot, búsqueda, categorías y tarjetas obtenidas de la API.                                |
+| Restaurantes   | Filtros por nombre, distrito, tipo de comida y precio; ordenación y paginación.                               |
+| Información    | Descripción, servicios, locales, horarios, contactos y resumen del restaurante.                               |
+| Fotos          | Galería por categorías y local, mosaico y visor ampliado con navegación y miniaturas.                         |
+| Platos         | Carta por categorías, precios, disponibilidad, sugerencias y promociones destacadas.                          |
+| Reseñas        | Resumen de puntuaciones, listado, ordenación y formulario modal para comida, servicio, ambiente y comentario. |
+| Ubicación      | Google Maps y datos de dirección y contacto del local seleccionado.                                           |
+| Acceso         | Registro e inicio de sesión conectados al backend mediante formularios modales.                               |
+| Perfil         | Edición de datos del cliente, avatar, reseñas propias y ayuda sencilla.                                       |
+| Administración | Gestión de restaurantes, locales, fotografías, platos y promociones, y respuesta a reseñas.                   |
 
 El filtro **Tipo de comida** incluye Criolla, Chifa, Pollería, Makis, Mariscos, Carnes, Desayunos y Cafeterías. La selección de varios tipos funciona como OR y se combina con los demás filtros.
 
@@ -98,18 +98,18 @@ El frontend se sirve mediante HTTP, por ejemplo con Live Server, o como sitio es
 
 **Reutilizar los tokens ya definidos en `:root` de `styles/main.css`.** Para componentes nuevos, usar `var(...)` en lugar de crear una paleta paralela o repetir los valores hexadecimales. No redefinir los mismos tokens en cada hoja específica.
 
-| Variable existente | Valor | Uso |
-| --- | --- | --- |
-| `--accent` | `#c95830` | Acento y acciones principales. |
-| `--accent-dark` | `#aa4321` | Variante oscura del acento. |
-| `--ink` | `#2c2825` | Texto principal. |
-| `--muted` | `#918983` | Texto secundario; revisar contraste según tamaño y fondo. |
-| `--paper` | `#faf8f5` | Fondo general. |
-| `--line` | `#ece6e1` | Bordes y separadores. |
-| `--soft` | `#fdf1eb` | Superficies suaves de énfasis. |
-| `--radius` | `17px` | Radio compartido. |
-| `--body` | `"DM Sans", sans-serif` | Texto y controles. |
-| `--heading` | `"Outfit", sans-serif` | Encabezados e identidad de marca. |
+| Variable existente | Valor                   | Uso                                                       |
+| ------------------ | ----------------------- | --------------------------------------------------------- |
+| `--accent`         | `#c95830`               | Acento y acciones principales.                            |
+| `--accent-dark`    | `#aa4321`               | Variante oscura del acento.                               |
+| `--ink`            | `#2c2825`               | Texto principal.                                          |
+| `--muted`          | `#918983`               | Texto secundario; revisar contraste según tamaño y fondo. |
+| `--paper`          | `#faf8f5`               | Fondo general.                                            |
+| `--line`           | `#ece6e1`               | Bordes y separadores.                                     |
+| `--soft`           | `#fdf1eb`               | Superficies suaves de énfasis.                            |
+| `--radius`         | `17px`                  | Radio compartido.                                         |
+| `--body`           | `"DM Sans", sans-serif` | Texto y controles.                                        |
+| `--heading`        | `"Outfit", sans-serif`  | Encabezados e identidad de marca.                         |
 
 DM Sans y Outfit se cargan actualmente mediante Google Fonts. La cabecera principal de la ficha tiene una excepción existente: `Georgia, serif`, definida en `styles/restaurant-detail.css`. No extender esa excepción a otras pantallas ni sustituir las fuentes compartidas sin revisar su impacto.
 
@@ -231,12 +231,12 @@ Al cerrar un avance, es útil registrar el alcance, los archivos afectados, las 
 
 ### Ramas
 
-| Rama | Uso |
-| --- | --- |
-| `main` | Versión estable del frontend y documentación del proyecto. |
-| `develop` | Integración del trabajo del equipo. |
-| `feature/nombre-del-cambio` | Desarrollo de una funcionalidad a partir de `develop`. |
-| `test` | Validación del frontend y mantenimiento de las herramientas de pruebas. |
+| Rama                        | Uso                                                                     |
+| --------------------------- | ----------------------------------------------------------------------- |
+| `main`                      | Versión estable del frontend y documentación del proyecto.              |
+| `develop`                   | Integración del trabajo del equipo.                                     |
+| `feature/nombre-del-cambio` | Desarrollo de una funcionalidad a partir de `develop`.                  |
+| `test`                      | Validación del frontend y mantenimiento de las herramientas de pruebas. |
 
 El flujo de integración es **`feature/...` → `develop` → `main`**. Para validar, incorporar los avances de `develop` en `test`. No mezclar toda la rama `test` hacia `develop` o `main`, porque introduciría los archivos de pruebas y dependencias en las ramas de publicación.
 
