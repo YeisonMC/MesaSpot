@@ -4,7 +4,12 @@
   const dialog = $('#modal');
   $('#close-modal')?.addEventListener('click', () => dialog.close());
   dialog?.addEventListener('close', () => { document.body.style.overflow = ''; });
+  // Solo Registrarse exige cierre explícito con la X; los demás modales se conservan.
+  dialog?.addEventListener('cancel', event => {
+    if (dialog.classList.contains('register-modal')) event.preventDefault();
+  });
   dialog?.addEventListener('click', event => {
+    if (dialog.classList.contains('register-modal')) return;
     const r = dialog.getBoundingClientRect();
     if (event.target === dialog && (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom)) dialog.close();
   });
