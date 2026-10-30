@@ -29,6 +29,7 @@
   <script defer src="../../js/auth.js"></script>
   <script defer src="../../js/price-range.js"></script>
   <script defer src="../../js/restaurants.js"></script>
+  <script defer src="../../js/restaurants-mobile.js"></script>
   <link rel="stylesheet" href="../../styles/navbar.css" />
 </head>
 
@@ -56,10 +57,14 @@
     </div>
   </header>
   <main class="container catalog-layout" id="restaurantes">
-    <aside class="filters-panel" aria-labelledby="filters-title" data-aos="fade-up">
-      <h2 id="filters-title">Filtros de Búsqueda</h2>
+    <aside class="filters-panel" id="filters-panel" aria-labelledby="filters-title" data-aos="fade-up">
+      <div class="filters-panel__header">
+        <h2 id="filters-title">Filtros de Búsqueda</h2>
+        <button class="filters-close" id="close-filters" type="button" aria-label="Cerrar filtros"><i
+            data-lucide="x" aria-hidden="true"></i></button>
+      </div>
       <form id="filters-form" role="search">
-        <div class="filter-field">
+        <div class="filter-field filter-field--query">
           <label for="filter-query">Buscar por nombre</label>
           <div class="filter-input">
             <i data-lucide="search" aria-hidden="true"></i><input type="search" id="filter-query" name="query"
@@ -109,13 +114,25 @@
           <p class="price-hint" id="price-hint">Desliza para elegir el rango en soles. Lleva el máximo al extremo
             derecho para buscar sin límite.</p>
         </fieldset>
-        <button class="button filters-submit" type="submit">
-          Buscar ahora
-        </button>
+        <div class="filters-actions">
+          <button class="button filters-submit" type="submit">
+            <span class="filters-submit__desktop">Buscar ahora</span>
+            <span class="filters-submit__mobile">Filtrar</span>
+          </button>
+          <button class="filters-clear" id="clear-filters" type="button"><i data-lucide="trash-2"
+              aria-hidden="true"></i>Limpiar todo</button>
+        </div>
       </form>
     </aside>
     <section class="catalog-results" aria-labelledby="results-title">
+      <form class="mobile-search" id="mobile-search-form" role="search">
+        <label class="sr-only" for="mobile-query">Buscar restaurantes por nombre</label>
+        <i data-lucide="search" aria-hidden="true"></i>
+        <input type="search" id="mobile-query" name="mobile-query" placeholder="Buscar restaurantes" autocomplete="off" />
+      </form>
       <div class="results-toolbar">
+        <button class="mobile-filter-button" id="open-filters" type="button" aria-controls="filters-panel"
+          aria-expanded="false"><i data-lucide="sliders-horizontal" aria-hidden="true"></i>Filtrar</button>
         <div class="results-title-group">
           <h1 id="results-title" tabindex="-1">Resultados de búsqueda</h1>
           <p id="result-count" role="status" aria-live="polite"></p>
