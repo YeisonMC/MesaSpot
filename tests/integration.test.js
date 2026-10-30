@@ -2,6 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
+import { existsSync } from 'node:fs';
 import { JSDOM } from 'jsdom';
 import { fileURLToPath } from 'node:url';
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -35,7 +36,7 @@ async function open(file, { role, data = fixtures() } = {}) {
   w.fetch = async (url, options = {}) => {
     if (data.fail) throw new TypeError('offline');
     const endpoint = new URL(url); const route = endpoint.pathname.replace('/api', ''); const method = options.method || 'GET';
-    const body = options.body instanceof w.FormData ? options.body : options.body ? JSON.parse(options.body) : undefined; data.requests.push({ route, method, body, headers: options.headers, query: Object.fromEntries(endpoint.searchParams) });
+    const body = options.body instanceof w.FormData ? options.body : options.body ? JSON.parse(options.body) : undefined; data.requests.push({ route, method, body, headers: options.headers, cache: options.cache, query: Object.fromEntries(endpoint.searchParams) });
     const response = (content, status = 200, meta) => ({ ok: status < 400, status, json: async () => status < 400 ? { success: true, data: content, meta } : { success: false, message: content } });
     const list = records => response(records, 200, { page: 1, limit: 100, total: records.length, totalPages: records.length ? 1 : 0 });
     if (endpoint.hostname === 'api.cloudinary.com') {
@@ -97,7 +98,7 @@ test('inicio obtiene datos, enlaza IDs reales y evita interpretar contenido del 
   assert.equal(page.errors.length, 0);
 });
 test('catálogo conserva filtros, vacíos, paginación y recuperación de fallos', async t => {
-  const page = await open('pages/restaurantes.html'); t.after(() => page.dom.window.close());
+  const page = await open('pages/restaurantes/restaurantes.html'); t.after(() => page.dom.window.close());
   await until(() => page.$('.restaurant-card'));
   page.$('[name=query]').value = 'inexistente'; page.submit('#filters-form');
   await until(() => !page.$('#empty-state').hidden);
@@ -115,7 +116,7 @@ test('login real, errores, perfil y cierre de sesión', async t => {
   await until(() => page.$('[data-session-action=profile]'));
   assert.equal(page.$('#modal').open, false);
   assert.equal(page.$('[data-account=login]').hidden, true);
-  assert.ok(page.$('[data-session-action=profile]').href.endsWith('/pages/perfil.html'));
+  assert.ok(page.$('[data-session-action=profile]').href.endsWith('/pages/perfil/perfil.html'));
   page.$('#account-trigger').click();
   assert.equal(page.$('#account-dropdown').hidden,false);
   page.w.document.dispatchEvent(new page.w.KeyboardEvent('keydown',{key:'Escape'}));
@@ -133,7 +134,7 @@ test('registro separa nombres y apellidos y no envía rol ni confirmación', asy
   await until(() => page.$('[data-session-action=profile]') && !page.$('#modal').open);
 });
 test('detalle muestra carta, galería, reseñas y permite publicar y editar una reseña propia', async t => {
-  const page = await open('pages/restaurante.html', { role: 'CLIENT' }); t.after(() => page.dom.window.close());
+  const page = await open('pages/restaurantes/restaurante.html', { role: 'CLIENT' }); t.after(() => page.dom.window.close());
   await until(() => page.$('.review-write'));
   assert.equal(page.$('#restaurant-title').textContent, 'Restaurante API');
   assert.equal(page.$('#panel-photos figure').textContent, 'Plato estrella');
@@ -158,10 +159,10 @@ test('detalle muestra carta, galería, reseñas y permite publicar y editar una 
   assert.equal(page.errors.length, 0);
 });
 test('administración restringe clientes y admite crear un restaurante con formulario', async t => {
-  const client = await open('pages/administracion.html', { role: 'CLIENT' }); t.after(() => client.dom.window.close());
+  const client = await open('pages/administracion/administracion.html', { role: 'CLIENT' }); t.after(() => client.dom.window.close());
   await until(() => client.$('#admin-workspace').textContent.includes('disponible para administradores'));
   assert.ok(!client.data.requests.some(r => r.route.startsWith('/admin')));
-  const page = await open('pages/administracion.html', { role: 'RESTAURANT_ADMIN' }); t.after(() => page.dom.window.close());
+  const page = await open('pages/administracion/administracion.html', { role: 'RESTAURANT_ADMIN' }); t.after(() => page.dom.window.close());
   await until(() => page.$('.admin-toolbar'));
   [...page.w.document.querySelectorAll('button')].find(b => b.textContent === 'Crear restaurante').click();
   for (const [key, value] of Object.entries({ name: 'Nuevo restaurante', slug: 'nuevo-restaurante', shortDescription: 'Restaurante nuevo de prueba' })) page.$('[name=' + key + ']').value = value;
@@ -172,7 +173,7 @@ test('administración restringe clientes y admite crear un restaurante con formu
   await until(() => !page.$('#modal').open && page.$('.admin-toolbar') && page.$('[name=restaurant]').value === 'b'.repeat(24));
 });
 test('edición de plato convierte soles a céntimos y usa su endpoint administrativo', async t => {
-  const page = await open('pages/administracion.html', { role: 'RESTAURANT_ADMIN' }); t.after(() => page.dom.window.close());
+  const page = await open('pages/administracion/administracion.html', { role: 'RESTAURANT_ADMIN' }); t.after(() => page.dom.window.close());
   await until(() => page.$('.admin-toolbar'));
   [...page.w.document.querySelectorAll('.category')].find(b => b.textContent === 'Carta').click(); page.$('.admin-resource .text-link').click();
   page.$('[name=price_' + bid + ']').value = '70.50'; page.submit('#modal form');
@@ -184,7 +185,7 @@ test('edición de plato convierte soles a céntimos y usa su endpoint administra
 });
 test('paginación del catálogo y filtro de cocina múltiple', async t => {
   const data = fixtures(); data.restaurants = Array.from({ length: 13 }, (_, i) => ({ ...data.restaurant, _id: i.toString(16).padStart(24, '0'), name: 'Restaurante ' + i }));
-  const page = await open('pages/restaurantes.html', { data }); t.after(() => page.dom.window.close());
+  const page = await open('pages/restaurantes/restaurantes.html', { data }); t.after(() => page.dom.window.close());
   await until(() => page.$('.restaurant-card'));
   assert.equal(page.w.document.querySelectorAll('.restaurant-card').length, 6);
   page.$('#pagination button[aria-label="Página siguiente"]').click();
@@ -196,7 +197,7 @@ test('paginación del catálogo y filtro de cocina múltiple', async t => {
   assert.equal(page.w.document.querySelectorAll('.restaurant-card').length, 6);
 });
 test('administrador crea local y conserva los dos periodos de cada día', async t => {
-  const page = await open('pages/administracion.html', { role: 'RESTAURANT_ADMIN' }); t.after(() => page.dom.window.close());
+  const page = await open('pages/administracion/administracion.html', { role: 'RESTAURANT_ADMIN' }); t.after(() => page.dom.window.close());
   await until(() => page.$('.admin-toolbar'));
   [...page.w.document.querySelectorAll('.category')].find(b => b.textContent === 'Locales').click();
   [...page.w.document.querySelectorAll('button')].find(b => b.textContent === 'Agregar local').click();
@@ -211,7 +212,7 @@ test('administrador crea local y conserva los dos periodos de cada día', async 
 
 
 test('slider consulta céntimos, impide cruzar extremos y restablece sin límite', async t => {
-  const page = await open('pages/restaurantes.html'); t.after(() => page.dom.window.close());
+  const page = await open('pages/restaurantes/restaurantes.html'); t.after(() => page.dom.window.close());
   await until(() => page.$('.restaurant-card'));
   const min = page.$('#price-min'), max = page.$('#price-max');
   assert.equal(max.type, 'range');
@@ -252,7 +253,7 @@ test('galería filtra por categoría y abre el visor en la foto pulsada', async 
     { _id:'5'.repeat(24), type:'AMBIENCE', title:'Salón principal', url:'https://example.com/salon.jpg', sortOrder:1 },
     { _id:'6'.repeat(24), type:'DESSERT', title:'Postre de la casa', url:'https://example.com/postre.jpg', sortOrder:2 }
   );
-  const page = await open('pages/restaurante.html', { data }); t.after(() => page.dom.window.close());
+  const page = await open('pages/restaurantes/restaurante.html', { data }); t.after(() => page.dom.window.close());
   await until(() => page.$('.gallery-mosaic'));
   assert.equal(page.w.document.querySelectorAll('.gallery-tile').length, 3);
   assert.ok(page.$('.gallery-summary').textContent.includes('3 fotos'));
@@ -278,7 +279,7 @@ test('galería filtra por categoría y abre el visor en la foto pulsada', async 
 test('el mosaico muestra ocho fotos y permite ver las restantes', async t => {
   const data = fixtures();
   data.photos = Array.from({length:10}, (_,i)=>({ _id:String(i).repeat(24), title:'Foto '+i, type:'AMBIENCE', url:'https://example.com/'+i+'.jpg', sortOrder:i }));
-  const page = await open('pages/restaurante.html', { data }); t.after(() => page.dom.window.close());
+  const page = await open('pages/restaurantes/restaurante.html', { data }); t.after(() => page.dom.window.close());
   await until(() => page.$('.gallery-mosaic'));
   assert.equal(page.w.document.querySelectorAll('.gallery-tile').length, 8);
   assert.ok(page.$('.gallery-show-more').textContent.includes('10'));
@@ -292,7 +293,7 @@ test('Platos reserva los detalles a promociones destacadas vigentes y filtra la 
   data['menu-items'].push({ ...data['menu-items'][0], _id: '7'.repeat(24), name: 'Postre de prueba', category: 'DESSERT', recommendation: { featured: false } });
   const promo = { _id: '8'.repeat(24), title: 'Cena para dos', description: 'Selección especial', photoId: pid, branchIds: [bid], featured: true, startsAt: '2020-01-01T00:00:00Z', endsAt: '2099-01-01T00:00:00Z', priceCents: 11900, pricingUnit: 'COUPLE', peopleCount: 2, items: [{ menuItemId: mid, quantity: 2 }] };
   data.promotions = [promo, { ...promo, _id: 'a'.repeat(24), title: 'No destacada', featured: false }, { ...promo, title: 'Caducada', endsAt: '2020-01-02T00:00:00Z' }];
-  const page = await open('pages/restaurante.html', { data }); t.after(() => page.dom.window.close());
+  const page = await open('pages/restaurantes/restaurante.html', { data }); t.after(() => page.dom.window.close());
   await until(() => page.$('.dish-item'));
   assert.equal(page.$('#tab-menu').textContent.trim(), 'Platos');
   assert.equal(page.w.document.querySelectorAll('.promo-details').length, 1);
@@ -314,7 +315,7 @@ test('Ubicación cambia local, carta y contacto conservando el orden de coordena
   const secondId = '5'.repeat(24);
   data.branches.push({ ...data.branches[0], _id: secondId, name: 'Sede Miraflores', address: { street: 'Av. de Prueba 200', district: 'Miraflores', province: 'Lima' }, location: { type: 'Point', coordinates: [-77.03, -12.12] }, contact: { phone: '+5110000001', email: 'sede@example.com' } });
   data['menu-items'].push({ ...data['menu-items'][0], _id: '6'.repeat(24), name: 'Exclusivo Miraflores', branchOffers: [{ branchId: secondId, priceCents: 9900, available: true }] });
-  const page = await open('pages/restaurante.html', { data }); t.after(() => page.dom.window.close());
+  const page = await open('pages/restaurantes/restaurante.html', { data }); t.after(() => page.dom.window.close());
   await until(() => page.$('.map-branch-select select'));
   const select = page.$('.map-branch-select select'); select.value = secondId; select.dispatchEvent(new page.w.Event('change'));
   assert.ok(decodeURIComponent(page.$('#panel-location iframe').src).includes('-12.12,-77.03'));
@@ -330,7 +331,7 @@ test('Ubicación cambia local, carta y contacto conservando el orden de coordena
 
 test('platos y ubicación presentan estados vacíos sin inventar datos', async t => {
   const data = fixtures(); data.branches = []; data['menu-items'] = []; data.photos = [];
-  const page = await open('pages/restaurante.html', { data }); t.after(() => page.dom.window.close());
+  const page = await open('pages/restaurantes/restaurante.html', { data }); t.after(() => page.dom.window.close());
   await until(() => page.$('#panel-location .api-state'));
   assert.equal(page.$('#panel-location iframe'), null);
   assert.equal(page.$('.promo-details'), null);
@@ -339,13 +340,13 @@ test('platos y ubicación presentan estados vacíos sin inventar datos', async t
 });
 
 test('Reseñas ofrece login al visitante y bloquea la publicación del administrador', async t => {
-  const visitor = await open('pages/restaurante.html'); t.after(() => visitor.dom.window.close());
+  const visitor = await open('pages/restaurantes/restaurante.html'); t.after(() => visitor.dom.window.close());
   await until(() => visitor.$('.review-login'));
   assert.equal(visitor.$('.review-write'), null);
   assert.equal(visitor.$('.review-person-name .lucide-badge-check'), null);
   visitor.$('.review-login').click();
   assert.equal(visitor.$('#modal-title').textContent, 'Iniciar sesión');
-  const admin = await open('pages/restaurante.html', { role:'RESTAURANT_ADMIN' }); t.after(() => admin.dom.window.close());
+  const admin = await open('pages/restaurantes/restaurante.html', { role:'RESTAURANT_ADMIN' }); t.after(() => admin.dom.window.close());
   await until(() => admin.$('.review-action-card'));
   assert.equal(admin.$('.review-write'), null);
   assert.equal(admin.$('.review-form'), null);
@@ -353,7 +354,7 @@ test('Reseñas ofrece login al visitante y bloquea la publicación del administr
 });
 
 test('modal exige tres puntuaciones, visita válida y máximo 500 palabras antes de enviar', async t => {
-  const page = await open('pages/restaurante.html', { role:'CLIENT' }); t.after(() => page.dom.window.close());
+  const page = await open('pages/restaurantes/restaurante.html', { role:'CLIENT' }); t.after(() => page.dom.window.close());
   await until(() => page.$('.review-write')); page.$('.review-write').click();
   assert.equal(page.w.document.querySelectorAll('.review-rating-group').length, 3);
   page.$('[name=comment]').value = 'Una experiencia muy agradable.'; page.$('[name=comment]').dispatchEvent(new page.w.Event('input'));
@@ -370,7 +371,7 @@ test('modal exige tres puntuaciones, visita válida y máximo 500 palabras antes
 
 test('un fallo de publicación conserva el comentario y no muestra una confirmación falsa', async t => {
   const data = fixtures(); data.rejectReview = true;
-  const page = await open('pages/restaurante.html', { role:'CLIENT', data }); t.after(() => page.dom.window.close());
+  const page = await open('pages/restaurantes/restaurante.html', { role:'CLIENT', data }); t.after(() => page.dom.window.close());
   await until(() => page.$('.review-write')); page.$('.review-write').click();
   page.$('[name=comment]').value = 'Comentario que debe mantenerse al fallar.'; page.$('[name=visitedAt]').value = '2026-10-20';
   for (const criterion of ['food','service','ambience']) page.$('.review-form [name='+criterion+'][value="5"]').click();
@@ -382,7 +383,7 @@ test('un fallo de publicación conserva el comentario y no muestra una confirmac
 
 test('Ver más reseñas agrega la siguiente página y cambiar el orden reinicia el listado', async t => {
   const data=fixtures(); data.reviews.push(...data.reviews.map((r,i)=>({...r,_id:'p'+i,title:'Otra opinión '+i,ratings:{...r.ratings,overall:i+1}})));
-  const page=await open('pages/restaurante.html',{data}); t.after(()=>page.dom.window.close());
+  const page=await open('pages/restaurantes/restaurante.html',{data}); t.after(()=>page.dom.window.close());
   await until(()=>page.w.document.querySelectorAll('.customer-review').length===3);
   page.$('.reviews-load-more').click(); await until(()=>page.w.document.querySelectorAll('.customer-review').length===6);
   assert.equal(page.$('.reviews-load-more').hidden,true);
@@ -393,7 +394,7 @@ test('Ver más reseñas agrega la siguiente página y cambiar el orden reinicia 
 });
 
 test('perfil guarda datos personales, normaliza celular y actualiza el header y la sesión', async t => {
-  const page=await open('pages/perfil.html',{role:'CLIENT'}); t.after(()=>page.dom.window.close());
+  const page=await open('pages/perfil/perfil.html',{role:'CLIENT'}); t.after(()=>page.dom.window.close());
   await until(()=>page.$('.profile-form'));
   assert.equal(page.$('[name=email]').readOnly,true);
   page.$('[name=firstName]').value='Ana'; page.$('[name=lastName]').value='Pérez'; page.$('[name=phone]').value='987654321';
@@ -406,7 +407,7 @@ test('perfil guarda datos personales, normaliza celular y actualiza el header y 
 });
 
 test('foto se previsualiza, firma y sube sin token; se vincula al guardar el perfil', async t => {
-  const page=await open('pages/perfil.html',{role:'CLIENT'}); t.after(()=>page.dom.window.close());
+  const page=await open('pages/perfil/perfil.html',{role:'CLIENT'}); t.after(()=>page.dom.window.close());
   await until(()=>page.$('.profile-form'));
   const file=new page.w.File(['png'],'avatar.png',{type:'image/png'});
   Object.defineProperty(page.$('#profile-photo-input'),'files',{configurable:true,value:[file]});
@@ -425,7 +426,7 @@ test('foto se previsualiza, firma y sube sin token; se vincula al guardar el per
 
 test('perfil rechaza tamaño y formato inválidos y conserva datos si Cloudinary no está configurado', async t => {
   const data=fixtures(); data.noCloudinary=true;
-  const page=await open('pages/perfil.html',{role:'CLIENT',data}); t.after(()=>page.dom.window.close());
+  const page=await open('pages/perfil/perfil.html',{role:'CLIENT',data}); t.after(()=>page.dom.window.close());
   await until(()=>page.$('.profile-form'));
   function choose(file) { Object.defineProperty(page.$('#profile-photo-input'),'files',{configurable:true,value:[file]}); page.$('#profile-photo-input').dispatchEvent(new page.w.Event('change')); }
   choose(new page.w.File(['<svg/>'],'avatar.svg',{type:'image/svg+xml'}));
@@ -442,7 +443,7 @@ test('perfil rechaza tamaño y formato inválidos y conserva datos si Cloudinary
 
 test('Mis reseñas solo consulta al autor autenticado y enlaza el restaurante correcto', async t => {
   const data=fixtures(); data.mine=[data.reviews[0]];
-  const page=await open('pages/perfil.html',{role:'CLIENT',data}); t.after(()=>page.dom.window.close());
+  const page=await open('pages/perfil/perfil.html',{role:'CLIENT',data}); t.after(()=>page.dom.window.close());
   await until(()=>page.$('.profile-form')); page.w.location.hash='#reviews';
   await until(()=>page.$('.profile-review-card'));
   assert.ok(page.$('.profile-review-card a').href.includes('?id='+rid+'#reviews'));
@@ -452,17 +453,17 @@ test('Mis reseñas solo consulta al autor autenticado y enlaza el restaurante co
 });
 
 test('perfil privado solicita sesión y no muestra formulario a administradores', async t => {
-  const visitor=await open('pages/perfil.html'); t.after(()=>visitor.dom.window.close());
+  const visitor=await open('pages/perfil/perfil.html'); t.after(()=>visitor.dom.window.close());
   await until(()=>visitor.$('#profile-status').textContent.includes('Inicia sesión'));
   assert.equal(visitor.$('.profile-form'),null);
-  const admin=await open('pages/perfil.html',{role:'RESTAURANT_ADMIN'}); t.after(()=>admin.dom.window.close());
+  const admin=await open('pages/perfil/perfil.html',{role:'RESTAURANT_ADMIN'}); t.after(()=>admin.dom.window.close());
   await until(()=>admin.$('#profile-status').textContent.includes('cuentas de cliente'));
   assert.equal(admin.$('.profile-form'),null);
-  assert.ok(admin.$('.account-admin-option').href.endsWith('/pages/administracion.html'));
+  assert.ok(admin.$('.account-admin-option').href.endsWith('/pages/administracion/administracion.html'));
 });
 
 test('Cancelar revierte campos y celular inválido impide guardar', async t => {
-  const page=await open('pages/perfil.html',{role:'CLIENT'}); t.after(()=>page.dom.window.close());
+  const page=await open('pages/perfil/perfil.html',{role:'CLIENT'}); t.after(()=>page.dom.window.close());
   await until(()=>page.$('.profile-form'));
   page.$('[name=firstName]').value='Cambio descartado';
   [...page.w.document.querySelectorAll('button')].find(button=>button.textContent==='Cancelar').click();
@@ -480,7 +481,7 @@ test('Tipo de comida ofrece ocho categorías y conserva Criolla histórica sin m
     {...data.restaurant,name:'Fusión de prueba',cuisineTypes:['FUSION_ASIATICA']},
     {...data.restaurant,name:'Pollería de prueba',cuisineTypes:['POLLERIA']}
   ];
-  const page=await open('pages/restaurantes.html',{data}); t.after(()=>page.dom.window.close());
+  const page=await open('pages/restaurantes/restaurantes.html',{data}); t.after(()=>page.dom.window.close());
   await until(()=>page.$('.restaurant-card'));
   assert.deepEqual([...page.w.document.querySelectorAll('[name=cuisine]')].map(input=>input.parentElement.textContent.trim()),['Criolla','Chifa','Pollería','Makis','Mariscos','Carnes','Desayunos','Cafeterías']);
   page.$('[value=CHIFA]').checked=true; page.submit('#filters-form');
@@ -504,4 +505,31 @@ test('navbar móvil cierra con Escape, clic exterior y selección, y restaura el
   toggle.click(); nav.querySelector('[data-info=promotions]').click(); assert.equal(nav.hidden,true);
   await until(()=>page.$('#modal-content').textContent.includes('No hay promociones'));
   assert.equal(page.errors.length,0);
+});
+
+test('páginas agrupadas conservan recursos y enlaces internos válidos', async () => {
+  const files = ['index.html', 'pages/restaurantes/restaurantes.html', 'pages/restaurantes/restaurante.html', 'pages/perfil/perfil.html', 'pages/administracion/administracion.html'];
+  for (const file of files) {
+    const dom = new JSDOM(await readFile(path.join(root, file), 'utf8'));
+    try {
+      for (const node of dom.window.document.querySelectorAll('[src], [href]')) {
+        const value = node.getAttribute('src') || node.getAttribute('href');
+        if (!value || /^(?:https?:|mailto:|tel:|#|data:)/.test(value)) continue;
+        const target = path.resolve(root, path.dirname(file), value.split(/[?#]/)[0]);
+        assert.ok(existsSync(target), `${file}: recurso o enlace roto ${value}`);
+      }
+    } finally { dom.window.close(); }
+  }
+  assert.equal(existsSync(path.join(root, 'pages/el-asador-de-surco.html')), false);
+});
+
+test('ficha usa la ruta genérica y peticiones sin reutilizar caché HTTP', async t => {
+  const page = await open('pages/restaurantes/restaurante.html', { role: 'CLIENT' });
+  t.after(() => page.dom.window.close());
+  await until(() => page.$('#restaurant-title').textContent === 'Restaurante API');
+  assert.equal(page.w.MesaUI.pageUrl('perfil.html'), 'http://127.0.0.1:5500/pages/perfil/perfil.html');
+  assert.ok(page.w.MesaUI.pageUrl('restaurante.html?id=abc#reviews').endsWith('/pages/restaurantes/restaurante.html?id=abc#reviews'));
+  assert.ok(page.data.requests.length > 0);
+  assert.ok(page.data.requests.every(item => item.cache === 'no-store'));
+  assert.equal(page.errors.length, 0);
 });
