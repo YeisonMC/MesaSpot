@@ -19,8 +19,9 @@
   function closeAccountMenu(focus = false) {
     const menu = $('#account-dropdown'), trigger = $('#account-trigger');
     if (!menu || !trigger) return;
+    const wasOpen = !menu.hidden;
     menu.hidden = true; trigger.setAttribute('aria-expanded', 'false');
-    if (focus) trigger.focus();
+    if (focus && wasOpen) trigger.focus();
   }
   // Las opciones de cuenta se muestran en un desplegable compacto, accesible con teclado.
   function renderHeader() {

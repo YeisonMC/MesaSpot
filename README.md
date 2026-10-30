@@ -171,3 +171,13 @@ No se añadió AOS a este formulario: el menú usa una animación CSS breve y la
 
 Se verificaron 26 pruebas del frontend y la suite del backend, con Cloudinary simulado y MongoDB temporal. La subida real a Cloudinary queda pendiente de configurar credenciales. No se modificaron cuentas de Atlas durante estas pruebas.
 
+## Tipo de comida y navbar responsive
+
+Rama: `feature/tipos-comida-navbar`. En Restaurantes el filtro **Tipo de comida** presenta exactamente Criolla, Chifa, Pollería, Makis, Mariscos, Carnes, Desayunos y Cafeterías. La selección múltiple sigue una lógica OR y se combina con nombre, distrito y precios. Criolla reconoce el código histórico `PERUANA_TRADICIONAL`; las demás opciones tienen códigos propios y no se infieren por nombre del restaurante.
+
+`js/navbar.js` y `styles/navbar.css` comparten el navbar en las seis páginas. Se implementa con HTML, CSS y JS, sin frameworks nuevos. Hasta 1024 px muestra un botón de menú de 44 px y un panel con navegación y accesos de sesión. Se cierra con Escape, al elegir una opción, al pulsar fuera y al cambiar de ancho o sesión. El estado `aria-expanded`, los iconos y la visibilidad accesible se mantienen sincronizados. Los usuarios conectados conservan avatar y menú de cuenta; los administradores mantienen acceso a Administrar. Se respeta movimiento reducido.
+
+Los cinco restaurantes de muestra se reclasificaron en Atlas para que coincidan con los filtros; El Asador de Surco se conserva. El backend incorpora los códigos nuevos y debe desplegarse para que el formulario administrativo los acepte. No se recrearon restaurantes ni se modificaron sus recursos.
+
+`/tests/` y `/.tests/` están incluidos en `.gitignore`, y los archivos previamente versionados se retiraron del índice de Git conservando las copias locales. Así dejan de subirse en próximos commits. `npm test` sigue siendo una herramienta local: un clon nuevo no tendrá estos archivos. Se verificaron 28 pruebas de frontend.
+

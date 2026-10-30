@@ -1,6 +1,11 @@
 (() => {
   "use strict";
   const labels = {
+    CRIOLLA: "Criolla",
+    CHIFA: "Chifa",
+    POLLERIA: "Pollería",
+    MAKIS: "Makis",
+    CAFETERIAS: "Cafeterías",
     PERUANA_TRADICIONAL: "Peruana tradicional",
     CARNES: "Carnes",
     MARISCOS: "Mariscos",

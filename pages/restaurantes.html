@@ -24,10 +24,12 @@
   <script defer src="../js/config.js"></script>
   <script defer src="../js/api.js"></script>
   <script defer src="../js/ui.js"></script>
-  <script defer src="../js/app.js"></script>
+  <script defer src="../js/navbar.js"></script>
+<script defer src="../js/app.js"></script>
   <script defer src="../js/auth.js"></script>
   <script defer src="../js/price-range.js"></script>
   <script defer src="../js/restaurants.js"></script>
+  <link rel="stylesheet" href="../styles/navbar.css" />
 </head>
 
 <body class="catalog-page" data-page="restaurants">
@@ -79,15 +81,16 @@
           </div>
         </div>
         <fieldset class="filter-group">
-          <legend>Tipo de Cocina</legend>
+          <legend>Tipo de comida</legend>
           <div class="filter-options">
-            <label><input type="checkbox" name="cuisine" value="Mexicano" />Mexicana</label><label><input
-                type="checkbox" name="cuisine" value="Italiana" />Italiana</label><label><input type="checkbox"
-                name="cuisine" value="Japonesa" />Japonesa</label><label><input type="checkbox" name="cuisine"
-                value="Tradicional" />Peruana tradicional</label><label><input type="checkbox" name="cuisine"
-                value="Mariscos" />Mariscos</label><label><input type="checkbox" name="cuisine" value="Fusión" />Fusión
-              asiática</label><label><input type="checkbox" name="cuisine" value="Carnes" />Carnes</label><label><input
-                type="checkbox" name="cuisine" value="Desayunos" />Desayunos</label>
+            <label><input type="checkbox" name="cuisine" value="CRIOLLA" />Criolla</label>
+            <label><input type="checkbox" name="cuisine" value="CHIFA" />Chifa</label>
+            <label><input type="checkbox" name="cuisine" value="POLLERIA" />Pollería</label>
+            <label><input type="checkbox" name="cuisine" value="MAKIS" />Makis</label>
+            <label><input type="checkbox" name="cuisine" value="MARISCOS" />Mariscos</label>
+            <label><input type="checkbox" name="cuisine" value="CARNES" />Carnes</label>
+            <label><input type="checkbox" name="cuisine" value="DESAYUNOS" />Desayunos</label>
+            <label><input type="checkbox" name="cuisine" value="CAFETERIAS" />Cafeterías</label>
           </div>
         </fieldset>
         <fieldset class="filter-group price-filter">
@@ -127,7 +130,7 @@
       <div class="restaurant-grid" id="restaurant-grid"></div>
       <div class="empty-state" id="empty-state" hidden>
         <h2>No encontramos restaurantes</h2>
-        <p>Prueba con otro distrito, tipo de cocina o rango de precios.</p>
+        <p>Prueba con otro distrito, tipo de comida o rango de precios.</p>
         <button class="button" id="reset-filters">Limpiar filtros</button>
       </div>
       <nav class="pagination" id="pagination" aria-label="Páginas de restaurantes"></nav>

@@ -6,6 +6,13 @@
   const home = !document.body.dataset.page;
   const form = home ? $("#search-form") : $("#filters-form");
   const aliases = {
+    Criolla: "CRIOLLA",
+    Chifa: "CHIFA",
+    Polleria: "POLLERIA",
+    "Pollería": "POLLERIA",
+    Makis: "MAKIS",
+    Cafeterias: "CAFETERIAS",
+    "Cafeterías": "CAFETERIAS",
     Tradicional: "PERUANA_TRADICIONAL",
     Fusión: "FUSION_ASIATICA",
     Mexicano: "MEXICANA",
@@ -16,6 +23,10 @@
     Mariscos: "MARISCOS",
     Carnes: "CARNES",
     Desayunos: "DESAYUNOS",
+  };
+  const relatedTypes = {
+    CRIOLLA: ["CRIOLLA", "PERUANA_TRADICIONAL"], PERUANA_TRADICIONAL: ["CRIOLLA", "PERUANA_TRADICIONAL"],
+    FUSION_ASIATICA: ["FUSION_ASIATICA", "CHIFA", "MAKIS"], JAPONESA: ["JAPONESA", "MAKIS"]
   };
   document.querySelectorAll("select option").forEach((option) => {
     if (option.value === "Surco" || option.textContent === "Surco") {
@@ -76,6 +87,8 @@
         ? [category]
         : []
       : values.getAll("cuisine").map((v) => aliases[v] || v);
+    // Criolla incluye la clasificación anterior; las demás categorías mantienen su identidad.
+    const selectedTypes = new Set(cuisines.flatMap(code => relatedTypes[code] || [code]));
     const params = {
       q: query,
       district,
@@ -89,18 +102,19 @@
     const typedCuisine = Object.entries(aliases).find(
       ([name]) => normalize(name) === normalize(query),
     )?.[1];
-    if (home && typedCuisine) {
-      params.q = "";
-      params.cuisine = typedCuisine;
-    }
-    if (home && category) params.cuisine = category;
+    const homeType = home ? category || typedCuisine : null;
+    const homeTypes = homeType ? relatedTypes[homeType] || [homeType] : [];
+    if (home && typedCuisine) params.q = "";
+    if (homeType && homeTypes.length === 1) params.cuisine = homeType;
     try {
       let items = await MesaAPI.all("/restaurants", params, {
         signal: current.signal,
       });
+      // Las categorías del inicio siguen encontrando los tipos nuevos durante el despliegue del backend.
+      if (home && homeTypes.length) items = items.filter(item => item.cuisineTypes.some(code => homeTypes.includes(code)));
       if (!home && cuisines.length)
         items = items.filter((item) =>
-          item.cuisineTypes.some((c) => cuisines.includes(c)),
+          item.cuisineTypes.some((c) => selectedTypes.has(c)),
         );
       const sort = $("#sort")?.value || "rating";
       items.sort((a, b) =>
