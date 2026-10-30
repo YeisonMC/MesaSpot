@@ -1,6 +1,6 @@
 (() => {
   "use strict";
-  const { $, element, button, field, state, link, feedback, modal } = MesaUI;
+  const { $, element, button, field, state, link, feedback, modal, pageUrl } = MesaUI;
   const icon = name => MesaIcons.icon(name);
   const maxBytes = 5 * 1024 * 1024;
   const formats = ["image/jpeg", "image/png", "image/webp"];
@@ -148,7 +148,7 @@
       const records = await MesaAPI.all("/users/me/reviews", {}, { authenticated: true });
       if (version !== viewVersion) return;
       list.replaceChildren();
-      if (!records.length) { state(list, "Todavía no has publicado reseñas."); list.append(link("Explorar restaurantes", "restaurantes.html", "button")); return; }
+      if (!records.length) { state(list, "Todavía no has publicado reseñas."); list.append(link("Explorar restaurantes", pageUrl("restaurantes.html"), "button")); return; }
       records.forEach(review => {
         const card = element("article", "profile-review-card");
         if (review.restaurant?.name) card.append(element("p", "profile-review-restaurant", review.restaurant.name));
@@ -160,7 +160,7 @@
         card.append(meta, element("h2", "", review.title), element("p", "", review.comment));
         const scores = element("div", "profile-review-scores");
         [["food", "Comida"], ["service", "Servicio"], ["ambience", "Ambiente"]].forEach(([key, name]) => scores.append(element("span", "", name + " " + review.ratings[key])));
-        const url = "restaurante.html?id=" + encodeURIComponent(review.restaurantId) + "#reviews";
+        const url = pageUrl("restaurante.html?id=" + encodeURIComponent(review.restaurantId) + "#reviews");
         const detail = link("Ver mi reseña en el restaurante", url, "text-link"); detail.append(icon("arrow-right")); card.append(scores, detail); list.append(card);
       });
     } catch (error) { if (version === viewVersion) state(list, error.message, renderReviews); }
@@ -185,7 +185,7 @@
       const status = $("#profile-status");
       state(status, user ? "Esta pantalla está disponible para cuentas de cliente." : "Inicia sesión para gestionar tu perfil.");
       if (!user) status.append(button("Iniciar sesión", () => MesaAuth.open("login")));
-      else status.append(link("Ir a administración", "administracion.html", "button"));
+      else status.append(link("Ir a administración", pageUrl("administracion.html"), "button"));
       return;
     }
     $("#profile-status").replaceChildren(); identity();

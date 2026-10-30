@@ -50,7 +50,7 @@ git push -u origin feature/nombre-del-cambio
 
 - Catálogo con nombre, distrito, tipo de comida, rango de precios en soles, orden y paginación.
 - Tipos de comida: Criolla, Chifa, Pollería, Makis, Mariscos, Carnes, Desayunos y Cafeterías. La selección múltiple combina categorías mediante OR.
-- Ficha genérica `pages/restaurante.html?id=OBJECT_ID`, con información, locales, horarios, servicios, galería, platos, promociones, reseñas y ubicación. El enlace histórico de El Asador de Surco sigue disponible.
+- Ficha genérica `pages/restaurantes/restaurante.html?id=OBJECT_ID`, con información, locales, horarios, servicios, galería, platos, promociones, reseñas y ubicación. La ficha específica de El Asador se retiró porque el catálogo y las reseñas ya utilizan la ficha genérica por ID.
 - Galería con filtros, visor Swiper, miniaturas, teclado y gestos táctiles.
 - Reseñas con comida, servicio y ambiente, validaciones y modal de confirmación. Solo `CLIENT` puede publicar; la verificación de visita depende de la API.
 - Login, registro, sesión, avatar y perfil de cliente, edición de nombres, apellidos y celular, y listado de reseñas propias.
@@ -62,7 +62,10 @@ Reservas, pagos, favoritos y notificaciones siguen pendientes. No se simulan con
 
 ## Archivos principales
 
-- `index.html` y `pages/`: pantallas del sitio.
+- `index.html`: portada.
+- `pages/restaurantes/`: `restaurantes.html` y `restaurante.html`.
+- `pages/perfil/`: `perfil.html`.
+- `pages/administracion/`: `administracion.html`.
 - `styles/`: estilos compartidos y específicos de cada pantalla.
 - `js/api.js` y `js/config.js`: acceso y configuración de la API.
 - `js/auth.js`, `js/profile.js`: sesión y perfil.
@@ -83,3 +86,7 @@ AOS 2.3.4 y Swiper 12.0.3 se cargan desde CDN donde se necesitan. El visor manti
 - [Lucide: instalación y versiones fijas](https://lucide.dev/guide/lucide/getting-started)
 - [Swiper desde CDN](https://swiperjs.com/get-started#use-swiper-from-cdn)
 - [AOS](https://github.com/michalsnik/aos)
+
+## Peticiones y caché CORS
+
+El cliente solicita la API con `cache: "no-store"` para evitar reutilizar respuestas condicionales del navegador con cabeceras de otro origen local. El backend debe conservar una lista explícita de `CORS_ORIGINS`, responder con el origen permitido que recibe y `Vary: Origin`, y marcar `/api` como `Cache-Control: no-store`. Despliega la corrección del backend para completar la solución. No se usa `no-cors` ni se omiten los permisos.

@@ -41,6 +41,8 @@
         `${window.MESA_CONFIG.apiBaseUrl.replace(/\/$/, "")}${path}`,
         {
           method,
+          // Evitamos reutilizar respuestas HTTP con cabeceras CORS de otro origen local.
+          cache: "no-store",
           signal: signal
             ? AbortSignal.any([signal, AbortSignal.timeout(25000)])
             : AbortSignal.timeout(25000),
