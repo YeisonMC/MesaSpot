@@ -10,7 +10,7 @@ Frontend estático en HTML, CSS y JavaScript para descubrir restaurantes de Lima
 | `develop` | Integración del trabajo de todo el equipo. |
 | `test` | Frontend acompañado de pruebas automatizadas y dependencias de desarrollo. |
 | `feature/nombre-del-cambio` | Un cambio concreto, creado desde `develop`. |
-| `archive/...` | Ramas históricas conservadas antes de esta organización. |
+| `feature/perfil-cliente` y `feature/redisenar-resenas` | Avances anteriores conservados con sus commits originales, ya integrados en las ramas principales. |
 
 No se crean ramas `develop/...` ni una rama llamada únicamente `feature`: Git no permite que convivan con `develop` y `feature/...`, respectivamente. El mismo flujo se aplica a todos los integrantes.
 
