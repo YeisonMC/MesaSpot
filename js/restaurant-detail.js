@@ -237,10 +237,11 @@
     state(status, "Cargando restaurante…");
     try {
       const id = new URLSearchParams(location.search).get("id");
+      if (!id) throw new Error("Selecciona un restaurante desde el catálogo para consultar su ficha.");
       if (id && !/^[a-f0-9]{24}$/i.test(id))
         throw new Error("El identificador del restaurante no es válido.");
       const { data } = await MesaAPI.request(
-        id ? "/restaurants/" + id : "/restaurants/slug/el-asador-de-surco",
+        "/restaurants/" + encodeURIComponent(id),
       );
       restaurant = data;
       document.title = restaurant.name + " · MesaSpot";

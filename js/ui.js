@@ -115,7 +115,13 @@
     if (!protocols) node.target = "_blank";
     return node;
   }
-  const pageUrl = (file) => (document.body.dataset.page ? "" : "pages/") + file;
+  // Resolvemos las páginas desde el script compartido para admitir carpetas y subdirectorios.
+  const siteRoot = new URL('../', document.querySelector('script[src$="js/ui.js"]').src);
+  const pageFolders = { 'restaurantes.html': 'restaurantes', 'restaurante.html': 'restaurantes', 'perfil.html': 'perfil', 'administracion.html': 'administracion' };
+  const pageUrl = (file) => {
+    const name = file.split(/[?#]/)[0];
+    return new URL('pages/' + pageFolders[name] + '/' + file, siteRoot).href;
+  };
   const detailUrl = (item) =>
     pageUrl(`restaurante.html?id=${encodeURIComponent(item._id)}`);
   function state(container, message, retry) {
