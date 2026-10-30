@@ -1,22 +1,131 @@
 /* Cuenta compartida por todas las pantallas: avatar, nombre y opciones de sesión. */
-.header-account { position: relative; }
-.account-trigger { display: flex; align-items: center; gap: 9px; padding: 4px 0 4px 4px; min-height: 44px; color: var(--ink); font-weight: 600; }
-.account-avatar { width: 38px; height: 38px; display: inline-grid; place-items: center; flex-shrink: 0; overflow: hidden; border-radius: 50%; background: #fff0e7; color: var(--accent); border: 2px solid #d3653b; font-size: 12px; }
-.account-avatar img { width: 100%; height: 100%; object-fit: cover; }
-.account-name { font-size: 13px; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.account-trigger > .lucide { width: 16px; height: 16px; transition: transform .2s; }
-.account-trigger[aria-expanded="true"] > .lucide { transform: rotate(180deg); }
-.account-dropdown { position: absolute; top: calc(100% + 10px); right: 0; z-index: 30; width: 200px; border: 1px solid var(--line); background: white; border-radius: 12px; padding: 6px; box-shadow: 0 12px 35px #38231318; animation: account-open .18s ease-out; }
-.account-option { display: flex; gap: 10px; align-items: center; padding: 12px; width: 100%; text-align: left; font-size: 13px; font-weight: 500; border-radius: 7px; }
-.account-option:hover, .account-option:focus-visible { background: #fbf3ed; color: var(--accent); }
-.account-option .lucide { width: 17px; height: 17px; }
-.account-logout { color: var(--accent); }
-.header-admin { font-size: 12px; padding: 10px; }
-.header .account-dropdown .account-admin-option { display: none; }
-@keyframes account-open { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
-@media (max-width: 520px) { .account-trigger { gap: 6px; } .account-name { max-width: 74px; font-size: 12px; } .account-avatar { width: 32px; height: 32px; } .header-admin { display: none; } .header .account-dropdown .account-admin-option { display: flex; } }
-@media (max-width: 800px) { .header .header-actions .notifications { display: none; } }
-@media (prefers-reduced-motion: reduce) { .account-dropdown { animation: none; } }
+.header-account {
+  position: relative;
+}
+.account-trigger {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 4px 0 4px 4px;
+  min-height: 44px;
+  color: var(--ink);
+  font-weight: 600;
+}
+.account-avatar {
+  width: 38px;
+  height: 38px;
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #fff0e7;
+  color: var(--accent);
+  border: 2px solid #d3653b;
+  font-size: 12px;
+}
+.account-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.account-name {
+  font-size: 13px;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.account-trigger > .lucide {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s;
+}
+.account-trigger[aria-expanded="true"] > .lucide {
+  transform: rotate(180deg);
+}
+.account-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 30;
+  width: 200px;
+  border: 1px solid var(--line);
+  background: white;
+  border-radius: 12px;
+  padding: 6px;
+  box-shadow: 0 12px 35px #38231318;
+  animation: account-open 0.18s ease-out;
+}
+.account-option {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 12px;
+  width: 100%;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: 7px;
+}
+.account-option:hover,
+.account-option:focus-visible {
+  background: #fbf3ed;
+  color: var(--accent);
+}
+.account-option .lucide {
+  width: 17px;
+  height: 17px;
+}
+.account-logout {
+  color: var(--accent);
+}
+.header-admin {
+  font-size: 12px;
+  padding: 10px;
+}
+.header .account-dropdown .account-admin-option {
+  display: none;
+}
+@keyframes account-open {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (max-width: 520px) {
+  .account-trigger {
+    gap: 6px;
+  }
+  .account-name {
+    max-width: 74px;
+    font-size: 12px;
+  }
+  .account-avatar {
+    width: 32px;
+    height: 32px;
+  }
+  .header-admin {
+    display: none;
+  }
+  .header .account-dropdown .account-admin-option {
+    display: flex;
+  }
+}
+@media (max-width: 800px) {
+  .header .header-actions .notifications {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .account-dropdown {
+    animation: none;
+  }
+}
 dialog.auth-modal {
   width: min(430px, calc(100% - 32px));
   max-height: calc(100dvh - 32px);
@@ -280,5 +389,292 @@ dialog.auth-modal {
   }
   .header-actions .register {
     padding-inline: 8px;
+  }
+}
+
+/* Registro: panel de dos columnas que se apila sin alterar el resto de modales. */
+dialog.auth-modal.register-modal {
+  --register-error: #b13224;
+  width: min(620px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  padding: 32px;
+  background: #fff;
+  overflow: hidden;
+}
+.register-modal #modal-content {
+  max-height: calc(100dvh - 96px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  padding-right: 6px;
+}
+.register-modal .modal-close {
+  top: 14px;
+  right: 14px;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+.register-modal .modal-close:hover {
+  background: var(--soft);
+  color: var(--accent-dark);
+}
+.register-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-right: 32px;
+  margin-bottom: 24px;
+  font-family: var(--heading);
+  font-size: 24px;
+  font-weight: 700;
+}
+.register-brand .brand-icon {
+  width: 36px;
+  height: 36px;
+}
+.register-modal .register-title {
+  margin: 0 0 8px;
+  padding: 0;
+  font: 700 28px/1.2 var(--heading);
+  letter-spacing: -0.5px;
+}
+.register-description {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.55;
+  max-width: 46ch;
+}
+.register-google {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 22px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  font-weight: 600;
+  font-size: 13px;
+}
+.register-modal .register-google:disabled {
+  opacity: 1;
+  cursor: not-allowed;
+  color: var(--muted);
+  background: var(--paper);
+}
+.register-google .lucide {
+  width: 20px;
+  height: 20px;
+}
+.register-google-note {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+}
+.register-divider {
+  margin: 20px 0;
+}
+.register-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 17px 16px;
+}
+.register-field {
+  min-width: 0;
+}
+.register-field > label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.register-input {
+  position: relative;
+}
+.register-input > .lucide {
+  position: absolute;
+  left: 12px;
+  top: 14px;
+  width: 18px;
+  height: 18px;
+  color: var(--muted);
+  pointer-events: none;
+}
+.register-input input {
+  width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #fff;
+  padding: 12px 12px 12px 39px;
+  color: var(--ink);
+  font: 400 13px/1.4 var(--body);
+  transition:
+    border-color 0.18s,
+    box-shadow 0.18s;
+}
+.register-input input::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+.register-input:has(.register-password-toggle) input {
+  padding-right: 44px;
+}
+.register-input input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.register-input input[aria-invalid="true"] {
+  border-color: var(--register-error);
+  background: #fffafa;
+}
+.register-input input[aria-invalid="true"]:focus-visible {
+  outline-color: var(--register-error);
+}
+.register-password-toggle {
+  position: absolute;
+  right: 1px;
+  top: 1px;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  border-radius: 8px;
+}
+.register-password-toggle:hover {
+  color: var(--accent-dark);
+  background: var(--soft);
+}
+.register-password-toggle .lucide {
+  width: 17px;
+  height: 17px;
+}
+.register-error {
+  margin-top: 6px;
+  color: var(--register-error);
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.register-terms-group,
+.register-legal,
+.register-submit,
+.register-status {
+  grid-column: 1 / -1;
+}
+.register-terms {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 12px;
+  line-height: 1.7;
+  cursor: pointer;
+}
+.register-terms > input {
+  appearance: auto;
+  width: 17px;
+  height: 17px;
+  margin: 3px 0 0;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+}
+.register-terms-group.has-error input {
+  outline: 2px solid var(--register-error);
+  outline-offset: 2px;
+}
+.register-legal-link {
+  display: inline;
+  padding: 0;
+  color: var(--accent-dark);
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.register-legal {
+  padding: 14px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.register-legal h3 {
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+.register-submit {
+  width: 100%;
+  min-height: 46px;
+  font-size: 14px;
+  border-radius: 9px;
+}
+.register-switch {
+  margin-top: 21px;
+  font-size: 13px;
+  text-align: center;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.register-switch .auth-link {
+  display: inline;
+}
+.register-success {
+  display: grid;
+  place-items: center;
+  margin: 28px 0 18px;
+}
+.register-success .lucide {
+  width: 56px;
+  height: 56px;
+  color: #27844b;
+}
+.register-modal:has(.register-success) .register-title,
+.register-modal:has(.register-success) .register-description {
+  text-align: center;
+  margin-inline: auto;
+}
+@media (max-width: 560px) {
+  dialog.auth-modal.register-modal {
+    width: calc(100% - 24px);
+    max-height: calc(100dvh - 24px);
+    padding: 26px 22px;
+  }
+  .register-modal #modal-content {
+    max-height: calc(100dvh - 76px);
+  }
+  .register-form {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  .register-brand {
+    justify-content: center;
+    padding-inline: 24px;
+    font-size: 25px;
+  }
+  .register-modal .register-title,
+  .register-description {
+    text-align: center;
+  }
+  .register-modal .register-title {
+    font-size: 27px;
+  }
+  .register-input input {
+    font-size: 16px;
+  }
+  .register-input input::placeholder {
+    font-size: 13px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .register-input input {
+    transition: none;
   }
 }

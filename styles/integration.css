@@ -269,47 +269,253 @@ button:disabled {
 }
 
 /* La tarjeta conserva su altura natural y reserva un espacio propio para la acción. */
-.restaurant-card { display: flex; flex-direction: column; min-width: 0; }
-.restaurant-card .card-detail-link { flex: none; }
-.restaurant-card .card-body { display: flex; flex: 1; flex-direction: column; gap: 12px; padding: 20px; }
-.restaurant-card .card-labels { align-items: flex-start; gap: 12px; margin: 0; }
-.card-cuisines { display: flex; flex: 1; flex-wrap: wrap; gap: 5px; min-width: 0; }
-.card-cuisines .tag { padding: 4px 7px; font-size: 10px; line-height: 1.4; overflow-wrap: anywhere; }
-.restaurant-card .rating { display: inline-flex; flex-shrink: 0; align-items: center; gap: 4px; line-height: 1.4; }
-.restaurant-card .card-body h3 { margin: 0; font-size: 20px; line-height: 1.35; overflow-wrap: anywhere; }
-.restaurant-card .card-meta { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 12px; margin: 0 0 4px; line-height: 1.6; }
-.card-location { display: inline-flex; align-items: center; gap: 6px; min-width: 0; }
-.card-location .lucide { width: 16px; height: 16px; }
-.restaurant-card .card-meta .price { white-space: nowrap; }
-.restaurant-card a.reserve { display: flex; align-items: center; justify-content: center; gap: 9px; width: 100%; min-height: 44px; margin-top: auto; padding: 12px 14px; line-height: 1.4; text-align: center; }
-.restaurant-card a.reserve .lucide { width: 17px; height: 17px; }
-.lucide { display: inline-block; vertical-align: middle; flex-shrink: 0; }
-button > .lucide, .text-link > .lucide { width: 18px; height: 18px; }
-button:has(> .lucide), a:has(> .lucide) { align-items: center; gap: 8px; }
-.text-link:has(> .lucide) { display: inline-flex; }
-.menu-toggle .lucide { width: 23px; height: 23px; }
-.modal-close .lucide { width: 22px; height: 22px; }
-.socials a { display: inline-flex; align-items: center; justify-content: center; }
-.socials .lucide { width: 18px; height: 18px; }
-.price-range-heading { clear: both; display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 16px; font-size: 12px; color: var(--muted); }
-.price-range-heading .text-link { font-size: 11px; }
-.price-range-heading .lucide { width: 13px; height: 13px; }
-.price-range-values { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.price-range-values > div { display: grid; gap: 4px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--paper); }
-.price-range-values span { color: var(--muted); font-size: 11px; }
-.price-range-values output { color: var(--ink); font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
-.price-range-track { position: relative; height: 42px; margin: 10px 10px 0; --range-min: 0%; --range-max: 100%; }
-.price-range-fill { position: absolute; top: 18px; left: 0; right: 0; height: 6px; border-radius: 10px; background: linear-gradient(to right, #ece6e1 var(--range-min), var(--accent) var(--range-min), var(--accent) var(--range-max), #ece6e1 var(--range-max)); }
-.price-range-track input[type="range"] { position: absolute; inset: 0; width: 100%; height: 42px; margin: 0; padding: 0; border: 0; background: transparent; appearance: none; -webkit-appearance: none; pointer-events: none; }
-.price-range-track input[type="range"]:focus-visible { outline: none; }
-.price-range-track input[type="range"]::-webkit-slider-runnable-track { height: 6px; background: transparent; }
-.price-range-track input[type="range"]::-moz-range-track { height: 6px; background: transparent; }
-.price-range-track input[type="range"]::-webkit-slider-thumb { width: 22px; height: 22px; margin-top: -8px; border: 3px solid white; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 1px #c95830, 0 2px 5px #372a1c25; cursor: grab; appearance: none; -webkit-appearance: none; pointer-events: auto; }
-.price-range-track input[type="range"]::-moz-range-thumb { width: 16px; height: 16px; border: 3px solid white; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 1px #c95830; cursor: grab; pointer-events: auto; }
-.price-range-track input[type="range"]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px #c9583055; }
-.price-range-track input[type="range"]:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 4px #c9583055; }
-.price-range-track input[type="range"]:active::-webkit-slider-thumb { cursor: grabbing; }
-.price-range-track input[type="range"]:focus { z-index: 2; }
+.restaurant-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.restaurant-card .card-detail-link {
+  flex: none;
+}
+.restaurant-card .card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+}
+.restaurant-card .card-labels {
+  align-items: flex-start;
+  gap: 12px;
+  margin: 0;
+}
+.card-cuisines {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-width: 0;
+}
+.card-cuisines .tag {
+  padding: 4px 7px;
+  font-size: 10px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.restaurant-card .rating {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 4px;
+  line-height: 1.4;
+}
+.restaurant-card .card-body h3 {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.restaurant-card .card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px 12px;
+  margin: 0 0 4px;
+  line-height: 1.6;
+}
+.card-location {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.card-location .lucide {
+  width: 16px;
+  height: 16px;
+}
+.restaurant-card .card-meta .price {
+  white-space: nowrap;
+}
+.restaurant-card a.reserve {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 44px;
+  margin-top: auto;
+  padding: 12px 14px;
+  line-height: 1.4;
+  text-align: center;
+}
+.restaurant-card a.reserve .lucide {
+  width: 17px;
+  height: 17px;
+}
+.lucide {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+button > .lucide,
+.text-link > .lucide {
+  width: 18px;
+  height: 18px;
+}
+button:has(> .lucide),
+a:has(> .lucide) {
+  align-items: center;
+  gap: 8px;
+}
+.text-link:has(> .lucide) {
+  display: inline-flex;
+}
+.menu-toggle .lucide {
+  width: 23px;
+  height: 23px;
+}
+.modal-close .lucide {
+  width: 22px;
+  height: 22px;
+}
+.socials a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.socials .lucide {
+  width: 18px;
+  height: 18px;
+}
+.price-range-heading {
+  clear: both;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.price-range-heading .text-link {
+  font-size: 11px;
+}
+.price-range-heading .lucide {
+  width: 13px;
+  height: 13px;
+}
+.price-range-values {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.price-range-values > div {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--paper);
+}
+.price-range-values span {
+  color: var(--muted);
+  font-size: 11px;
+}
+.price-range-values output {
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.price-range-track {
+  position: relative;
+  height: 42px;
+  margin: 10px 10px 0;
+  --range-min: 0%;
+  --range-max: 100%;
+}
+.price-range-fill {
+  position: absolute;
+  top: 18px;
+  left: 0;
+  right: 0;
+  height: 6px;
+  border-radius: 10px;
+  background: linear-gradient(
+    to right,
+    #ece6e1 var(--range-min),
+    var(--accent) var(--range-min),
+    var(--accent) var(--range-max),
+    #ece6e1 var(--range-max)
+  );
+}
+.price-range-track input[type="range"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 42px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  pointer-events: none;
+}
+.price-range-track input[type="range"]:focus-visible {
+  outline: none;
+}
+.price-range-track input[type="range"]::-webkit-slider-runnable-track {
+  height: 6px;
+  background: transparent;
+}
+.price-range-track input[type="range"]::-moz-range-track {
+  height: 6px;
+  background: transparent;
+}
+.price-range-track input[type="range"]::-webkit-slider-thumb {
+  width: 22px;
+  height: 22px;
+  margin-top: -8px;
+  border: 3px solid white;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow:
+    0 0 0 1px #c95830,
+    0 2px 5px #372a1c25;
+  cursor: grab;
+  appearance: none;
+  -webkit-appearance: none;
+  pointer-events: auto;
+}
+.price-range-track input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border: 3px solid white;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 1px #c95830;
+  cursor: grab;
+  pointer-events: auto;
+}
+.price-range-track input[type="range"]:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 4px #c9583055;
+}
+.price-range-track input[type="range"]:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 4px #c9583055;
+}
+.price-range-track input[type="range"]:active::-webkit-slider-thumb {
+  cursor: grabbing;
+}
+.price-range-track input[type="range"]:focus {
+  z-index: 2;
+}
 
-
-button:not(.menu-toggle):has(> .lucide), .header-actions a:has(> .lucide), .contact-list a:has(> .lucide) { display: inline-flex; align-items: center; gap: 8px; }
+button:not(.menu-toggle):has(> .lucide),
+.header-actions a:has(> .lucide),
+.contact-list a:has(> .lucide) {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}

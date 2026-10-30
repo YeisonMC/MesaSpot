@@ -9,10 +9,10 @@
     Criolla: "CRIOLLA",
     Chifa: "CHIFA",
     Polleria: "POLLERIA",
-    "Pollería": "POLLERIA",
+    Pollería: "POLLERIA",
     Makis: "MAKIS",
     Cafeterias: "CAFETERIAS",
-    "Cafeterías": "CAFETERIAS",
+    Cafeterías: "CAFETERIAS",
     Tradicional: "PERUANA_TRADICIONAL",
     Fusión: "FUSION_ASIATICA",
     Mexicano: "MEXICANA",
@@ -25,8 +25,10 @@
     Desayunos: "DESAYUNOS",
   };
   const relatedTypes = {
-    CRIOLLA: ["CRIOLLA", "PERUANA_TRADICIONAL"], PERUANA_TRADICIONAL: ["CRIOLLA", "PERUANA_TRADICIONAL"],
-    FUSION_ASIATICA: ["FUSION_ASIATICA", "CHIFA", "MAKIS"], JAPONESA: ["JAPONESA", "MAKIS"]
+    CRIOLLA: ["CRIOLLA", "PERUANA_TRADICIONAL"],
+    PERUANA_TRADICIONAL: ["CRIOLLA", "PERUANA_TRADICIONAL"],
+    FUSION_ASIATICA: ["FUSION_ASIATICA", "CHIFA", "MAKIS"],
+    JAPONESA: ["JAPONESA", "MAKIS"],
   };
   document.querySelectorAll("select option").forEach((option) => {
     if (option.value === "Surco" || option.textContent === "Surco") {
@@ -88,7 +90,9 @@
         : []
       : values.getAll("cuisine").map((v) => aliases[v] || v);
     // Criolla incluye la clasificación anterior; las demás categorías mantienen su identidad.
-    const selectedTypes = new Set(cuisines.flatMap(code => relatedTypes[code] || [code]));
+    const selectedTypes = new Set(
+      cuisines.flatMap((code) => relatedTypes[code] || [code]),
+    );
     const params = {
       q: query,
       district,
@@ -111,7 +115,10 @@
         signal: current.signal,
       });
       // Las categorías del inicio siguen encontrando los tipos nuevos durante el despliegue del backend.
-      if (home && homeTypes.length) items = items.filter(item => item.cuisineTypes.some(code => homeTypes.includes(code)));
+      if (home && homeTypes.length)
+        items = items.filter((item) =>
+          item.cuisineTypes.some((code) => homeTypes.includes(code)),
+        );
       if (!home && cuisines.length)
         items = items.filter((item) =>
           item.cuisineTypes.some((c) => selectedTypes.has(c)),
@@ -188,6 +195,8 @@
         );
     load();
   });
-  document.querySelectorAll('.price-range-track input[type="range"]').forEach(slider => slider.addEventListener('change', load));
+  document
+    .querySelectorAll('.price-range-track input[type="range"]')
+    .forEach((slider) => slider.addEventListener("change", load));
   load();
 })();
