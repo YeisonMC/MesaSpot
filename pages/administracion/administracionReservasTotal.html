@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Panel de administracion de MesaSpot: Vista Total." />
+  <title>Vista Total · Administración · MesaSpot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="../../styles/administracionReservasTotal.css" />
+</head>
+
+<body class="admin-page">
+  <div class="shell">
+    <header class="sidebar">
+      <div class="sidebar-top">
+        <div class="brand"><span class="logo-badge"><i class="fa-solid fa-table-cells-large"></i></span><span class="brand-text"><strong>MesaSpot</strong><small>SOCIO ADMIN</small></span></div>
+        <section class="restaurant-profile" aria-label="Restaurante">
+          <span class="avatar" aria-hidden="true"><i class="fa-solid fa-fire"></i></span>
+          <div><strong>Asador de Segovia</strong><small>Segovia, España</small></div>
+        </section>
+        <nav class="nav" aria-label="Navegación principal">
+          <a class="nav-link nav-demo" href="administracionDemo.html"><i class="fa-solid fa-table-columns"></i>Dashboard</a>
+          <a class="nav-link nav-reservas active" aria-current="page" href="administracionReservas.html"><i class="fa-solid fa-calendar-check"></i>Reservas</a>
+          <a class="nav-link nav-menu" href="administracionMenu.html"><i class="fa-solid fa-bars"></i>Menú</a>
+          <a class="nav-link nav-resenas" href="administracionResenas.html"><i class="fa-solid fa-star-half-stroke"></i>Reseñas</a>
+          <a class="nav-link nav-promociones" href="administracionPromociones.html"><i class="fa-solid fa-ticket"></i>Promociones</a>
+        </nav>
+      </div>
+      <div class="user-bar">
+        <span class="avatar-round">CG</span>
+        <div><strong>Carlos Gómez</strong><small>Propietario</small></div>
+        <button type="button" class="icon-btn" aria-label="Cerrar sesión"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </header>
+
+    <main class="main" aria-labelledby="t-total">
+    <div class="reservas-layout">
+      <aside class="subpanel" aria-label="Filtros de reservas">
+        <h2>Reservas</h2>
+        <p>Filtros rápidos para revisar el estado de cada grupo.</p>
+        <a class="subcard sub-total active" aria-current="page" href="administracionReservasTotal.html"><span><strong>Total</strong><small>47 reservas</small></span><span class="sub-right"><strong class="num">47</strong><small>Total</small></span></a>
+        <a class="subcard sub-comp" href="administracionReservas.html"><span><strong>R. Completadas</strong><small>32 reservas</small></span><span class="sub-right"><strong class="num">32</strong><small>Completadas</small></span></a>
+        <a class="subcard sub-pend" href="administracionReservasPendientes.html"><span><strong>R. Pendientes</strong><small>10 reservas</small></span><span class="sub-right"><strong class="num">10</strong><small>Pendientes</small></span></a>
+        <a class="subcard sub-canc" href="administracionReservasCanceladas.html"><span><strong>R. Canceladas</strong><small>5 reservas</small></span><span class="sub-right"><strong class="num">5</strong><small>Canceladas</small></span></a>
+      </aside>
+      <div>
+        <header class="page-header"><div><h1 id="t-total">Vista Total</h1><p>Resumen general del total de reservas y su desglose por estado.</p></div></header>
+        <div class="content">
+          <section class="card" aria-labelledby="t-total-card">
+            <h2 id="t-total-card" style="font-size:26px">Total de reservas</h2>
+            <p style="margin-top:6px;color:var(--muted)">Vista consolidada de completadas, pendientes y canceladas.</p>
+            <p class="total-number">47 <small style="font-family:Manrope,Arial,sans-serif;font-size:13px;font-weight:500;color:var(--muted)">reservas</small></p>
+            <div class="stack" role="img" aria-label="68% completadas, 21% pendientes, 11% canceladas"><span class="seg-ok" style="flex:68"></span><span class="seg-wait" style="flex:21"></span><span class="seg-cancel" style="flex:11"></span></div>
+            <ul class="legend">
+              <li style="--dot:var(--green)"><strong>Completadas</strong>32 reservas · 68%</li>
+              <li style="--dot:var(--orange)"><strong>Pendientes</strong>10 reservas · 21%</li>
+              <li style="--dot:var(--red)"><strong>Canceladas</strong>5 reservas · 11%</li>
+            </ul>
+          </section>
+        </div>
+      </div>
+    </div>
+    </main>
+  </div>
+</body>
+
+</html>

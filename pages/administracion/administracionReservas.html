@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Panel de administracion de MesaSpot: Reservas." />
+  <title>Reservas · Administración · MesaSpot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="../../styles/administracionReservas.css" />
+</head>
+
+<body class="admin-page">
+  <div class="shell">
+    <header class="sidebar">
+      <div class="sidebar-top">
+        <div class="brand"><span class="logo-badge"><i class="fa-solid fa-table-cells-large"></i></span><span class="brand-text"><strong>MesaSpot</strong><small>SOCIO ADMIN</small></span></div>
+        <section class="restaurant-profile" aria-label="Restaurante">
+          <span class="avatar" aria-hidden="true"><i class="fa-solid fa-fire"></i></span>
+          <div><strong>Asador de Segovia</strong><small>Segovia, España</small></div>
+        </section>
+        <nav class="nav" aria-label="Navegación principal">
+          <a class="nav-link nav-demo" href="administracionDemo.html"><i class="fa-solid fa-table-columns"></i>Dashboard</a>
+          <a class="nav-link nav-reservas active" aria-current="page" href="administracionReservas.html"><i class="fa-solid fa-calendar-check"></i>Reservas</a>
+          <a class="nav-link nav-menu" href="administracionMenu.html"><i class="fa-solid fa-bars"></i>Menú</a>
+          <a class="nav-link nav-resenas" href="administracionResenas.html"><i class="fa-solid fa-star-half-stroke"></i>Reseñas</a>
+          <a class="nav-link nav-promociones" href="administracionPromociones.html"><i class="fa-solid fa-ticket"></i>Promociones</a>
+        </nav>
+      </div>
+      <div class="user-bar">
+        <span class="avatar-round">CG</span>
+        <div><strong>Carlos Gómez</strong><small>Propietario</small></div>
+        <button type="button" class="icon-btn" aria-label="Cerrar sesión"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </header>
+
+    <main class="main" aria-labelledby="t-reservas">
+    <div class="reservas-layout">
+      <aside class="subpanel" aria-label="Filtros de reservas">
+        <h2>Reservas</h2>
+        <p>Filtros rápidos para revisar el estado de cada grupo.</p>
+        <a class="subcard sub-total" href="administracionReservasTotal.html"><span><strong>Total</strong><small>47 reservas</small></span><span class="sub-right"><strong class="num">47</strong><small>Total</small></span></a>
+        <a class="subcard sub-comp active" aria-current="page" href="administracionReservas.html"><span><strong>R. Completadas</strong><small>32 reservas</small></span><span class="sub-right"><strong class="num">15 Oct 2025</strong><small>Hoy</small></span></a>
+        <a class="subcard sub-pend" href="administracionReservasPendientes.html"><span><strong>R. Pendientes</strong><small>10 reservas</small></span><span class="sub-right"><strong class="num">10</strong><small>Pendientes</small></span></a>
+        <a class="subcard sub-canc" href="administracionReservasCanceladas.html"><span><strong>R. Canceladas</strong><small>5 reservas</small></span><span class="sub-right"><strong class="num">5</strong><small>Canceladas</small></span></a>
+      </aside>
+      <div>
+        <header class="page-header"><div><h1 id="t-reservas">Gestión de Reservas</h1><p>Panel de administración y control del flujo de mesas de tu local.</p></div></header>
+        <div class="content">
+        <section class="card" aria-labelledby="plan-reservas">
+          <div class="card-head"><h2 id="plan-reservas">Planificador de Fechas</h2><small class="link">Octubre 2025</small></div>
+          <fieldset><legend class="sr-only">Selecciona un día</legend><div class="day-picker"><label class="day"><input class="sr-only" type="radio" name="dia-reservas" value="12" />Lun<strong>12</strong></label><label class="day"><input class="sr-only" type="radio" name="dia-reservas" value="13" />Mar<strong>13</strong></label><label class="day"><input class="sr-only" type="radio" name="dia-reservas" value="14" />Mié<strong>14</strong></label><label class="day"><input class="sr-only" type="radio" name="dia-reservas" value="15" checked />Jue<strong>15</strong></label><label class="day"><input class="sr-only" type="radio" name="dia-reservas" value="16" />Vie<strong>16</strong></label><label class="day"><input class="sr-only" type="radio" name="dia-reservas" value="17" />Sáb<strong>17</strong></label><label class="day"><input class="sr-only" type="radio" name="dia-reservas" value="18" />Dom<strong>18</strong></label></div></fieldset>
+        </section>
+          <section class="card" aria-labelledby="lista-reservas">
+            <div class="card-head"><h2 id="lista-reservas">Listado de Reservas Registradas</h2><label class="search-box" for="buscar-reservas"><i class="fa-solid fa-magnifying-glass"></i><input type="search" id="buscar-reservas" name="q" placeholder="Buscar cliente..." /></label></div>
+            <div class="table-wrap"><table class="data-table">
+              <thead><tr><th>Nº Reserva</th><th>Cliente</th><th>Pax</th><th>Fecha</th><th>Hora</th><th>Mesa asignada</th><th>Estado</th><th>Acciones</th></tr></thead>
+              <tbody>
+            <tr><td data-label="Nº Reserva">#MS-4820</td><td data-label="Cliente">Francisco Alarcón</td><td data-label="Pax">4 pax</td><td data-label="Fecha">15 Oct 2025</td><td data-label="Hora">14:00</td><td data-label="Mesa asignada">Mesa 4 (Terraza)</td><td data-label="Estado"><span class="badge badge-ok">Confirmada</span></td><td data-label="Acciones"><div class="actions"><button type="button" class="action-ok" aria-label="Confirmar reserva"><i class="fa-solid fa-check"></i></button><button type="button" class="action-no" aria-label="Cancelar reserva"><i class="fa-solid fa-circle-xmark"></i></button></div></td></tr>
+            <tr><td data-label="Nº Reserva">#MS-4819</td><td data-label="Cliente">Beatriz Luengo</td><td data-label="Pax">2 pax</td><td data-label="Fecha">15 Oct 2025</td><td data-label="Hora">14:15</td><td data-label="Mesa asignada">Mesa 12</td><td data-label="Estado"><span class="badge badge-ok">Confirmada</span></td><td data-label="Acciones"><div class="actions"><button type="button" class="action-ok" aria-label="Confirmar reserva"><i class="fa-solid fa-check"></i></button><button type="button" class="action-no" aria-label="Cancelar reserva"><i class="fa-solid fa-circle-xmark"></i></button></div></td></tr>
+            <tr><td data-label="Nº Reserva">#MS-4818</td><td data-label="Cliente">Ramón García</td><td data-label="Pax">8 pax</td><td data-label="Fecha">15 Oct 2025</td><td data-label="Hora">15:00</td><td data-label="Mesa asignada">Mesa 1 (Salón)</td><td data-label="Estado"><span class="badge badge-wait">Pendiente</span></td><td data-label="Acciones"><div class="actions"><button type="button" class="action-ok" aria-label="Confirmar reserva"><i class="fa-solid fa-check"></i></button><button type="button" class="action-no" aria-label="Cancelar reserva"><i class="fa-solid fa-circle-xmark"></i></button></div></td></tr>
+            <tr><td data-label="Nº Reserva">#MS-4817</td><td data-label="Cliente">Sonia Monroy</td><td data-label="Pax">3 pax</td><td data-label="Fecha">15 Oct 2025</td><td data-label="Hora">21:00</td><td data-label="Mesa asignada">Mesa 8</td><td data-label="Estado"><span class="badge badge-ok">Confirmada</span></td><td data-label="Acciones"><div class="actions"><button type="button" class="action-ok" aria-label="Confirmar reserva"><i class="fa-solid fa-check"></i></button><button type="button" class="action-no" aria-label="Cancelar reserva"><i class="fa-solid fa-circle-xmark"></i></button></div></td></tr>
+            <tr><td data-label="Nº Reserva">#MS-4816</td><td data-label="Cliente">Andrés Iniesta</td><td data-label="Pax">5 pax</td><td data-label="Fecha">15 Oct 2025</td><td data-label="Hora">21:30</td><td data-label="Mesa asignada">Mesa 15 (Salón)</td><td data-label="Estado"><span class="badge badge-wait">Pendiente</span></td><td data-label="Acciones"><div class="actions"><button type="button" class="action-ok" aria-label="Confirmar reserva"><i class="fa-solid fa-check"></i></button><button type="button" class="action-no" aria-label="Cancelar reserva"><i class="fa-solid fa-circle-xmark"></i></button></div></td></tr>
+            <tr><td data-label="Nº Reserva">#MS-4815</td><td data-label="Cliente">Paula Echevarría</td><td data-label="Pax">4 pax</td><td data-label="Fecha">16 Oct 2025</td><td data-label="Hora">13:30</td><td data-label="Mesa asignada">Mesa 2 (Terraza)</td><td data-label="Estado"><span class="badge badge-cancel">Cancelada</span></td><td data-label="Acciones"><div class="actions"><button type="button" class="action-ok" aria-label="Confirmar reserva"><i class="fa-solid fa-check"></i></button><button type="button" class="action-no" aria-label="Cancelar reserva"><i class="fa-solid fa-circle-xmark"></i></button></div></td></tr>
+            <tr><td data-label="Nº Reserva">#MS-4814</td><td data-label="Cliente">Enrique Iglesias</td><td data-label="Pax">2 pax</td><td data-label="Fecha">16 Oct 2025</td><td data-label="Hora">22:15</td><td data-label="Mesa asignada">Mesa 10</td><td data-label="Estado"><span class="badge badge-ok">Confirmada</span></td><td data-label="Acciones"><div class="actions"><button type="button" class="action-ok" aria-label="Confirmar reserva"><i class="fa-solid fa-check"></i></button><button type="button" class="action-no" aria-label="Cancelar reserva"><i class="fa-solid fa-circle-xmark"></i></button></div></td></tr>
+              </tbody>
+            </table></div>
+          </section>
+        </div>
+      </div>
+    </div>
+    </main>
+  </div>
+</body>
+
+</html>

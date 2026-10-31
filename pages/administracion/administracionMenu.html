@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Panel de administracion de MesaSpot: Menú." />
+  <title>Menú · Administración · MesaSpot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="../../styles/administracionMenu.css" />
+</head>
+
+<body class="admin-page">
+  <div class="shell">
+    <header class="sidebar">
+      <div class="sidebar-top">
+        <div class="brand"><span class="logo-badge"><i class="fa-solid fa-table-cells-large"></i></span><span class="brand-text"><strong>MesaSpot</strong><small>SOCIO ADMIN</small></span></div>
+        <section class="restaurant-profile" aria-label="Restaurante">
+          <span class="avatar" aria-hidden="true"><i class="fa-solid fa-fire"></i></span>
+          <div><strong>Asador de Segovia</strong><small>Segovia, España</small></div>
+        </section>
+        <nav class="nav" aria-label="Navegación principal">
+          <a class="nav-link nav-demo" href="administracionDemo.html"><i class="fa-solid fa-table-columns"></i>Dashboard</a>
+          <a class="nav-link nav-reservas" href="administracionReservas.html"><i class="fa-solid fa-calendar-check"></i>Reservas</a>
+          <a class="nav-link nav-menu active" aria-current="page" href="administracionMenu.html"><i class="fa-solid fa-bars"></i>Menú</a>
+          <a class="nav-link nav-resenas" href="administracionResenas.html"><i class="fa-solid fa-star-half-stroke"></i>Reseñas</a>
+          <a class="nav-link nav-promociones" href="administracionPromociones.html"><i class="fa-solid fa-ticket"></i>Promociones</a>
+        </nav>
+      </div>
+      <div class="user-bar">
+        <span class="avatar-round">CG</span>
+        <div><strong>Carlos Gómez</strong><small>Propietario</small></div>
+        <button type="button" class="icon-btn" aria-label="Cerrar sesión"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </header>
+
+    <main class="main" aria-labelledby="t-menu">
+    <header class="page-header"><div><h1 id="t-menu">Gestión del Menú y Carta</h1><p>Modifica la carta digital de MesaSpot y destaca tus mejores elaboraciones para tu restaurante.</p></div><button type="button" class="btn"><i class="fa-solid fa-plus"></i>Añadir plato</button></header>
+    <div class="content">
+      <h2 class="section-title"><i class="fa-solid fa-star"></i>Platos Estrella destacadas en MesaSpot</h2>
+      <div class="dish-grid">
+        <article class="dish dish-featured"><div class="dish-photo photo-1" aria-hidden="true"><i class="fa-solid fa-drumstick-bite"></i></div><div class="dish-body"><div class="dish-top"><h3>Cochinillo Asado Crujiente</h3><strong>S/ 29.00</strong></div><p>El clásico de Segovia, asado lentamente en horno de leña alimentado con madera de encina. Piel extra crujiente y carne tierna y jugosa.</p><div class="dish-foot"><span class="status">Disponible</span><span><button type="button" class="icon-btn" aria-label="Editar plato"><i class="fa-solid fa-pen"></i></button> <button type="button" class="icon-btn danger" aria-label="Eliminar plato"><i class="fa-solid fa-trash"></i></button></span></div></div></article>
+        <article class="dish dish-featured"><div class="dish-photo photo-2" aria-hidden="true"><i class="fa-solid fa-utensils"></i></div><div class="dish-body"><div class="dish-top"><h3>Cordero Lechal al Horno de Leña</h3><strong>S/ 31.50</strong></div><p>Paletilla de cordero de leche adobada solo con agua, sal y manteca de cerdo, asada durante horas para derretirse en boca.</p><div class="dish-foot"><span class="status">Disponible</span><span><button type="button" class="icon-btn" aria-label="Editar plato"><i class="fa-solid fa-pen"></i></button> <button type="button" class="icon-btn danger" aria-label="Eliminar plato"><i class="fa-solid fa-trash"></i></button></span></div></div></article>
+      </div>
+      <h2 class="section-title">Carta regular</h2>
+      <div class="dish-grid">
+        <article class="dish"><div class="dish-photo photo-3" aria-hidden="true"><i class="fa-solid fa-bacon"></i></div><div class="dish-body"><div class="dish-top"><h3>Jamón Ibérico de Bellota</h3><strong>S/ 24.00</strong></div><p>Cortado a cuchillo en el momento, acompañado de pan con tomate y aceite de oliva virgen extra.</p><div class="dish-foot"><span class="status">Disponible</span><span><button type="button" class="icon-btn" aria-label="Editar plato"><i class="fa-solid fa-pen"></i></button> <button type="button" class="icon-btn danger" aria-label="Eliminar plato"><i class="fa-solid fa-trash"></i></button></span></div></div></article>
+        <article class="dish"><div class="dish-photo photo-4" aria-hidden="true"><i class="fa-solid fa-cookie-bite"></i></div><div class="dish-body"><div class="dish-top"><h3>Croquetas Caseras de Jamón</h3><strong>S/ 12.50</strong></div><p>Croquetas melosas de bechamel tradicional y taquitos de jamón ibérico selecto.</p><div class="dish-foot"><span class="status">Disponible</span><span><button type="button" class="icon-btn" aria-label="Editar plato"><i class="fa-solid fa-pen"></i></button> <button type="button" class="icon-btn danger" aria-label="Eliminar plato"><i class="fa-solid fa-trash"></i></button></span></div></div></article>
+        <article class="dish"><div class="dish-photo photo-5" aria-hidden="true"><i class="fa-solid fa-cake-candles"></i></div><div class="dish-body"><div class="dish-top"><h3>Tarta de Queso Fundente</h3><strong>S/ 9.00</strong></div><p>Nuestra famosa tarta de queso horneada, cremosa por dentro y con base crujiente de galleta.</p><div class="dish-foot"><span class="status">Disponible</span><span><button type="button" class="icon-btn" aria-label="Editar plato"><i class="fa-solid fa-pen"></i></button> <button type="button" class="icon-btn danger" aria-label="Eliminar plato"><i class="fa-solid fa-trash"></i></button></span></div></div></article>
+        <article class="dish"><div class="dish-photo photo-6" aria-hidden="true"><i class="fa-solid fa-bowl-food"></i></div><div class="dish-body"><div class="dish-top"><h3>Sopa Castellana Tradicional</h3><strong>S/ 10.00</strong></div><p>Sopa de ajo con pan, pimentón de la Vera, huevo escalfado e hilos de jamón crujientes.</p><div class="dish-foot"><span class="status sold-out">Agotado</span><span><button type="button" class="icon-btn" aria-label="Editar plato"><i class="fa-solid fa-pen"></i></button> <button type="button" class="icon-btn danger" aria-label="Eliminar plato"><i class="fa-solid fa-trash"></i></button></span></div></div></article>
+      </div>
+    </div>
+    </main>
+  </div>
+</body>
+
+</html>
