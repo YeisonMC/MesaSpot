@@ -1,6 +1,6 @@
 (() => {
   "use strict";
-  const { $, modal, element, state, link, money, detailUrl } = MesaUI;
+  const { $, modal, element } = MesaUI;
   const dialog = $("#modal");
   $("#close-modal")?.addEventListener("click", () => dialog.close());
   dialog?.addEventListener("close", () => {
@@ -74,50 +74,9 @@
     ],
     press: ["MesaSpot", "Descubrimiento gastronómico en Lima Metropolitana."],
   };
-  async function promotions() {
-    const content = modal("Promociones de restaurantes", "wide-modal");
-    const list = element("div", "promo-grid");
-    content.append(list);
-    state(list, "Cargando promociones…");
-    try {
-      const items = await MesaAPI.all("/promotions");
-      list.replaceChildren();
-      if (!items.length)
-        return state(list, "No hay promociones publicadas en este momento.");
-      items.forEach((p) => {
-        const article = element("article", "detail-panel");
-        article.append(
-          element("h3", "", p.title),
-          element("p", "", p.description || ""),
-          element(
-            "strong",
-            "price",
-            money(p.priceCents) + " " + MesaUI.label(p.pricingUnit),
-          ),
-          element(
-            "p",
-            "muted",
-            p.availableNow
-              ? "Disponible en esta franja horaria"
-              : "Consulta días, horario y condiciones",
-          ),
-          element("p", "", p.terms || ""),
-          link(
-            p.restaurant?.name || "Ver restaurante",
-            detailUrl({ _id: p.restaurantId }) + "#menu",
-            "text-link",
-          ),
-        );
-        list.append(article);
-      });
-    } catch (error) {
-      state(list, error.message, promotions);
-    }
-  }
   document.addEventListener("click", (event) => {
     const trigger = event.target.closest("[data-info]");
     if (!trigger) return;
-    if (trigger.dataset.info === "promotions") return void promotions();
     const [title, description] = info[trigger.dataset.info] || [
       "MesaSpot",
       "Esta función aún no está disponible.",
