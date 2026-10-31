@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Panel de administracion de MesaSpot: Reservas Canceladas." />
+  <title>Reservas Canceladas · Administración · MesaSpot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="../../styles/administracionReservasCanceladas.css" />
+</head>
+
+<body class="admin-page">
+  <div class="shell">
+    <header class="sidebar">
+      <div class="sidebar-top">
+        <div class="brand"><span class="logo-badge"><i class="fa-solid fa-table-cells-large"></i></span><span class="brand-text"><strong>MesaSpot</strong><small>SOCIO ADMIN</small></span></div>
+        <section class="restaurant-profile" aria-label="Restaurante">
+          <span class="avatar" aria-hidden="true"><i class="fa-solid fa-fire"></i></span>
+          <div><strong>Asador de Segovia</strong><small>Segovia, España</small></div>
+        </section>
+        <nav class="nav" aria-label="Navegación principal">
+          <a class="nav-link nav-demo" href="administracionDemo.html"><i class="fa-solid fa-table-columns"></i>Dashboard</a>
+          <a class="nav-link nav-reservas active" aria-current="page" href="administracionReservas.html"><i class="fa-solid fa-calendar-check"></i>Reservas</a>
+          <span class="nav-link nav-menu disabled" aria-disabled="true"><i class="fa-solid fa-bars"></i>Menú</span>
+          <span class="nav-link nav-resenas disabled" aria-disabled="true"><i class="fa-solid fa-star-half-stroke"></i>Reseñas</span>
+          <span class="nav-link nav-promociones disabled" aria-disabled="true"><i class="fa-solid fa-ticket"></i>Promociones</span>
+          <span class="nav-link nav-configuracion disabled" aria-disabled="true"><i class="fa-solid fa-sliders"></i>Configuración</span>
+        </nav>
+      </div>
+      <div class="user-bar">
+        <span class="avatar-round">CG</span>
+        <div><strong>Carlos Gómez</strong><small>Propietario</small></div>
+        <button type="button" class="icon-btn" aria-label="Cerrar sesión"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </header>
+
+    <main class="main" aria-labelledby="t-reservas-canceladas">
+    <div class="reservas-layout">
+      <aside class="subpanel" aria-label="Filtros de reservas">
+        <h2>Reservas</h2>
+        <p>Filtros rápidos para revisar el estado de cada grupo.</p>
+        <a class="subcard sub-total" href="administracionReservasTotal.html"><span><strong>Total</strong><small>47 reservas</small></span><span class="sub-right"><strong class="num">47</strong><small>Total</small></span></a>
+        <a class="subcard sub-comp" href="administracionReservas.html"><span><strong>R. Completadas</strong><small>32 reservas</small></span><span class="sub-right"><strong class="num">32</strong><small>Completadas</small></span></a>
+        <a class="subcard sub-pend" href="administracionReservasPendientes.html"><span><strong>R. Pendientes</strong><small>10 reservas</small></span><span class="sub-right"><strong class="num">10</strong><small>Pendientes</small></span></a>
+        <a class="subcard sub-canc active" aria-current="page" href="administracionReservasCanceladas.html"><span><strong>R. Canceladas</strong><small>5 reservas</small></span><span class="sub-right"><strong class="num">5</strong><small>Canceladas</small></span></a>
+      </aside>
+      <div>
+        <header class="page-header"><div><h1 id="t-reservas-canceladas">Reservas Canceladas</h1><p>Revisa el listado de reservas canceladas y gestiona sus acciones asociadas.</p></div></header>
+        <div class="content">
+        <section class="card" aria-labelledby="plan-reservas-canceladas">
+          <div class="card-head"><h2 id="plan-reservas-canceladas">Planificador de Fechas</h2><small class="link">Octubre 2025</small></div>
+          <fieldset><legend class="sr-only">Selecciona un día</legend><div class="day-picker"><label class="day"><input class="sr-only" type="radio" name="dia-reservas-canceladas" value="12" />Lun<strong>12</strong></label><label class="day"><input class="sr-only" type="radio" name="dia-reservas-canceladas" value="13" />Mar<strong>13</strong></label><label class="day"><input class="sr-only" type="radio" name="dia-reservas-canceladas" value="14" />Mié<strong>14</strong></label><label class="day"><input class="sr-only" type="radio" name="dia-reservas-canceladas" value="15" checked />Jue<strong>15</strong></label><label class="day"><input class="sr-only" type="radio" name="dia-reservas-canceladas" value="16" />Vie<strong>16</strong></label><label class="day"><input class="sr-only" type="radio" name="dia-reservas-canceladas" value="17" />Sáb<strong>17</strong></label><label class="day"><input class="sr-only" type="radio" name="dia-reservas-canceladas" value="18" />Dom<strong>18</strong></label></div></fieldset>
+        </section>
+          <section class="card" aria-labelledby="lista-reservas-canceladas">
+            <div class="card-head"><h2 id="lista-reservas-canceladas">Listado de Reservas Canceladas</h2><label class="search-box" for="buscar-reservas-canceladas"><i class="fa-solid fa-magnifying-glass"></i><input type="search" id="buscar-reservas-canceladas" name="q" placeholder="Buscar cliente..." /></label></div>
+            <div class="table-wrap"><table class="data-table">
+              <thead><tr><th>Nº Reserva</th><th>Cliente</th><th>Pax</th><th>Fecha</th><th>Hora</th><th>Mesa asignada</th><th>Estado</th><th>Acciones</th></tr></thead>
+              <tbody>
+            <tr><td data-label="Nº Reserva">#MS-4815</td><td data-label="Cliente">Paula Echevarría</td><td data-label="Pax">4 pax</td><td data-label="Fecha">16 Oct 2025</td><td data-label="Hora">13:30</td><td data-label="Mesa asignada">Mesa 2 (Terraza)</td><td data-label="Estado"><span class="badge badge-cancel">Cancelada</span></td><td data-label="Acciones"><div class="actions"><button type="button" class="action-ok" aria-label="Confirmar reserva"><i class="fa-solid fa-check"></i></button><button type="button" class="action-no" aria-label="Cancelar reserva"><i class="fa-solid fa-circle-xmark"></i></button></div></td></tr>
+            <tr><td data-label="Nº Reserva">#MS-4814</td><td data-label="Cliente">Enrique Iglesias</td><td data-label="Pax">2 pax</td><td data-label="Fecha">16 Oct 2025</td><td data-label="Hora">22:15</td><td data-label="Mesa asignada">Mesa 10</td><td data-label="Estado"><span class="badge badge-cancel">Cancelada</span></td><td data-label="Acciones"><div class="actions"><button type="button" class="action-ok" aria-label="Confirmar reserva"><i class="fa-solid fa-check"></i></button><button type="button" class="action-no" aria-label="Cancelar reserva"><i class="fa-solid fa-circle-xmark"></i></button></div></td></tr>
+            <tr><td data-label="Nº Reserva">#MS-4813</td><td data-label="Cliente">Marta Sánchez</td><td data-label="Pax">6 pax</td><td data-label="Fecha">17 Oct 2025</td><td data-label="Hora">20:00</td><td data-label="Mesa asignada">Mesa 7 (Salón)</td><td data-label="Estado"><span class="badge badge-cancel">Cancelada</span></td><td data-label="Acciones"><div class="actions"><button type="button" class="action-ok" aria-label="Confirmar reserva"><i class="fa-solid fa-check"></i></button><button type="button" class="action-no" aria-label="Cancelar reserva"><i class="fa-solid fa-circle-xmark"></i></button></div></td></tr>
+            <tr><td data-label="Nº Reserva">#MS-4812</td><td data-label="Cliente">Diego Torres</td><td data-label="Pax">3 pax</td><td data-label="Fecha">18 Oct 2025</td><td data-label="Hora">13:45</td><td data-label="Mesa asignada">Mesa 3 (Terraza)</td><td data-label="Estado"><span class="badge badge-cancel">Cancelada</span></td><td data-label="Acciones"><div class="actions"><button type="button" class="action-ok" aria-label="Confirmar reserva"><i class="fa-solid fa-check"></i></button><button type="button" class="action-no" aria-label="Cancelar reserva"><i class="fa-solid fa-circle-xmark"></i></button></div></td></tr>
+            <tr><td data-label="Nº Reserva">#MS-4811</td><td data-label="Cliente">Laura Pausini</td><td data-label="Pax">2 pax</td><td data-label="Fecha">19 Oct 2025</td><td data-label="Hora">21:15</td><td data-label="Mesa asignada">Mesa 9</td><td data-label="Estado"><span class="badge badge-cancel">Cancelada</span></td><td data-label="Acciones"><div class="actions"><button type="button" class="action-ok" aria-label="Confirmar reserva"><i class="fa-solid fa-check"></i></button><button type="button" class="action-no" aria-label="Cancelar reserva"><i class="fa-solid fa-circle-xmark"></i></button></div></td></tr>
+              </tbody>
+            </table></div>
+          </section>
+        </div>
+      </div>
+    </div>
+    </main>
+  </div>
+</body>
+
+</html>
