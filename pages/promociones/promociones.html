@@ -27,6 +27,7 @@
   <script defer src="../../js/navbar.js"></script>
   <script defer src="../../js/app.js"></script>
   <script defer src="../../js/auth.js"></script>
+  <script defer src="../../js/promotions.js"></script>
   <link rel="stylesheet" href="../../styles/navbar.css" />
 </head>
 
@@ -52,20 +53,85 @@
       </div>
     </div>
   </header>
-  <main class="container promotions-main" id="promociones">
-    <section class="promotions-intro" aria-labelledby="promotions-title">
-      <h1 id="promotions-title">Promociones de restaurantes</h1>
-      <p>Ofertas de ejemplo de los restaurantes de Lima. Confirma precios, horarios y condiciones directamente con cada local.</p>
+  <main id="promociones">
+    <section class="promo-hero" aria-labelledby="promotions-title">
+      <div class="container promo-hero__inner">
+        <div class="promo-hero__copy">
+          <h1 id="promotions-title">Promociones gastronómicas</h1>
+          <p>Descubre ofertas especiales en restaurantes de Lima y encuentra la mejor opción para tu próxima salida.</p>
+        </div>
+        <div class="promo-hero__art" aria-hidden="true">
+          <p class="promo-hero__tag"><i data-lucide="tag"></i>Buenas comidas,<br />mejores momentos</p>
+          <img src="../../assets/promociones/ceviche.jpg" alt="" />
+        </div>
+      </div>
     </section>
-    <section class="promotions-list" aria-label="Lista de promociones">
-      <div class="promo-cards">
-        <article class="promo-card">
+    <div class="container promotions-main">
+      <form class="promo-filters" id="promo-filters" role="search" aria-label="Filtrar promociones">
+        <div class="promo-filters__field promo-filters__field--search">
+          <i data-lucide="search" aria-hidden="true"></i>
+          <label class="sr-only" for="promo-query">Buscar promociones, restaurantes o platos</label>
+          <input type="search" id="promo-query" name="query" placeholder="Buscar promociones, restaurantes o platos…" autocomplete="off" />
+        </div>
+        <div class="promo-filters__field">
+          <i data-lucide="map-pin" aria-hidden="true"></i>
+          <label class="sr-only" for="promo-district">Distrito</label>
+          <select id="promo-district" name="district">
+            <option value="">Lima, Perú</option>
+            <option>Barranco</option>
+            <option>Miraflores</option>
+            <option>Pueblo Libre</option>
+            <option>San Isidro</option>
+            <option>San Miguel</option>
+            <option>Santiago de Surco</option>
+          </select>
+        </div>
+        <div class="promo-filters__field">
+          <i data-lucide="utensils" aria-hidden="true"></i>
+          <label class="sr-only" for="promo-type">Tipo de comida</label>
+          <select id="promo-type" name="type">
+            <option value="">Tipo de comida</option>
+            <option value="carnes">Carnes</option>
+            <option value="criolla">Criolla</option>
+            <option value="desayunos">Desayunos</option>
+            <option value="makis">Makis</option>
+            <option value="mariscos">Mariscos</option>
+            <option value="polleria">Pollería</option>
+          </select>
+        </div>
+        <div class="promo-filters__field">
+          <i data-lucide="tag" aria-hidden="true"></i>
+          <label class="sr-only" for="promo-price">Rango de precios</label>
+          <select id="promo-price" name="price">
+            <option value="">Rango de precios</option>
+            <option value="low">Hasta S/ 40</option>
+            <option value="mid">S/ 41 – S/ 70</option>
+            <option value="high">Más de S/ 70</option>
+          </select>
+        </div>
+        <div class="promo-filters__field promo-filters__field--sort">
+          <i data-lucide="arrow-up-down" aria-hidden="true"></i>
+          <label for="promo-sort">Ordenar por:</label>
+          <select id="promo-sort" name="sort">
+            <option value="popular">Más populares</option>
+            <option value="price-asc">Menor precio</option>
+            <option value="price-desc">Mayor precio</option>
+          </select>
+        </div>
+      </form>
+      <section class="promotions-list" aria-label="Lista de promociones">
+        <p class="sr-only" id="promo-count" role="status" aria-live="polite"></p>
+        <div class="promo-cards" id="promo-cards">
+        <article class="promo-card" data-distrito="Miraflores" data-precio="38" data-orden="1" data-tipo="mariscos">
           <div class="promo-card__image">
-            <img src="../../assets/restaurant-placeholder.svg" alt="Imagen de ejemplo de 2x1 en ceviches en Cevichería La Mar Azul" loading="lazy" />
-            <span class="promo-card__tag">Miraflores</span>
+            <img src="../../assets/promociones/ceviche.jpg" alt="Plato de ceviche clásico" loading="lazy" onerror="this.onerror=null;this.src='../../assets/restaurant-placeholder.svg'" />
+            <span class="promo-card__badge">2x1</span>
+            <input class="promo-card__fav-input" type="checkbox" id="fav-1" />
+            <label class="promo-card__fav" for="fav-1" aria-label="Guardar 2x1 en ceviches en favoritos"><i data-lucide="heart" aria-hidden="true"></i></label>
           </div>
           <div class="promo-card__body">
             <p class="promo-card__restaurant">Cevichería La Mar Azul</p>
+            <p class="promo-card__location"><i data-lucide="map-pin" aria-hidden="true"></i>Miraflores</p>
             <h3 class="promo-card__title">2x1 en ceviches</h3>
             <p class="promo-card__text">Pide un ceviche clásico y llévate el segundo sin costo adicional.</p>
             <p class="promo-card__schedule"><i data-lucide="clock" aria-hidden="true"></i>Lunes a jueves</p>
@@ -74,13 +140,16 @@
             <a class="promo-card__link" href="../restaurantes/restaurantes.html">Ver restaurantes<i data-lucide="arrow-right" aria-hidden="true"></i></a>
           </div>
         </article>
-        <article class="promo-card">
+        <article class="promo-card" data-distrito="Pueblo Libre" data-precio="22" data-orden="2" data-tipo="criolla">
           <div class="promo-card__image">
-            <img src="../../assets/restaurant-placeholder.svg" alt="Imagen de ejemplo de Menú ejecutivo criollo en Sabores de Barrio" loading="lazy" />
-            <span class="promo-card__tag">Pueblo Libre</span>
+            <img src="../../assets/promociones/menu-criollo.jpg" alt="Menú criollo con entrada y plato de fondo" loading="lazy" onerror="this.onerror=null;this.src='../../assets/restaurant-placeholder.svg'" />
+            <span class="promo-card__badge">-20%</span>
+            <input class="promo-card__fav-input" type="checkbox" id="fav-2" />
+            <label class="promo-card__fav" for="fav-2" aria-label="Guardar Menú ejecutivo criollo en favoritos"><i data-lucide="heart" aria-hidden="true"></i></label>
           </div>
           <div class="promo-card__body">
             <p class="promo-card__restaurant">Sabores de Barrio</p>
+            <p class="promo-card__location"><i data-lucide="map-pin" aria-hidden="true"></i>Pueblo Libre</p>
             <h3 class="promo-card__title">Menú ejecutivo criollo</h3>
             <p class="promo-card__text">Entrada, plato de fondo, refresco y postre del día.</p>
             <p class="promo-card__schedule"><i data-lucide="clock" aria-hidden="true"></i>Lunes a viernes, 12:00–16:00</p>
@@ -89,13 +158,16 @@
             <a class="promo-card__link" href="../restaurantes/restaurantes.html">Ver restaurantes<i data-lucide="arrow-right" aria-hidden="true"></i></a>
           </div>
         </article>
-        <article class="promo-card">
+        <article class="promo-card" data-distrito="Santiago de Surco" data-precio="95" data-orden="3" data-tipo="carnes">
           <div class="promo-card__image">
-            <img src="../../assets/restaurant-placeholder.svg" alt="Imagen de ejemplo de Parrilla para dos en El Asador de Surco" loading="lazy" />
-            <span class="promo-card__tag">Santiago de Surco</span>
+            <img src="../../assets/promociones/parrilla.jpg" alt="Parrilla mixta con carnes" loading="lazy" onerror="this.onerror=null;this.src='../../assets/restaurant-placeholder.svg'" />
+            <span class="promo-card__badge">-25%</span>
+            <input class="promo-card__fav-input" type="checkbox" id="fav-3" />
+            <label class="promo-card__fav" for="fav-3" aria-label="Guardar Parrilla para dos en favoritos"><i data-lucide="heart" aria-hidden="true"></i></label>
           </div>
           <div class="promo-card__body">
             <p class="promo-card__restaurant">El Asador de Surco</p>
+            <p class="promo-card__location"><i data-lucide="map-pin" aria-hidden="true"></i>Santiago de Surco</p>
             <h3 class="promo-card__title">Parrilla para dos</h3>
             <p class="promo-card__text">Parrilla mixta con papas, ensaladas y dos bebidas.</p>
             <p class="promo-card__schedule"><i data-lucide="clock" aria-hidden="true"></i>Viernes a domingo</p>
@@ -104,13 +176,16 @@
             <a class="promo-card__link" href="../restaurantes/restaurantes.html">Ver restaurantes<i data-lucide="arrow-right" aria-hidden="true"></i></a>
           </div>
         </article>
-        <article class="promo-card">
+        <article class="promo-card" data-distrito="Barranco" data-precio="69" data-orden="4" data-tipo="makis">
           <div class="promo-card__image">
-            <img src="../../assets/restaurant-placeholder.svg" alt="Imagen de ejemplo de Combo makis 30 piezas en Maki Barranco" loading="lazy" />
-            <span class="promo-card__tag">Barranco</span>
+            <img src="../../assets/promociones/makis.jpg" alt="Bandeja de makis variados" loading="lazy" onerror="this.onerror=null;this.src='../../assets/restaurant-placeholder.svg'" />
+            <span class="promo-card__badge">Nuevo</span>
+            <input class="promo-card__fav-input" type="checkbox" id="fav-4" />
+            <label class="promo-card__fav" for="fav-4" aria-label="Guardar Combo makis 30 piezas en favoritos"><i data-lucide="heart" aria-hidden="true"></i></label>
           </div>
           <div class="promo-card__body">
             <p class="promo-card__restaurant">Maki Barranco</p>
+            <p class="promo-card__location"><i data-lucide="map-pin" aria-hidden="true"></i>Barranco</p>
             <h3 class="promo-card__title">Combo makis 30 piezas</h3>
             <p class="promo-card__text">Treinta piezas variadas para compartir y una bebida.</p>
             <p class="promo-card__schedule"><i data-lucide="clock" aria-hidden="true"></i>Todos los días</p>
@@ -119,13 +194,16 @@
             <a class="promo-card__link" href="../restaurantes/restaurantes.html">Ver restaurantes<i data-lucide="arrow-right" aria-hidden="true"></i></a>
           </div>
         </article>
-        <article class="promo-card">
+        <article class="promo-card" data-distrito="San Isidro" data-precio="24" data-orden="5" data-tipo="desayunos">
           <div class="promo-card__image">
-            <img src="../../assets/restaurant-placeholder.svg" alt="Imagen de ejemplo de Desayuno de la casa en Café Central" loading="lazy" />
-            <span class="promo-card__tag">San Isidro</span>
+            <img src="../../assets/promociones/desayuno.jpg" alt="Desayuno con café y pan" loading="lazy" onerror="this.onerror=null;this.src='../../assets/restaurant-placeholder.svg'" />
+            <span class="promo-card__badge">Nuevo</span>
+            <input class="promo-card__fav-input" type="checkbox" id="fav-5" />
+            <label class="promo-card__fav" for="fav-5" aria-label="Guardar Desayuno de la casa en favoritos"><i data-lucide="heart" aria-hidden="true"></i></label>
           </div>
           <div class="promo-card__body">
             <p class="promo-card__restaurant">Café Central</p>
+            <p class="promo-card__location"><i data-lucide="map-pin" aria-hidden="true"></i>San Isidro</p>
             <h3 class="promo-card__title">Desayuno de la casa</h3>
             <p class="promo-card__text">Café, jugo natural y pan con chicharrón o tostadas.</p>
             <p class="promo-card__schedule"><i data-lucide="clock" aria-hidden="true"></i>Sábados y domingos, 8:00–12:00</p>
@@ -134,13 +212,16 @@
             <a class="promo-card__link" href="../restaurantes/restaurantes.html">Ver restaurantes<i data-lucide="arrow-right" aria-hidden="true"></i></a>
           </div>
         </article>
-        <article class="promo-card">
+        <article class="promo-card" data-distrito="San Miguel" data-precio="55" data-orden="6" data-tipo="polleria">
           <div class="promo-card__image">
-            <img src="../../assets/restaurant-placeholder.svg" alt="Imagen de ejemplo de Noche de pollo a la brasa en Pollería Don Lucho" loading="lazy" />
-            <span class="promo-card__tag">San Miguel</span>
+            <img src="../../assets/promociones/pollo-brasa.jpg" alt="Pollo a la brasa con papas" loading="lazy" onerror="this.onerror=null;this.src='../../assets/restaurant-placeholder.svg'" />
+            <span class="promo-card__badge">-20%</span>
+            <input class="promo-card__fav-input" type="checkbox" id="fav-6" />
+            <label class="promo-card__fav" for="fav-6" aria-label="Guardar Noche de pollo a la brasa en favoritos"><i data-lucide="heart" aria-hidden="true"></i></label>
           </div>
           <div class="promo-card__body">
             <p class="promo-card__restaurant">Pollería Don Lucho</p>
+            <p class="promo-card__location"><i data-lucide="map-pin" aria-hidden="true"></i>San Miguel</p>
             <h3 class="promo-card__title">Noche de pollo a la brasa</h3>
             <p class="promo-card__text">Pollo entero con papas, ensalada y gaseosa familiar.</p>
             <p class="promo-card__schedule"><i data-lucide="clock" aria-hidden="true"></i>Miércoles</p>
@@ -149,8 +230,14 @@
             <a class="promo-card__link" href="../restaurantes/restaurantes.html">Ver restaurantes<i data-lucide="arrow-right" aria-hidden="true"></i></a>
           </div>
         </article>
-      </div>
-    </section>
+        </div>
+        <div class="promo-empty" id="promo-empty" hidden>
+          <h3>No encontramos promociones</h3>
+          <p>Prueba con otro distrito, tipo de comida o rango de precios.</p>
+          <button class="button" id="promo-reset" type="button">Limpiar filtros</button>
+        </div>
+      </section>
+    </div>
   </main>
   <footer class="footer">
     <div class="container">
