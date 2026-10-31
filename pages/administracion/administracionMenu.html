@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Panel de administracion de MesaSpot: Menú." />
+  <title>Menú · Administración · MesaSpot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="../../styles/administracionMenu.css" />
+</head>
+
+<body class="admin-page">
+  <div class="shell">
+    <header class="sidebar">
+      <div class="sidebar-top">
+        <div class="brand"><span class="logo-badge"><i class="fa-solid fa-table-cells-large"></i></span><span class="brand-text"><strong>MesaSpot</strong><small>SOCIO ADMIN</small></span></div>
+        <section class="restaurant-profile" aria-label="Restaurante">
+          <span class="avatar" aria-hidden="true"><i class="fa-solid fa-fire"></i></span>
+          <div><strong>El Sabor Criollo</strong><small>Lima, Perú</small></div>
+        </section>
+        <nav class="nav" aria-label="Navegación principal">
+          <a class="nav-link nav-demo" href="administracionDemo.html"><i class="fa-solid fa-table-columns"></i>Dashboard</a>
+          <a class="nav-link nav-reservas" href="administracionReservas.html"><i class="fa-solid fa-calendar-check"></i>Reservas</a>
+          <a class="nav-link nav-menu active" aria-current="page" href="administracionMenu.html"><i class="fa-solid fa-bars"></i>Menú</a>
+          <a class="nav-link nav-resenas" href="administracionResenas.html"><i class="fa-solid fa-star-half-stroke"></i>Reseñas</a>
+          <a class="nav-link nav-promociones" href="administracionPromociones.html"><i class="fa-solid fa-ticket"></i>Promociones</a>
+          <span class="nav-link nav-configuracion disabled" aria-disabled="true" title="Próximamente"><i class="fa-solid fa-sliders"></i>Configuración</span>
+        </nav>
+      </div>
+      <div class="user-bar">
+        <span class="avatar-round">CG</span>
+        <div><strong>Carlos Gómez</strong><small>Propietario</small></div>
+        <button type="button" class="icon-btn" aria-label="Cerrar sesión"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </header>
+
+    <main class="main" aria-labelledby="t-menu">
+      <header class="page-header"><div><h1 id="t-menu">Gestión del Menú y Carta</h1><p>Modifica la carta digital de MesaSpot y destaca tus mejores elaboraciones para tu restaurante.</p></div><button type="button" class="btn"><i class="fa-solid fa-plus"></i>Añadir plato</button></header>
+      <div class="content">
+        <h2 class="section-title"><i class="fa-solid fa-star"></i>Platos Estrella destacadas en MesaSpot</h2>
+        <div class="dish-grid">
+          <article class="dish dish-featured">
+            <div class="dish-photo photo-1">
+              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTd662Au6BQeCUrtRIV0dFlbaVXJqWqZ3RPsD1uSetWeg&s=10" alt="Lomo Saltado" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;" />
+            </div>
+            <div class="dish-body">
+              <div class="dish-top"><h3>Lomo Saltado</h3><strong>S/ 38.00</strong></div>
+              <p>Trozos de lomo fino salteados al wok con cebolla, tomates, ají amarillo, sillao y vinagre. Acompañado de papas fritas y arroz.</p>
+              <div class="dish-foot"><span class="status">Disponible</span><span><button type="button" class="icon-btn" aria-label="Editar plato"><i class="fa-solid fa-pen"></i></button> <button type="button" class="icon-btn danger" aria-label="Eliminar plato"><i class="fa-solid fa-trash"></i></button></span></div>
+            </div>
+          </article>
+          <article class="dish dish-featured">
+            <div class="dish-photo photo-2">
+              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT7NkuXt9locSj_t6CWxvbdY5t0Qr1N2qfIyzkYgJMOBA&s=10" alt="Ají de Gallina" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;" />
+            </div>
+            <div class="dish-body">
+              <div class="dish-top"><h3>Ají de Gallina</h3><strong>S/ 32.00</strong></div>
+              <p>Fino crema de ají amarillo, leche, queso fresco y trozos de gallina deshilachada, servido con papa sancochada, aceituna y huevo.</p>
+              <div class="dish-foot"><span class="status">Disponible</span><span><button type="button" class="icon-btn" aria-label="Editar plato"><i class="fa-solid fa-pen"></i></button> <button type="button" class="icon-btn danger" aria-label="Eliminar plato"><i class="fa-solid fa-trash"></i></button></span></div>
+            </div>
+          </article>
+        </div>
+        <h2 class="section-title">Carta regular</h2>
+        <div class="dish-grid">
+          <article class="dish">
+            <div class="dish-photo photo-3">
+              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRoRGsGOTArUqTasWPfnHS29-vVN5n9o-EWm2lPbzFfrw&s=10" alt="Causa Limeña" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;" />
+            </div>
+            <div class="dish-body">
+              <div class="dish-top"><h3>Causa Limeña</h3><strong>S/ 24.00</strong></div>
+              <p>Masa de papa amarilla sazonada con ají amarillo y limón, rellena de jugosa pechuga de pollo desmenuzada con mayonesa y palta.</p>
+              <div class="dish-foot"><span class="status">Disponible</span><span><button type="button" class="icon-btn" aria-label="Editar plato"><i class="fa-solid fa-pen"></i></button> <button type="button" class="icon-btn danger" aria-label="Eliminar plato"><i class="fa-solid fa-trash"></i></button></span></div>
+            </div>
+          </article>
+          <article class="dish">
+            <div class="dish-photo photo-4">
+              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQPuo8MTD5gJSrokdbQ-lEcTLXfOiCZbMbz9_Z7HHO7jA&s=10" alt="Anticuchos de Corazón" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;" />
+            </div>
+            <div class="dish-body">
+              <div class="dish-top"><h3>Anticuchos de Corazón</h3><strong>S/ 26.50</strong></div>
+              <p>Brochetas de corazón de res marinadas en ají panca, vinagre y especias a la parrilla, acompañadas de papa dorada y choclo.</p>
+              <div class="dish-foot"><span class="status">Disponible</span><span><button type="button" class="icon-btn" aria-label="Editar plato"><i class="fa-solid fa-pen"></i></button> <button type="button" class="icon-btn danger" aria-label="Eliminar plato"><i class="fa-solid fa-trash"></i></button></span></div>
+            </div>
+          </article>
+          <article class="dish">
+            <div class="dish-photo photo-5">
+              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSe62odWf8_oNgew-qELP-etrPHDJoGFs-oal2Gyf4ueA&s=10" alt="Arroz con Leche" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;" />
+            </div>
+            <div class="dish-body">
+              <div class="dish-top"><h3>Arroz con Leche Tradicional</h3><strong>S/ 12.00</strong></div>
+              <p>Postre clásico preparado a fuego lento con leche condensada, leche evaporada, canela, clavo de olor y un toque de limón.</p>
+              <div class="dish-foot"><span class="status">Disponible</span><span><button type="button" class="icon-btn" aria-label="Editar plato"><i class="fa-solid fa-pen"></i></button> <button type="button" class="icon-btn danger" aria-label="Eliminar plato"><i class="fa-solid fa-trash"></i></button></span></div>
+            </div>
+          </article>
+          <article class="dish">
+            <div class="dish-photo photo-6">
+              <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGOXUHA_6QnGi-EbrSjmp9owJkVezBJpapelgpcFTZyA&s=10" alt="Seco de Res" style="width: 100%; height: 100%; object-fit: cover; border-radius: inherit;" />
+            </div>
+            <div class="dish-body">
+              <div class="dish-top"><h3>Seco de Res con Frijoles</h3><strong>S/ 34.00</strong></div>
+              <p>Tierno guiso de carne de res cocinado a base de culantro, chicha de jora y arvejas, acompañado de frijoles criollos y arroz.</p>
+              <div class="dish-foot"><span class="status sold-out">Agotado</span><span><button type="button" class="icon-btn" aria-label="Editar plato"><i class="fa-solid fa-pen"></i></button> <button type="button" class="icon-btn danger" aria-label="Eliminar plato"><i class="fa-solid fa-trash"></i></button></span></div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+
+</html>
