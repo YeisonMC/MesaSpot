@@ -1,0 +1,140 @@
+/* Promociones: página estática con datos de ejemplo. Reutiliza los tokens de main.css. */
+.promotions-page .header {
+  border-bottom: 1px solid var(--line);
+}
+.promotions-main {
+  padding-block: 40px 56px;
+}
+.promotions-intro {
+  margin-bottom: 32px;
+}
+.promotions-intro h1 {
+  font: 700 30px/1.2 var(--heading);
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
+.promotions-intro p {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+  max-width: 60ch;
+}
+/* Móvil primero: una columna. */
+.promo-cards {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+}
+.promo-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  transition:
+    box-shadow 0.2s,
+    transform 0.2s;
+}
+.promo-card:hover {
+  box-shadow: 0 8px 24px #372a1c1f;
+  transform: translateY(-2px);
+}
+.promo-card__image {
+  position: relative;
+  aspect-ratio: 1.65;
+  background: var(--soft);
+}
+.promo-card__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.promo-card__tag {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--accent-dark);
+  font-size: 12px;
+  font-weight: 700;
+}
+.promo-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  flex: 1;
+}
+.promo-card__restaurant {
+  color: var(--muted);
+  font-size: 13px;
+}
+.promo-card__title {
+  font: 700 20px/1.25 var(--heading);
+}
+.promo-card__text {
+  font-size: 14px;
+  line-height: 1.55;
+}
+.promo-card__schedule {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.promo-card__schedule .lucide {
+  width: 16px;
+  height: 16px;
+}
+.promo-card__price {
+  font: 700 20px/1 var(--heading);
+  color: var(--accent-dark);
+}
+.promo-card__terms {
+  color: var(--muted);
+  font-size: 12px;
+}
+.promo-card__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 6px;
+  color: var(--accent-dark);
+  font-weight: 700;
+  font-size: 14px;
+}
+.promo-card__link .lucide {
+  width: 16px;
+  height: 16px;
+}
+.promo-card__link:hover {
+  text-decoration: underline;
+}
+/* Escritorio: dos y luego tres columnas. */
+@media (min-width: 768px) {
+  .promo-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+  }
+  .promotions-intro h1 {
+    font-size: 36px;
+  }
+}
+@media (min-width: 1100px) {
+  .promo-cards {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .promo-card {
+    transition: none;
+  }
+  .promo-card:hover {
+    transform: none;
+  }
+}

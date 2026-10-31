@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="Conoce las promociones de los restaurantes de Lima, Perú." />
+  <meta name="theme-color" content="#c95830" />
+  <title>Promociones · MesaSpot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" />
+  <link rel="stylesheet" href="../../styles/main.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+  <link rel="stylesheet" href="../../styles/auth.css" />
+  <link rel="stylesheet" href="../../styles/promotions.css" />
+  <link rel="stylesheet" href="../../styles/integration.css" />
+  <script defer src="../../vendor/lucide-1.61.0.min.js"></script>
+  <script defer src="../../js/icons.js"></script>
+  <script defer src="../../js/config.js"></script>
+  <script defer src="../../js/api.js"></script>
+  <script defer src="../../js/ui.js"></script>
+  <script defer src="../../js/navbar.js"></script>
+  <script defer src="../../js/app.js"></script>
+  <script defer src="../../js/auth.js"></script>
+  <link rel="stylesheet" href="../../styles/navbar.css" />
+</head>
+
+<body class="promotions-page" data-page="promotions">
+  <a class="skip-link" href="#promociones">Saltar a promociones</a>
+
+  <header class="header" id="inicio">
+    <div class="container header-inner">
+      <a class="brand" href="../../index.html" aria-label="MesaSpot, inicio"><span class="brand-icon"><i
+            data-lucide="chef-hat" aria-hidden="true"></i></span>MesaSpot</a>
+      <button class="menu-toggle icon-button" aria-label="Abrir menú" aria-expanded="false"
+        aria-controls="navigation"><i data-lucide="menu" aria-hidden="true"></i></button>
+      <nav class="navigation" id="navigation" aria-label="Navegación principal">
+        <a href="../../index.html">Inicio</a><a href="../restaurantes/restaurantes.html">Restaurantes</a><a class="active" aria-current="page" href="promociones.html">Promociones</a>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-button notifications" aria-label="Notificaciones" data-info="notifications">
+          <i data-lucide="bell" aria-hidden="true"></i></button><span class="header-divider"></span><button
+          class="login" data-account="login">Iniciar
+          sesión</button><button class="button register" data-account="register">
+          Registrarse
+        </button>
+      </div>
+    </div>
+  </header>
+  <main class="container promotions-main" id="promociones">
+    <section class="promotions-intro" aria-labelledby="promotions-title">
+      <h1 id="promotions-title">Promociones de restaurantes</h1>
+      <p>Ofertas de ejemplo de los restaurantes de Lima. Confirma precios, horarios y condiciones directamente con cada local.</p>
+    </section>
+    <section class="promotions-list" aria-label="Lista de promociones">
+      <div class="promo-cards">
+        <article class="promo-card">
+          <div class="promo-card__image">
+            <img src="../../assets/restaurant-placeholder.svg" alt="Imagen de ejemplo de 2x1 en ceviches en Cevichería La Mar Azul" loading="lazy" />
+            <span class="promo-card__tag">Miraflores</span>
+          </div>
+          <div class="promo-card__body">
+            <p class="promo-card__restaurant">Cevichería La Mar Azul</p>
+            <h3 class="promo-card__title">2x1 en ceviches</h3>
+            <p class="promo-card__text">Pide un ceviche clásico y llévate el segundo sin costo adicional.</p>
+            <p class="promo-card__schedule"><i data-lucide="clock" aria-hidden="true"></i>Lunes a jueves</p>
+            <p class="promo-card__price">S/ 38.00</p>
+            <p class="promo-card__terms">Válido en el local, no acumulable con otras ofertas.</p>
+            <a class="promo-card__link" href="../restaurantes/restaurantes.html">Ver restaurantes<i data-lucide="arrow-right" aria-hidden="true"></i></a>
+          </div>
+        </article>
+        <article class="promo-card">
+          <div class="promo-card__image">
+            <img src="../../assets/restaurant-placeholder.svg" alt="Imagen de ejemplo de Menú ejecutivo criollo en Sabores de Barrio" loading="lazy" />
+            <span class="promo-card__tag">Pueblo Libre</span>
+          </div>
+          <div class="promo-card__body">
+            <p class="promo-card__restaurant">Sabores de Barrio</p>
+            <h3 class="promo-card__title">Menú ejecutivo criollo</h3>
+            <p class="promo-card__text">Entrada, plato de fondo, refresco y postre del día.</p>
+            <p class="promo-card__schedule"><i data-lucide="clock" aria-hidden="true"></i>Lunes a viernes, 12:00–16:00</p>
+            <p class="promo-card__price">S/ 22.00</p>
+            <p class="promo-card__terms">Sujeto a disponibilidad del día.</p>
+            <a class="promo-card__link" href="../restaurantes/restaurantes.html">Ver restaurantes<i data-lucide="arrow-right" aria-hidden="true"></i></a>
+          </div>
+        </article>
+        <article class="promo-card">
+          <div class="promo-card__image">
+            <img src="../../assets/restaurant-placeholder.svg" alt="Imagen de ejemplo de Parrilla para dos en El Asador de Surco" loading="lazy" />
+            <span class="promo-card__tag">Santiago de Surco</span>
+          </div>
+          <div class="promo-card__body">
+            <p class="promo-card__restaurant">El Asador de Surco</p>
+            <h3 class="promo-card__title">Parrilla para dos</h3>
+            <p class="promo-card__text">Parrilla mixta con papas, ensaladas y dos bebidas.</p>
+            <p class="promo-card__schedule"><i data-lucide="clock" aria-hidden="true"></i>Viernes a domingo</p>
+            <p class="promo-card__price">S/ 95.00</p>
+            <p class="promo-card__terms">Reserva previa recomendada.</p>
+            <a class="promo-card__link" href="../restaurantes/restaurantes.html">Ver restaurantes<i data-lucide="arrow-right" aria-hidden="true"></i></a>
+          </div>
+        </article>
+        <article class="promo-card">
+          <div class="promo-card__image">
+            <img src="../../assets/restaurant-placeholder.svg" alt="Imagen de ejemplo de Combo makis 30 piezas en Maki Barranco" loading="lazy" />
+            <span class="promo-card__tag">Barranco</span>
+          </div>
+          <div class="promo-card__body">
+            <p class="promo-card__restaurant">Maki Barranco</p>
+            <h3 class="promo-card__title">Combo makis 30 piezas</h3>
+            <p class="promo-card__text">Treinta piezas variadas para compartir y una bebida.</p>
+            <p class="promo-card__schedule"><i data-lucide="clock" aria-hidden="true"></i>Todos los días</p>
+            <p class="promo-card__price">S/ 69.00</p>
+            <p class="promo-card__terms">Hasta agotar stock.</p>
+            <a class="promo-card__link" href="../restaurantes/restaurantes.html">Ver restaurantes<i data-lucide="arrow-right" aria-hidden="true"></i></a>
+          </div>
+        </article>
+        <article class="promo-card">
+          <div class="promo-card__image">
+            <img src="../../assets/restaurant-placeholder.svg" alt="Imagen de ejemplo de Desayuno de la casa en Café Central" loading="lazy" />
+            <span class="promo-card__tag">San Isidro</span>
+          </div>
+          <div class="promo-card__body">
+            <p class="promo-card__restaurant">Café Central</p>
+            <h3 class="promo-card__title">Desayuno de la casa</h3>
+            <p class="promo-card__text">Café, jugo natural y pan con chicharrón o tostadas.</p>
+            <p class="promo-card__schedule"><i data-lucide="clock" aria-hidden="true"></i>Sábados y domingos, 8:00–12:00</p>
+            <p class="promo-card__price">S/ 24.00</p>
+            <p class="promo-card__terms">No incluye propina.</p>
+            <a class="promo-card__link" href="../restaurantes/restaurantes.html">Ver restaurantes<i data-lucide="arrow-right" aria-hidden="true"></i></a>
+          </div>
+        </article>
+        <article class="promo-card">
+          <div class="promo-card__image">
+            <img src="../../assets/restaurant-placeholder.svg" alt="Imagen de ejemplo de Noche de pollo a la brasa en Pollería Don Lucho" loading="lazy" />
+            <span class="promo-card__tag">San Miguel</span>
+          </div>
+          <div class="promo-card__body">
+            <p class="promo-card__restaurant">Pollería Don Lucho</p>
+            <h3 class="promo-card__title">Noche de pollo a la brasa</h3>
+            <p class="promo-card__text">Pollo entero con papas, ensalada y gaseosa familiar.</p>
+            <p class="promo-card__schedule"><i data-lucide="clock" aria-hidden="true"></i>Miércoles</p>
+            <p class="promo-card__price">S/ 55.00</p>
+            <p class="promo-card__terms">Delivery no incluido.</p>
+            <a class="promo-card__link" href="../restaurantes/restaurantes.html">Ver restaurantes<i data-lucide="arrow-right" aria-hidden="true"></i></a>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <a class="brand" href="../../index.html"><span class="brand-icon"><i data-lucide="chef-hat"
+                aria-hidden="true"></i></span>MesaSpot</a>
+          <p>
+            Tu plataforma de descubrimiento gastronómico en
+            Lima, Perú. Encuentra tu próxima experiencia culinaria
+            inolvidable.
+          </p>
+          <div class="socials" aria-label="Redes sociales">
+            <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i
+                data-lucide="external-link" aria-hidden="true"></i></a><a href="https://www.instagram.com/"
+              target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i data-lucide="camera"
+                aria-hidden="true"></i></a><a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer"
+              aria-label="YouTube"><i data-lucide="circle-play" aria-hidden="true"></i></a>
+          </div>
+        </div>
+        <div>
+          <h3>Descubre</h3>
+          <a href="../../index.html#restaurantes">Restaurantes destacados</a><button data-info="favorites">Favoritos del
+            mes</button><button data-info="experiences">Experiencias culinarias</button><a href="promociones.html">Promociones activas</a>
+        </div>
+        <div>
+          <h3>Legal</h3>
+          <button data-info="terms">Términos de servicio</button><button data-info="privacy">Política de
+            privacidad</button><button data-info="cookies">Política de cookies</button><button
+            data-info="conditions">Condiciones de reserva</button>
+        </div>
+        <div>
+          <h3>Contacto</h3>
+          <button data-info="support">Soporte al cliente</button><button data-info="join">Únete como
+            restaurante</button><button data-info="faq">Preguntas frecuentes</button><button data-info="press">Prensa y
+            media</button>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2026 MesaSpot. Diseñado con pasión gastronómica.</p>
+        <p>Hecho en Lima, Perú</p>
+      </div>
+    </div>
+  </footer>
+  <dialog id="modal" aria-labelledby="modal-title">
+    <button class="modal-close icon-button" id="close-modal" aria-label="Cerrar ventana"><i data-lucide="x"
+        aria-hidden="true"></i></button>
+    <div id="modal-content"></div>
+  </dialog>
+  <div class="toast" id="toast" role="status" hidden></div>
+</body>
+
+</html>
