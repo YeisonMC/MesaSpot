@@ -87,11 +87,15 @@
     /* Paso 3 */
     .rv-note{display:flex;gap:10px;align-items:center;background:var(--soft);border-radius:10px;padding:13px 16px;margin-bottom:22px}
     .rv-note b{color:var(--accent)}
-    .rv-methods{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0 20px}
-    .rv-method{display:grid;place-items:center;text-align:center;border:1px solid var(--line);background:#fff;border-radius:12px;padding:22px 8px;font-weight:600;font-size:14px;cursor:pointer;transition:border-color .2s}
+    .rv-methods{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0 20px}  
+    .rv-method{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;border:1px solid var(--line);background:#fff;border-radius:12px;padding:18px 8px;font-weight:600;font-size:14px;cursor:pointer;transition:border-color .2s}
+    .rv-method img{height:44px;width:auto;max-width:100%;object-fit:contain}
+    .rv-method svg{width:44px;height:44px;color:var(--ink);stroke-width:1.6}
     .rv-method:hover{border-color:var(--accent)}
     .rv-met-in:checked+.rv-method{border:2px solid var(--accent);color:var(--accent)}
+    .rv-met-in:checked+.rv-method::after{content:"✓";position:absolute;top:-8px;right:-8px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;display:grid;place-items:center}
     .rv-met-in:focus-visible+.rv-method{outline:3px solid #e8a17f;outline-offset:2px}
+    img.rv-qr{width:150px;height:150px;object-fit:contain;background:#fff;border:1px solid var(--line);padding:4px}
     .rv-pay{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:22px}
     .rv-pay h3{font-size:19px;margin-bottom:10px}
     .rv-hint{color:var(--muted);font-size:14px;margin:0 0 16px}
@@ -137,7 +141,7 @@
 
   <main class="container rv-page" id="reserva">
     <section class="rv-card rv-rest" aria-label="Restaurante">
-      <img src="../../assets/restaurant-placeholder.svg" alt="" />
+      <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80" alt="El Asador de Surco" />
       <div>
         <h1>El Asador de Surco</h1>
         <div class="rv-meta">
@@ -169,8 +173,7 @@
         <p class="rv-sub">Elige la mesa que prefieras según la disponibilidad.</p>
         <div class="rv-cols">
           <div class="rv-plano">
-            <span>Plano del restaurante<br><small>(imagen que sube el restaurante)</small></span>
-            <!-- Cuando exista la imagen: <img src="../../assets/plano-restaurante.png" alt="Plano del restaurante" /> -->
+            <img src="../../assets/plano de restaurante.png" alt="Plano del restaurante El Asador de Surco" />
           </div>
           <aside class="rv-card rv-side">
             <div class="rv-legend">
@@ -225,21 +228,46 @@
             <div class="rv-note"><i data-lucide="info" aria-hidden="true" style="color:var(--accent)"></i><span><b>Importante:</b> el adelanto es del 30% del total de tu reserva.</span></div>
             <h3>Selecciona un método de pago</h3>
             <div class="rv-methods" role="radiogroup" aria-label="Método de pago">
-              <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt1" checked /><label class="rv-method" for="mt1">Yape</label>
-              <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt2" /><label class="rv-method" for="mt2">Plin</label>
-              <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt3" /><label class="rv-method" for="mt3">Tarjeta de débito o crédito</label>
-              <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt4" /><label class="rv-method" for="mt4">Transferencia bancaria</label>
+              <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt1" checked />
+              <label class="rv-method" for="mt1">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1wHEfIMvk2Iu6PEt52kZuoA5MPAM0Wm4vPhR9pnXjeg&s=10" alt="" referrerpolicy="no-referrer" />
+                <span>Yape</span>
+              </label>
+
+              <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt2" />
+              <label class="rv-method" for="mt2">
+                <img src="https://images.seeklogo.com/logo-png/38/1/plin-logo-png_seeklogo-386806.png" alt="" referrerpolicy="no-referrer" />
+                <span>Plin</span>
+              </label>
+
+              <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt3" />
+              <label class="rv-method" for="mt3">
+                <img src="https://i.pinimg.com/736x/c6/a1/fe/c6a1fe7033dc3c76ec28d13c3c7699c2.jpg" alt="" referrerpolicy="no-referrer" />
+                <span>Tarjeta de débito o crédito</span>
+              </label>
+
+              <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt4" />
+              <label class="rv-method" for="mt4">
+                <i data-lucide="landmark" aria-hidden="true"></i>
+                <span>Transferencia bancaria</span>
+              </label>
             </div>
             <div class="rv-pay">
               <div class="rv-pago pg-yape">
                 <h3>Paga con Yape</h3>
                 <p class="rv-hint">Escanea el código QR o ingresa el número del comercio.</p>
-                <div class="rv-pay-body"><div class="rv-qr" aria-label="Código QR de Yape"></div><div><small>Número de Yape</small><div class="rv-form"><input value="987 654 321" readonly aria-label="Número de Yape" /></div></div></div>
+                <div class="rv-pay-body">
+                  <img class="rv-qr" src="https://www.lanacion.com.ar/resizer/v2/U5SE7L2DWRCV7JWVQHMVSOARXE.jpg?auth=118965a2e5344b2e8f9baa30519d4afcbb0240978456c2e6a6c099d76b43946d&width=1200&height=900&quality=70&smart=true" alt="Código QR de Yape" referrerpolicy="no-referrer" />
+                  <div><small>Número de Yape</small><div class="rv-form"><input value="987 654 321" readonly aria-label="Número de Yape" /></div></div>
+                </div>
               </div>
               <div class="rv-pago pg-plin">
                 <h3>Paga con Plin</h3>
                 <p class="rv-hint">Escanea el código QR o ingresa el número del comercio.</p>
-                <div class="rv-pay-body"><div class="rv-qr" aria-label="Código QR de Plin"></div><div><small>Número de Plin</small><div class="rv-form"><input value="987 654 321" readonly aria-label="Número de Plin" /></div></div></div>
+                <div class="rv-pay-body">
+                  <img class="rv-qr" src="https://www.lanacion.com.ar/resizer/v2/U5SE7L2DWRCV7JWVQHMVSOARXE.jpg?auth=118965a2e5344b2e8f9baa30519d4afcbb0240978456c2e6a6c099d76b43946d&width=1200&height=900&quality=70&smart=true" alt="Código QR de Plin" referrerpolicy="no-referrer" />
+                  <div><small>Número de Plin</small><div class="rv-form"><input value="987 654 321" readonly aria-label="Número de Plin" /></div></div>
+                </div>
               </div>
               <div class="rv-pago pg-tarjeta">
                 <h3>Paga con tarjeta de débito o crédito</h3>
