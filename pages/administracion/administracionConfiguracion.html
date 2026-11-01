@@ -40,8 +40,10 @@
 
     <main class="main" aria-labelledby="t-config">
     <header class="page-header"><div><h1 id="t-config">Configuración de Local</h1><p>Modifica los parámetros de reservas, horarios habituales y datos de perfil del restaurante.</p></div><div class="date-chip"><i class="fa-solid fa-calendar-days"></i>Hoy, 15 de Octubre<i class="fa-solid fa-chevron-down"></i></div></header>
-    <form class="content" action="#" method="post" novalidate>
+    <form class="content" action="#" method="post" enctype="multipart/form-data" novalidate>
       <div class="settings-grid">
+
+        <!-- ============ PERFIL ============ -->
         <section class="card" aria-labelledby="t-perfil">
           <h2 id="t-perfil">Perfil del Restaurante</h2>
           <div class="profile-row"><span class="avatar" aria-hidden="true"><i class="fa-solid fa-fire"></i></span><div><button type="button" class="btn btn-small">Subir Nueva</button> <button type="button" class="btn btn-small btn-soft">Eliminar</button><small>JPG, PNG o GIF. Máximo 1MB.</small></div></div>
@@ -52,40 +54,77 @@
             <div class="field"><label for="email">Email de Contacto</label><input type="email" id="email" name="email" value="contacto@asadorsegovia.com" /></div>
           </div>
         </section>
+
+        <!-- ============ HORARIOS (apertura y cierre editables) ============ -->
         <section class="card" aria-labelledby="t-horarios">
           <h2 id="t-horarios">Horarios de Apertura habituales</h2>
           <div class="table-wrap"><table class="hours-table">
             <thead><tr><th>Día</th><th>Apertura</th><th>Cierre</th><th>Estado</th></tr></thead>
             <tbody>
-              <tr><td>Lunes</td><td>13:00</td><td>Cerrado</td><td><label class="switch"><input class="sr-only" type="checkbox" name="abre-Lunes" /><span class="on-text">Abierto</span><span class="off-text">Cerrado</span></label></td></tr>
-              <tr><td>Martes</td><td>13:00</td><td>23:30</td><td><label class="switch"><input class="sr-only" type="checkbox" name="abre-Martes" checked /><span class="on-text">Abierto</span><span class="off-text">Cerrado</span></label></td></tr>
-              <tr><td>Miércoles</td><td>13:00</td><td>23:30</td><td><label class="switch"><input class="sr-only" type="checkbox" name="abre-Miércoles" checked /><span class="on-text">Abierto</span><span class="off-text">Cerrado</span></label></td></tr>
-              <tr><td>Jueves</td><td>13:00</td><td>23:30</td><td><label class="switch"><input class="sr-only" type="checkbox" name="abre-Jueves" checked /><span class="on-text">Abierto</span><span class="off-text">Cerrado</span></label></td></tr>
-              <tr><td>Viernes</td><td>13:00</td><td>23:30</td><td><label class="switch"><input class="sr-only" type="checkbox" name="abre-Viernes" checked /><span class="on-text">Abierto</span><span class="off-text">Cerrado</span></label></td></tr>
-              <tr><td>Sábado</td><td>12:30</td><td>00:00</td><td><label class="switch"><input class="sr-only" type="checkbox" name="abre-Sábado" checked /><span class="on-text">Abierto</span><span class="off-text">Cerrado</span></label></td></tr>
-              <tr><td>Domingo</td><td>12:30</td><td>Cerrado</td><td><label class="switch"><input class="sr-only" type="checkbox" name="abre-Domingo" /><span class="on-text">Abierto</span><span class="off-text">Cerrado</span></label></td></tr>
+              <tr><td>Lunes</td><td><input type="time" name="apertura-Lunes" value="13:00" aria-label="Hora de apertura del lunes" /></td><td><input type="time" name="cierre-Lunes" value="23:30" aria-label="Hora de cierre del lunes" /></td><td><label class="switch"><input class="sr-only" type="checkbox" name="abre-Lunes" /><span class="on-text">Abierto</span><span class="off-text">Cerrado</span></label></td></tr>
+              <tr><td>Martes</td><td><input type="time" name="apertura-Martes" value="13:00" aria-label="Hora de apertura del martes" /></td><td><input type="time" name="cierre-Martes" value="23:30" aria-label="Hora de cierre del martes" /></td><td><label class="switch"><input class="sr-only" type="checkbox" name="abre-Martes" checked /><span class="on-text">Abierto</span><span class="off-text">Cerrado</span></label></td></tr>
+              <tr><td>Miércoles</td><td><input type="time" name="apertura-Miercoles" value="13:00" aria-label="Hora de apertura del miércoles" /></td><td><input type="time" name="cierre-Miercoles" value="23:30" aria-label="Hora de cierre del miércoles" /></td><td><label class="switch"><input class="sr-only" type="checkbox" name="abre-Miércoles" checked /><span class="on-text">Abierto</span><span class="off-text">Cerrado</span></label></td></tr>
+              <tr><td>Jueves</td><td><input type="time" name="apertura-Jueves" value="13:00" aria-label="Hora de apertura del jueves" /></td><td><input type="time" name="cierre-Jueves" value="23:30" aria-label="Hora de cierre del jueves" /></td><td><label class="switch"><input class="sr-only" type="checkbox" name="abre-Jueves" checked /><span class="on-text">Abierto</span><span class="off-text">Cerrado</span></label></td></tr>
+              <tr><td>Viernes</td><td><input type="time" name="apertura-Viernes" value="13:00" aria-label="Hora de apertura del viernes" /></td><td><input type="time" name="cierre-Viernes" value="23:30" aria-label="Hora de cierre del viernes" /></td><td><label class="switch"><input class="sr-only" type="checkbox" name="abre-Viernes" checked /><span class="on-text">Abierto</span><span class="off-text">Cerrado</span></label></td></tr>
+              <tr><td>Sábado</td><td><input type="time" name="apertura-Sabado" value="12:30" aria-label="Hora de apertura del sábado" /></td><td><input type="time" name="cierre-Sabado" value="00:00" aria-label="Hora de cierre del sábado" /></td><td><label class="switch"><input class="sr-only" type="checkbox" name="abre-Sábado" checked /><span class="on-text">Abierto</span><span class="off-text">Cerrado</span></label></td></tr>
+              <tr><td>Domingo</td><td><input type="time" name="apertura-Domingo" value="12:30" aria-label="Hora de apertura del domingo" /></td><td><input type="time" name="cierre-Domingo" value="23:30" aria-label="Hora de cierre del domingo" /></td><td><label class="switch"><input class="sr-only" type="checkbox" name="abre-Domingo" /><span class="on-text">Abierto</span><span class="off-text">Cerrado</span></label></td></tr>
             </tbody>
           </table></div>
         </section>
+
+        <!-- ============ PARÁMETROS DE RESERVA ============ -->
         <section class="card" aria-labelledby="t-param">
           <h2 id="t-param">Parámetros de Reserva</h2>
-          <div class="field"><label for="capacidad">Capacidad Máxima Simultánea</label><div class="range-row"><input type="range" id="capacidad" name="capacidad" min="10" max="150" value="80" /><span>80 Pax</span></div></div>
+          <div class="field-row">
+            <div class="field"><label for="mesas">Cantidad de Mesas</label><input type="number" id="mesas" name="mesas" min="1" max="200" value="20" /></div>
+            <div class="field"><label for="personas-mesa">Personas máximo por mesa</label><input type="number" id="personas-mesa" name="personas-mesa" min="1" max="30" value="6" /></div>
+          </div>
           <div class="field-row">
             <div class="field"><label for="turno">Duración del Turno</label><input type="text" id="turno" name="turno" value="2 horas (120 min)" /></div>
             <div class="field"><label for="margen">Margen de Reserva Anticipada</label><input type="text" id="margen" name="margen" value="Hasta 30 días antes" /></div>
           </div>
             <div class="setting-item"><div><label for="auto-confirm">Confirmación Automática de Mesas</label><small>Confirmar de inmediato si hay aforo suficiente.</small></div><label class="switch"><input class="sr-only" type="checkbox" id="auto-confirm" name="auto-confirm" checked /><span class="on-text">Activo</span><span class="off-text">Inactivo</span></label></div>
         </section>
+
+        <!-- ============ NOTIFICACIONES ============ -->
         <section class="card" aria-labelledby="t-notif">
           <h2 id="t-notif">Notificaciones y Alertas</h2>
             <div class="setting-item"><div><label for="n-reservas">Nuevas Reservas y Solicitudes</label><small>Recibir correo electrónico con cada nueva mesa solicitada.</small></div><label class="switch"><input class="sr-only" type="checkbox" id="n-reservas" name="n-reservas" checked /><span class="on-text">Activo</span><span class="off-text">Inactivo</span></label></div>
             <div class="setting-item"><div><label for="n-cancel">Aviso de Cancelación de Mesa</label><small>Recibir alerta instantánea para reorganizar tu plano de sala.</small></div><label class="switch"><input class="sr-only" type="checkbox" id="n-cancel" name="n-cancel" checked /><span class="on-text">Activo</span><span class="off-text">Inactivo</span></label></div>
             <div class="setting-item"><div><label for="n-resenas">Alertas de Nuevas Reseñas</label><small>Notificar al smartphone de las opiniones inferiores a 4 estrellas.</small></div><label class="switch"><input class="sr-only" type="checkbox" id="n-resenas" name="n-resenas" /><span class="on-text">Activo</span><span class="off-text">Inactivo</span></label></div>
         </section>
+
+        <!-- ============ PLANO DEL RESTAURANTE ============ -->
+        <section class="card card-wide" aria-labelledby="t-plano">
+          <h2 id="t-plano">Plano del Restaurante</h2>
+          <p class="plan-help">Esta imagen la verá el cliente al reservar, para elegir su mesa.</p>
+          <img class="plan-preview" src="../../assets/plano%20de%20restaurante.png" alt="Plano de mesas del restaurante" />
+          <div class="plan-actions">
+            <input class="sr-only" type="file" id="plano" name="plano" accept="image/png, image/jpeg" />
+            <label for="plano" class="btn btn-small">Subir plano</label>
+            <button type="button" class="btn btn-small btn-soft">Eliminar</button>
+            <small>JPG o PNG. Máximo 2MB.</small>
+          </div>
+        </section>
+
       </div>
-      <section class="card save-bar"><span>Última modificación realizada hoy a las 11:34 h por Carlos Gómez.</span><div><button type="button" class="btn btn-soft">Descartar</button><button type="submit" class="btn">Guardar Cambios</button></div></section>
+      <section class="card save-bar"><span>Última modificación realizada hoy a las 11:34 h por Carlos Gómez.</span><div><button type="button" class="btn btn-soft">Descartar</button><a href="#confirmar-guardar" class="btn">Guardar Cambios</a></div></section>
     </form>
     </main>
+  </div>
+
+  <!-- ============ MODAL: CONFIRMAR GUARDAR CAMBIOS ============ -->
+  <div class="modal" id="confirmar-guardar">
+    <a href="#" class="modal-bg" aria-label="Cerrar"></a>
+    <div class="modal-box modal-small">
+      <div class="ask-icon"><i class="fa-solid fa-circle-question"></i></div>
+      <h2>¿Estás seguro de guardar los cambios?</h2>
+      <p>Se actualizará la configuración de tu restaurante: perfil, horarios, parámetros de reserva y plano.</p>
+      <div class="form-actions center">
+        <a href="#" class="btn-sec">Cancelar</a>
+        <a href="#" class="btn">Sí, guardar</a>
+      </div>
+    </div>
   </div>
 </body>
 
