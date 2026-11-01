@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#c95830" />
+  <title>Reservar mesa · MesaSpot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../styles/main.css" />
+  <link rel="stylesheet" href="../../styles/auth.css" />
+  <link rel="stylesheet" href="../../styles/integration.css" />
+  <link rel="stylesheet" href="../../styles/navbar.css" />
+  <style>
+    /* Módulo Reservas · solo HTML y CSS. Clases rv-* para no chocar con otros módulos. */
+    .rv-page{padding-block:28px 64px}
+    .rv-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 4px 10px #372a1c04}
+    .rv-rest{display:flex;gap:22px;align-items:center;padding:18px;margin-bottom:22px}
+    .rv-rest img{width:200px;height:96px;border-radius:12px;object-fit:cover;background:#e9dfd4;flex:none}
+    .rv-rest h1{font-size:28px;font-weight:800;letter-spacing:-.5px;margin-bottom:6px}
+    .rv-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px;color:var(--muted);font-size:14px}
+    .rv-meta span{display:flex;align-items:center;gap:6px}
+    .rv-meta svg{width:16px;height:16px}
+    .rv-body{padding:26px 28px 28px}
+
+    /* Pasos: radios ocultos p1..p4 controlan qué panel se ve */
+    .rv-steps{list-style:none;padding:0;margin:0 0 30px;display:flex;align-items:center;gap:14px}
+    .rv-step{display:flex;align-items:center;gap:10px;flex:1;color:var(--muted);font-size:14px;font-weight:600;white-space:nowrap}
+    .rv-step b{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:#d8d1cb;color:#fff;font-family:var(--heading);flex:none}
+    .rv-step:after{content:"";flex:1;height:2px;background:var(--line);min-width:16px}
+    .rv-step:last-child{flex:none}.rv-step:last-child:after{display:none}
+    .rv-flow:has(#p1:checked) .rv-step:nth-child(-n+1),
+    .rv-flow:has(#p2:checked) .rv-step:nth-child(-n+2),
+    .rv-flow:has(#p3:checked) .rv-step:nth-child(-n+3),
+    .rv-flow:has(#p4:checked) .rv-step:nth-child(-n+4){color:var(--accent)}
+    .rv-flow:has(#p1:checked) .rv-step:nth-child(-n+1) b,
+    .rv-flow:has(#p2:checked) .rv-step:nth-child(-n+2) b,
+    .rv-flow:has(#p3:checked) .rv-step:nth-child(-n+3) b,
+    .rv-flow:has(#p4:checked) .rv-step:nth-child(-n+4) b{background:var(--accent)}
+    .rv-flow:has(#p2:checked) .rv-step:nth-child(-n+1):after,
+    .rv-flow:has(#p3:checked) .rv-step:nth-child(-n+2):after,
+    .rv-flow:has(#p4:checked) .rv-step:nth-child(-n+3):after{background:var(--accent)}
+    .rv-panel{display:none}
+    .rv-flow:has(#p1:checked) #panel1,.rv-flow:has(#p2:checked) #panel2,
+    .rv-flow:has(#p3:checked) #panel3,.rv-flow:has(#p4:checked) #panel4{display:block}
+    .rv-panel>h2{font-size:30px}
+    .rv-sub{color:var(--muted);margin:6px 0 22px}
+    .rv-cols{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(280px,1fr);gap:24px;align-items:start}
+    label.button,label.rv-ghost{cursor:pointer}
+
+    /* Paso 1 */
+    .rv-plano{position:relative;min-height:380px;border:5px solid #d9cdbf;border-radius:14px;background:var(--paper);overflow:hidden;display:grid;place-items:center;text-align:center;color:var(--muted);padding:16px}
+    .rv-plano img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+    .rv-side{padding:22px}
+    .rv-legend p{display:flex;align-items:center;gap:10px;margin:0 0 12px;font-weight:500}
+    .rv-legend i{width:14px;height:14px;border-radius:50%}
+    .rv-mesas{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px;padding-top:24px;border-top:1px solid var(--line)}
+    .rv-mesa{position:relative;width:70px;height:70px;cursor:pointer}
+    .rv-mesa span{position:absolute;inset:14px;border-radius:12px;background:#3f9d5a;color:#fff;font:700 19px var(--heading);display:grid;place-items:center}
+    .rv-mesa:before,.rv-mesa:after{content:"";position:absolute;left:21px;right:21px;height:9px;border-radius:5px;background:#3f9d5a;opacity:.55}
+    .rv-mesa:before{top:1px}.rv-mesa:after{bottom:1px}
+    .rv-mesa.occ{cursor:not-allowed}
+    .rv-mesa.occ span,.rv-mesa.occ:before,.rv-mesa.occ:after{background:#d8d4d0}.rv-mesa.occ span{color:var(--ink)}
+    .rv-mesa-in:checked+.rv-mesa span,.rv-mesa-in:checked+.rv-mesa:before,.rv-mesa-in:checked+.rv-mesa:after{background:var(--accent)}
+    .rv-mesa-in:focus-visible+.rv-mesa{outline:3px solid #e8a17f;outline-offset:2px;border-radius:12px}
+    .rv-flow:not(:has(.rv-mesa-in:checked)) #next1{opacity:.4;pointer-events:none}
+
+    /* Paso 2 */
+    .rv-form label{display:grid;gap:7px;font-size:14px;font-weight:600;margin-top:16px}
+    .rv-form input,.rv-form select{width:100%;min-height:46px;padding:11px 13px;border:1px solid #ded6cf;border-radius:9px;background:#fff;color:var(--ink)}
+    .rv-two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .rv-form .rv-check{display:flex;align-items:center;gap:10px;font-weight:400}
+    .rv-form .rv-check input{width:18px;min-height:0;accent-color:var(--accent)}
+    .rv-check a{color:var(--accent);text-decoration:underline}
+    .rv-flow:not(:has(#tyc:checked)) #next3{opacity:.4;pointer-events:none}
+    .rv-sum{padding:22px}
+    .rv-sum h3{font-size:20px;margin-bottom:14px}
+    .rv-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f3efeb;font-size:14px}
+    .rv-row span:first-child{color:var(--muted)}
+    .rv-pill{display:none;background:var(--soft);color:var(--accent);font-weight:700;padding:2px 12px;border-radius:30px;font-size:13px}
+    .rv-flow:has(#m1:checked) .pm1,.rv-flow:has(#m3:checked) .pm3,.rv-flow:has(#m4:checked) .pm4{display:inline}
+    .rv-total{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:16px;padding:16px;background:var(--soft);border-radius:12px;font-weight:700}
+    .rv-total strong{font:800 26px var(--heading);color:var(--accent)}
+    .rv-total small{display:block;color:var(--muted);font-weight:400;text-align:right}
+
+    /* Paso 3 */
+    .rv-note{display:flex;gap:10px;align-items:center;background:var(--soft);border-radius:10px;padding:13px 16px;margin-bottom:22px}
+    .rv-note b{color:var(--accent)}
+    .rv-methods{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0 20px}
+    .rv-method{display:grid;place-items:center;text-align:center;border:1px solid var(--line);background:#fff;border-radius:12px;padding:22px 8px;font-weight:600;font-size:14px;cursor:pointer;transition:border-color .2s}
+    .rv-method:hover{border-color:var(--accent)}
+    .rv-met-in:checked+.rv-method{border:2px solid var(--accent);color:var(--accent)}
+    .rv-met-in:focus-visible+.rv-method{outline:3px solid #e8a17f;outline-offset:2px}
+    .rv-pay{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:22px}
+    .rv-pay h3{font-size:19px;margin-bottom:10px}
+    .rv-hint{color:var(--muted);font-size:14px;margin:0 0 16px}
+    .rv-pago{display:none}
+    .rv-flow:has(#mt1:checked) .pg-yape,.rv-flow:has(#mt2:checked) .pg-plin,
+    .rv-flow:has(#mt3:checked) .pg-tarjeta,.rv-flow:has(#mt4:checked) .pg-transf{display:block}
+    .rv-pay-body{display:flex;gap:26px;align-items:center;flex-wrap:wrap}
+    .rv-qr{width:112px;height:112px;border-radius:8px;background:repeating-conic-gradient(#2c2825 0 25%,#fff 0 50%) 0 0/16px 16px}
+    .rv-pay small{display:block;margin-bottom:6px;color:var(--muted);font-weight:600}
+    .rv-card-form{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+    .rv-card-form .rv-full{grid-column:1/-1}
+    .rv-cuenta .rv-row:last-child{border:0}
+    .rv-actions{display:flex;justify-content:space-between;gap:12px;margin-top:28px}
+    .rv-ghost{display:inline-flex;align-items:center;border:1.5px solid var(--ink);border-radius:9px;padding:13px 26px;font-weight:700;background:#fff}
+    .rv-ghost:hover{background:var(--paper)}
+    @media(max-width:900px){.rv-cols{grid-template-columns:1fr}.rv-methods{grid-template-columns:1fr 1fr}.rv-rest img{display:none}.rv-step span{display:none}}
+    @media(max-width:520px){.rv-body{padding:20px 16px}.rv-two,.rv-card-form{grid-template-columns:1fr}.rv-panel>h2{font-size:26px}}
+  </style>
+  <script defer src="../../vendor/lucide-1.61.0.min.js"></script>
+  <script defer src="../../js/icons.js"></script>
+  <script defer src="../../js/config.js"></script>
+  <script defer src="../../js/api.js"></script>
+  <script defer src="../../js/ui.js"></script>
+  <script defer src="../../js/navbar.js"></script>
+  <script defer src="../../js/app.js"></script>
+  <script defer src="../../js/auth.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#reserva">Saltar a la reserva</a>
+
+  <header class="header" id="inicio">
+    <div class="container header-inner">
+      <a class="brand" href="../../index.html" aria-label="MesaSpot, inicio"><span class="brand-icon"><i data-lucide="chef-hat" aria-hidden="true"></i></span>MesaSpot</a>
+      <button class="menu-toggle icon-button" aria-label="Abrir menú" aria-expanded="false" aria-controls="navigation"><i data-lucide="menu" aria-hidden="true"></i></button>
+      <nav class="navigation" id="navigation" aria-label="Navegación principal">
+        <a href="../../index.html">Inicio</a><a class="active" href="../restaurantes/restaurantes.html">Restaurantes</a><button data-info="promotions">Promociones</button>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-button notifications" aria-label="Notificaciones" data-info="notifications"><i data-lucide="bell" aria-hidden="true"></i></button><span class="header-divider"></span><button class="login" data-account="login">Iniciar sesión</button><button class="button register" data-account="register">Registrarse</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container rv-page" id="reserva">
+    <section class="rv-card rv-rest" aria-label="Restaurante">
+      <img src="../../assets/restaurant-placeholder.svg" alt="" />
+      <div>
+        <h1>El Asador de Surco</h1>
+        <div class="rv-meta">
+          <span class="rating"><i data-lucide="star" aria-hidden="true"></i>4.8</span><span>(1,240 reseñas)</span>
+          <span><i data-lucide="utensils" aria-hidden="true"></i>Carnes y parrillas</span>
+          <span><i data-lucide="map-pin" aria-hidden="true"></i>Surco, Lima</span>
+          <span class="price">S/ 50 - S/120</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="rv-card rv-body rv-flow">
+      <!-- Radios ocultos: controlan el paso actual (solo CSS) -->
+      <input class="sr-only" type="radio" name="paso" id="p1" checked aria-label="Paso 1" />
+      <input class="sr-only" type="radio" name="paso" id="p2" aria-label="Paso 2" />
+      <input class="sr-only" type="radio" name="paso" id="p3" aria-label="Paso 3" />
+      <input class="sr-only" type="radio" name="paso" id="p4" aria-label="Paso 4" />
+
+      <ol class="rv-steps">
+        <li class="rv-step"><b>1</b><span>Seleccionar mesa</span></li>
+        <li class="rv-step"><b>2</b><span>Datos de la reserva</span></li>
+        <li class="rv-step"><b>3</b><span>Pago del adelanto</span></li>
+        <li class="rv-step"><b>4</b><span>Confirmación</span></li>
+      </ol>
+
+      <!-- PASO 1 -->
+      <div class="rv-panel" id="panel1">
+        <h2>Selecciona tu mesa</h2>
+        <p class="rv-sub">Elige la mesa que prefieras según la disponibilidad.</p>
+        <div class="rv-cols">
+          <div class="rv-plano">
+            <span>Plano del restaurante<br><small>(imagen que sube el restaurante)</small></span>
+            <!-- Cuando exista la imagen: <img src="../../assets/plano-restaurante.png" alt="Plano del restaurante" /> -->
+          </div>
+          <aside class="rv-card rv-side">
+            <div class="rv-legend">
+              <p><i style="background:#3f9d5a"></i>Disponible</p>
+              <p><i style="background:var(--accent)"></i>Seleccionada</p>
+              <p><i style="background:#d8d4d0"></i>Ocupada</p>
+            </div>
+            <div class="rv-mesas" role="radiogroup" aria-label="Mesas">
+              <input class="sr-only rv-mesa-in" type="radio" name="mesa" id="m1" /><label class="rv-mesa" for="m1" aria-label="Mesa 1, disponible"><span>1</span></label>
+              <input class="sr-only rv-mesa-in" type="radio" name="mesa" id="m2" disabled /><label class="rv-mesa occ" for="m2" aria-label="Mesa 2, ocupada"><span>2</span></label>
+              <input class="sr-only rv-mesa-in" type="radio" name="mesa" id="m3" /><label class="rv-mesa" for="m3" aria-label="Mesa 3, disponible"><span>3</span></label>
+              <input class="sr-only rv-mesa-in" type="radio" name="mesa" id="m4" /><label class="rv-mesa" for="m4" aria-label="Mesa 4, disponible"><span>4</span></label>
+            </div>
+          </aside>
+        </div>
+        <div class="rv-actions"><span></span><label class="button" id="next1" for="p2">Siguiente</label></div>
+      </div>
+
+      <!-- PASO 2 -->
+      <div class="rv-panel" id="panel2">
+        <h2>Datos de la reserva</h2>
+        <p class="rv-sub">Completa la información para confirmar tu reserva.</p>
+        <div class="rv-cols">
+          <div class="rv-card rv-sum rv-form">
+            <div class="rv-two">
+              <label>Fecha de la reserva<input type="date" value="2026-11-07" /></label>
+              <label>Hora<select><option>7:00 p. m.</option><option selected>8:00 p. m.</option><option>9:00 p. m.</option></select></label>
+            </div>
+            <label>Número de personas<select><option>2 personas</option><option>3 personas</option><option selected>4 personas</option><option>5 personas</option><option>6 personas</option></select></label>
+            <label>Teléfono de contacto<input type="tel" placeholder="987 654 321" autocomplete="tel" /></label>
+            <label>Correo electrónico (opcional)<input type="email" placeholder="usuario@correo.com" autocomplete="email" /></label>
+            <label class="rv-check"><input type="checkbox" id="tyc" /> Acepto los <a href="#" data-info="terms">términos y condiciones</a></label>
+          </div>
+          <aside class="rv-card rv-sum">
+            <h3>Resumen de tu reserva</h3>
+            <div class="rv-row"><span>Mesa seleccionada</span><span><span class="rv-pill pm1">Mesa 1</span><span class="rv-pill pm3">Mesa 3</span><span class="rv-pill pm4">Mesa 4</span></span></div>
+            <div class="rv-row"><span>Fecha</span><span>Sáb, 7 de nov. 2026</span></div>
+            <div class="rv-row"><span>Hora</span><span>8:00 p. m.</span></div>
+            <div class="rv-row"><span>Personas</span><span>4 personas</span></div>
+            <div class="rv-total"><span>Total a pagar (adelanto)</span><span><strong>S/ 24.00</strong><small>(30% del total)</small></span></div>
+          </aside>
+        </div>
+        <div class="rv-actions"><label class="rv-ghost" for="p1">Volver</label><label class="button" id="next3" for="p3">Continuar al pago</label></div>
+      </div>
+
+      <!-- PASO 3 -->
+      <div class="rv-panel" id="panel3">
+        <h2>Pago adelantado</h2>
+        <p class="rv-sub">Realiza el pago del adelanto para confirmar tu reserva.</p>
+        <div class="rv-cols">
+          <div>
+            <div class="rv-note"><i data-lucide="info" aria-hidden="true" style="color:var(--accent)"></i><span><b>Importante:</b> el adelanto es del 30% del total de tu reserva.</span></div>
+            <h3>Selecciona un método de pago</h3>
+            <div class="rv-methods" role="radiogroup" aria-label="Método de pago">
+              <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt1" checked /><label class="rv-method" for="mt1">Yape</label>
+              <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt2" /><label class="rv-method" for="mt2">Plin</label>
+              <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt3" /><label class="rv-method" for="mt3">Tarjeta de débito o crédito</label>
+              <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt4" /><label class="rv-method" for="mt4">Transferencia bancaria</label>
+            </div>
+            <div class="rv-pay">
+              <div class="rv-pago pg-yape">
+                <h3>Paga con Yape</h3>
+                <p class="rv-hint">Escanea el código QR o ingresa el número del comercio.</p>
+                <div class="rv-pay-body"><div class="rv-qr" aria-label="Código QR de Yape"></div><div><small>Número de Yape</small><div class="rv-form"><input value="987 654 321" readonly aria-label="Número de Yape" /></div></div></div>
+              </div>
+              <div class="rv-pago pg-plin">
+                <h3>Paga con Plin</h3>
+                <p class="rv-hint">Escanea el código QR o ingresa el número del comercio.</p>
+                <div class="rv-pay-body"><div class="rv-qr" aria-label="Código QR de Plin"></div><div><small>Número de Plin</small><div class="rv-form"><input value="987 654 321" readonly aria-label="Número de Plin" /></div></div></div>
+              </div>
+              <div class="rv-pago pg-tarjeta">
+                <h3>Paga con tarjeta de débito o crédito</h3>
+                <div class="rv-form rv-card-form">
+                  <label class="rv-full">Número de tarjeta<input inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000" autocomplete="cc-number" /></label>
+                  <label class="rv-full">Nombre en la tarjeta<input placeholder="Como aparece en la tarjeta" autocomplete="cc-name" /></label>
+                  <label>Vencimiento<input inputmode="numeric" maxlength="5" placeholder="MM/AA" autocomplete="cc-exp" /></label>
+                  <label>CVV<input inputmode="numeric" maxlength="4" placeholder="123" autocomplete="cc-csc" /></label>
+                </div>
+              </div>
+              <div class="rv-pago pg-transf">
+                <h3>Paga con transferencia bancaria</h3>
+                <p class="rv-hint">Transfiere el adelanto a la cuenta del restaurante y guarda tu constancia.</p>
+                <div class="rv-cuenta">
+                  <div class="rv-row"><span>Banco</span><b>BCP</b></div>
+                  <div class="rv-row"><span>Titular</span><b>El Asador de Surco S.A.C.</b></div>
+                  <div class="rv-row"><span>Cuenta corriente (S/)</span><b>191-0000000-0-00</b></div>
+                  <div class="rv-row"><span>CCI</span><b>002-191-000000000000-00</b></div>
+                  <div class="rv-row"><span>Monto a transferir</span><b>S/ 24.00</b></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="rv-card rv-sum">
+            <h3>Resumen de tu reserva</h3>
+            <div class="rv-row"><span>Mesa seleccionada</span><span><span class="rv-pill pm1">Mesa 1</span><span class="rv-pill pm3">Mesa 3</span><span class="rv-pill pm4">Mesa 4</span></span></div>
+            <div class="rv-row"><span>Fecha</span><span>Sáb, 7 de nov. 2026</span></div>
+            <div class="rv-row"><span>Hora</span><span>8:00 p. m.</span></div>
+            <div class="rv-row"><span>Personas</span><span>4 personas</span></div>
+            <div class="rv-row"><b>Total de la reserva</b><b>S/ 80.00</b></div>
+            <div class="rv-total" style="display:block"><div class="rv-row" style="border:0;padding-top:0"><b>Adelanto (30%)</b><b>S/ 24.00</b></div><div class="rv-row" style="border:0;padding-bottom:0"><span>Saldo pendiente en el restaurante</span><span>S/ 56.00</span></div></div>
+          </aside>
+        </div>
+        <div class="rv-actions"><label class="rv-ghost" for="p2">Volver</label><label class="button" for="p4">Continuar</label></div>
+      </div>
+
+      <!-- PASO 4: pendiente -->
+      <div class="rv-panel" id="panel4">
+        <h2>Confirmación</h2>
+        <p class="rv-sub">Esta pantalla se agrega después.</p>
+        <div class="rv-actions"><label class="rv-ghost" for="p3">Volver</label><span></span></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <a class="brand" href="../../index.html"><span class="brand-icon"><i data-lucide="chef-hat" aria-hidden="true"></i></span>MesaSpot</a>
+          <p>Tu plataforma de descubrimiento gastronómico en Lima, Perú. Encuentra tu próxima experiencia culinaria inolvidable.</p>
+          <div class="socials" aria-label="Redes sociales">
+            <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i data-lucide="external-link" aria-hidden="true"></i></a><a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i data-lucide="camera" aria-hidden="true"></i></a><a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i data-lucide="circle-play" aria-hidden="true"></i></a>
+          </div>
+        </div>
+        <div><h3>Descubre</h3><a href="../restaurantes/restaurantes.html">Restaurantes destacados</a><button data-info="favorites">Favoritos del mes</button><button data-info="experiences">Experiencias culinarias</button><button data-info="promotions">Promociones activas</button></div>
+        <div><h3>Legal</h3><button data-info="terms">Términos de servicio</button><button data-info="privacy">Política de privacidad</button><button data-info="cookies">Política de cookies</button><button data-info="conditions">Condiciones de reserva</button></div>
+        <div><h3>Contacto</h3><button data-info="support">Soporte al cliente</button><button data-info="join">Únete como restaurante</button><button data-info="faq">Preguntas frecuentes</button><button data-info="press">Prensa y media</button></div>
+      </div>
+      <div class="footer-bottom"><p>© 2026 MesaSpot. Diseñado con pasión gastronómica.</p><p>Hecho en la clase :3</p></div>
+    </div>
+  </footer>
+
+  <dialog id="modal" aria-labelledby="modal-title">
+    <button class="modal-close icon-button" id="close-modal" aria-label="Cerrar ventana"><i data-lucide="x" aria-hidden="true"></i></button>
+    <div id="modal-content"></div>
+  </dialog>
+  <div class="toast" id="toast" role="status" hidden></div>
+</body>
+</html>
