@@ -11,6 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="../../styles/administracionReservasPendientes.css" />
+  <link rel="stylesheet" href="../../styles/administracionReservasEstados.css" />
 </head>
 
 <body class="admin-page">
@@ -60,8 +61,26 @@
             <div class="table-wrap"><table class="data-table">
               <thead><tr><th>Nº Reserva</th><th>Cliente</th><th>Pax</th><th>Fecha</th><th>Hora</th><th>Mesa asignada</th><th>Estado</th><th>Acciones</th></tr></thead>
               <tbody>
-            <tr><td data-label="Nº Reserva">#MS-4818</td><td data-label="Cliente">Ramón García</td><td data-label="Pax">8 pax</td><td data-label="Fecha">15 Oct 2025</td><td data-label="Hora">15:00</td><td data-label="Mesa asignada">Mesa 1 (Salón)</td><td data-label="Estado"><span class="badge badge-wait">Pendiente</span></td><td data-label="Acciones"><div class="actions"><button type="button" class="action-ok" aria-label="Confirmar reserva"><i class="fa-solid fa-check"></i></button><button type="button" class="action-no" aria-label="Cancelar reserva"><i class="fa-solid fa-circle-xmark"></i></button></div></td></tr>
-            <tr><td data-label="Nº Reserva">#MS-4816</td><td data-label="Cliente">Andrés Iniesta</td><td data-label="Pax">5 pax</td><td data-label="Fecha">15 Oct 2025</td><td data-label="Hora">21:30</td><td data-label="Mesa asignada">Mesa 15 (Salón)</td><td data-label="Estado"><span class="badge badge-wait">Pendiente</span></td><td data-label="Acciones"><div class="actions"><button type="button" class="action-ok" aria-label="Confirmar reserva"><i class="fa-solid fa-check"></i></button><button type="button" class="action-no" aria-label="Cancelar reserva"><i class="fa-solid fa-circle-xmark"></i></button></div></td></tr>
+                <tr>
+                  <td data-label="Nº Reserva">#MS-4818<input class="sr-only st-ok" type="radio" name="r4818" id="r4818-ok" tabindex="-1" /><input class="sr-only st-wait" type="radio" name="r4818" id="r4818-wait" checked tabindex="-1" /><input class="sr-only st-cancel" type="radio" name="r4818" id="r4818-cancel" tabindex="-1" /></td>
+                  <td data-label="Cliente">Ramón García</td>
+                  <td data-label="Pax">8 pax</td>
+                  <td data-label="Fecha">15 Oct 2025</td>
+                  <td data-label="Hora">15:00</td>
+                  <td data-label="Mesa asignada">Mesa 1 (Salón)</td>
+                  <td data-label="Estado"><span class="badge badge-ok">Confirmada</span><span class="badge badge-wait">Pendiente</span><span class="badge badge-cancel">Cancelada</span></td>
+                  <td data-label="Acciones"><div class="actions"><label class="action-ok" for="r4818-ok" title="Confirmar reserva"><i class="fa-solid fa-check"></i></label><label class="action-no" for="r4818-cancel" title="Cancelar reserva"><i class="fa-solid fa-circle-xmark"></i></label></div></td>
+                </tr>
+                <tr>
+                  <td data-label="Nº Reserva">#MS-4816<input class="sr-only st-ok" type="radio" name="r4816" id="r4816-ok" tabindex="-1" /><input class="sr-only st-wait" type="radio" name="r4816" id="r4816-wait" checked tabindex="-1" /><input class="sr-only st-cancel" type="radio" name="r4816" id="r4816-cancel" tabindex="-1" /></td>
+                  <td data-label="Cliente">Andrés Iniesta</td>
+                  <td data-label="Pax">5 pax</td>
+                  <td data-label="Fecha">15 Oct 2025</td>
+                  <td data-label="Hora">21:30</td>
+                  <td data-label="Mesa asignada">Mesa 15 (Salón)</td>
+                  <td data-label="Estado"><span class="badge badge-ok">Confirmada</span><span class="badge badge-wait">Pendiente</span><span class="badge badge-cancel">Cancelada</span></td>
+                  <td data-label="Acciones"><div class="actions"><label class="action-ok" for="r4816-ok" title="Confirmar reserva"><i class="fa-solid fa-check"></i></label><label class="action-no" for="r4816-cancel" title="Cancelar reserva"><i class="fa-solid fa-circle-xmark"></i></label></div></td>
+                </tr>
               </tbody>
             </table></div>
           </section>
