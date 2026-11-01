@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Panel de administracion de MesaSpot: Configuración." />
+  <title>Configuración · Administración · MesaSpot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="../../styles/administracionConfiguracion.css" />
+</head>
+
+<body class="admin-page">
+  <div class="shell">
+    <header class="sidebar">
+      <div class="sidebar-top">
+        <div class="brand"><span class="logo-badge"><i class="fa-solid fa-table-cells-large"></i></span><span class="brand-text"><strong>MesaSpot</strong><small>SOCIO ADMIN</small></span></div>
+        <section class="restaurant-profile" aria-label="Restaurante">
+          <span class="avatar" aria-hidden="true"><i class="fa-solid fa-fire"></i></span>
+          <div><strong>Asador de Segovia</strong><small>Segovia, España</small></div>
+        </section>
+        <nav class="nav" aria-label="Navegación principal">
+          <a class="nav-link nav-demo" href="administracionDemo.html"><i class="fa-solid fa-table-columns"></i>Dashboard</a>
+          <a class="nav-link nav-reservas" href="administracionReservas.html"><i class="fa-solid fa-calendar-check"></i>Reservas</a>
+          <a class="nav-link nav-menu" href="administracionMenu.html"><i class="fa-solid fa-bars"></i>Menú</a>
+          <a class="nav-link nav-resenas" href="administracionResenas.html"><i class="fa-solid fa-star-half-stroke"></i>Reseñas</a>
+          <a class="nav-link nav-promociones" href="administracionPromociones.html"><i class="fa-solid fa-ticket"></i>Promociones</a>
+          <a class="nav-link nav-configuracion active" aria-current="page" href="administracionConfiguracion.html"><i class="fa-solid fa-sliders"></i>Configuración</a>
+        </nav>
+      </div>
+      <div class="user-bar">
+        <span class="avatar-round">CG</span>
+        <div><strong>Carlos Gómez</strong><small>Propietario</small></div>
+        <button type="button" class="icon-btn" aria-label="Cerrar sesión"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </header>
+
+    <main class="main" aria-labelledby="t-config">
+    <header class="page-header"><div><h1 id="t-config">Configuración de Local</h1><p>Modifica los parámetros de reservas, horarios habituales y datos de perfil del restaurante.</p></div><div class="date-chip"><i class="fa-solid fa-calendar-days"></i>Hoy, 15 de Octubre<i class="fa-solid fa-chevron-down"></i></div></header>
+    <form class="content" action="#" method="post" novalidate>
+      <div class="settings-grid">
+        <section class="card" aria-labelledby="t-perfil">
+          <h2 id="t-perfil">Perfil del Restaurante</h2>
+          <div class="profile-row"><span class="avatar" aria-hidden="true"><i class="fa-solid fa-fire"></i></span><div><button type="button" class="btn btn-small">Subir Nueva</button> <button type="button" class="btn btn-small btn-soft">Eliminar</button><small>JPG, PNG o GIF. Máximo 1MB.</small></div></div>
+          <div class="field"><label for="nombre">Nombre del Establecimiento</label><input type="text" id="nombre" name="nombre" value="Asador de Segovia" /></div>
+          <div class="field"><label for="direccion">Dirección Física</label><input type="text" id="direccion" name="direccion" value="Calle Mayor, 14, Segovia, España" /></div>
+          <div class="field-row">
+            <div class="field"><label for="telefono">Teléfono</label><input type="text" id="telefono" name="telefono" value="+34 921 444 555" /></div>
+            <div class="field"><label for="email">Email de Contacto</label><input type="email" id="email" name="email" value="contacto@asadorsegovia.com" /></div>
+          </div>
+        </section>
+        <section class="card" aria-labelledby="t-horarios">
+          <h2 id="t-horarios">Horarios de Apertura habituales</h2>
+          <div class="table-wrap"><table class="hours-table">
+            <thead><tr><th>Día</th><th>Apertura</th><th>Cierre</th><th>Estado</th></tr></thead>
+            <tbody>
+              <tr><td>Lunes</td><td>13:00</td><td>Cerrado</td><td><label class="switch"><input class="sr-only" type="checkbox" name="abre-Lunes" /><span class="on-text">Abierto</span><span class="off-text">Cerrado</span></label></td></tr>
+              <tr><td>Martes</td><td>13:00</td><td>23:30</td><td><label class="switch"><input class="sr-only" type="checkbox" name="abre-Martes" checked /><span class="on-text">Abierto</span><span class="off-text">Cerrado</span></label></td></tr>
+              <tr><td>Miércoles</td><td>13:00</td><td>23:30</td><td><label class="switch"><input class="sr-only" type="checkbox" name="abre-Miércoles" checked /><span class="on-text">Abierto</span><span class="off-text">Cerrado</span></label></td></tr>
+              <tr><td>Jueves</td><td>13:00</td><td>23:30</td><td><label class="switch"><input class="sr-only" type="checkbox" name="abre-Jueves" checked /><span class="on-text">Abierto</span><span class="off-text">Cerrado</span></label></td></tr>
+              <tr><td>Viernes</td><td>13:00</td><td>23:30</td><td><label class="switch"><input class="sr-only" type="checkbox" name="abre-Viernes" checked /><span class="on-text">Abierto</span><span class="off-text">Cerrado</span></label></td></tr>
+              <tr><td>Sábado</td><td>12:30</td><td>00:00</td><td><label class="switch"><input class="sr-only" type="checkbox" name="abre-Sábado" checked /><span class="on-text">Abierto</span><span class="off-text">Cerrado</span></label></td></tr>
+              <tr><td>Domingo</td><td>12:30</td><td>Cerrado</td><td><label class="switch"><input class="sr-only" type="checkbox" name="abre-Domingo" /><span class="on-text">Abierto</span><span class="off-text">Cerrado</span></label></td></tr>
+            </tbody>
+          </table></div>
+        </section>
+        <section class="card" aria-labelledby="t-param">
+          <h2 id="t-param">Parámetros de Reserva</h2>
+          <div class="field"><label for="capacidad">Capacidad Máxima Simultánea</label><div class="range-row"><input type="range" id="capacidad" name="capacidad" min="10" max="150" value="80" /><span>80 Pax</span></div></div>
+          <div class="field-row">
+            <div class="field"><label for="turno">Duración del Turno</label><input type="text" id="turno" name="turno" value="2 horas (120 min)" /></div>
+            <div class="field"><label for="margen">Margen de Reserva Anticipada</label><input type="text" id="margen" name="margen" value="Hasta 30 días antes" /></div>
+          </div>
+            <div class="setting-item"><div><label for="auto-confirm">Confirmación Automática de Mesas</label><small>Confirmar de inmediato si hay aforo suficiente.</small></div><label class="switch"><input class="sr-only" type="checkbox" id="auto-confirm" name="auto-confirm" checked /><span class="on-text">Activo</span><span class="off-text">Inactivo</span></label></div>
+        </section>
+        <section class="card" aria-labelledby="t-notif">
+          <h2 id="t-notif">Notificaciones y Alertas</h2>
+            <div class="setting-item"><div><label for="n-reservas">Nuevas Reservas y Solicitudes</label><small>Recibir correo electrónico con cada nueva mesa solicitada.</small></div><label class="switch"><input class="sr-only" type="checkbox" id="n-reservas" name="n-reservas" checked /><span class="on-text">Activo</span><span class="off-text">Inactivo</span></label></div>
+            <div class="setting-item"><div><label for="n-cancel">Aviso de Cancelación de Mesa</label><small>Recibir alerta instantánea para reorganizar tu plano de sala.</small></div><label class="switch"><input class="sr-only" type="checkbox" id="n-cancel" name="n-cancel" checked /><span class="on-text">Activo</span><span class="off-text">Inactivo</span></label></div>
+            <div class="setting-item"><div><label for="n-resenas">Alertas de Nuevas Reseñas</label><small>Notificar al smartphone de las opiniones inferiores a 4 estrellas.</small></div><label class="switch"><input class="sr-only" type="checkbox" id="n-resenas" name="n-resenas" /><span class="on-text">Activo</span><span class="off-text">Inactivo</span></label></div>
+        </section>
+      </div>
+      <section class="card save-bar"><span>Última modificación realizada hoy a las 11:34 h por Carlos Gómez.</span><div><button type="button" class="btn btn-soft">Descartar</button><button type="submit" class="btn">Guardar Cambios</button></div></section>
+    </form>
+    </main>
+  </div>
+</body>
+
+</html>
