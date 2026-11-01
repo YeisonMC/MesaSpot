@@ -24,7 +24,7 @@
     .rv-meta svg{width:16px;height:16px}
     .rv-body{padding:26px 28px 28px}
 
-    /* Pasos: radios ocultos p1..p4 controlan qué panel se ve */
+    /* Pasos: radios ocultos controlan qué panel se ve */
     .rv-steps{list-style:none;padding:0;margin:0 0 30px;display:flex;align-items:center;gap:14px}
     .rv-step{display:flex;align-items:center;gap:10px;flex:1;color:var(--muted);font-size:14px;font-weight:600;white-space:nowrap}
     .rv-step b{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:#d8d1cb;color:#fff;font-family:var(--heading);flex:none}
@@ -32,18 +32,18 @@
     .rv-step:last-child{flex:none}.rv-step:last-child:after{display:none}
     .rv-flow:has(#p1:checked) .rv-step:nth-child(-n+1),
     .rv-flow:has(#p2:checked) .rv-step:nth-child(-n+2),
-    .rv-flow:has(#p3:checked) .rv-step:nth-child(-n+3),
-    .rv-flow:has(#p4:checked) .rv-step:nth-child(-n+4){color:var(--accent)}
+    .rv-flow:has(:is(#p3,#p3b):checked) .rv-step:nth-child(-n+3),
+    .rv-flow:has(:is(#p4,#p4f):checked) .rv-step:nth-child(-n+4){color:var(--accent)}
     .rv-flow:has(#p1:checked) .rv-step:nth-child(-n+1) b,
     .rv-flow:has(#p2:checked) .rv-step:nth-child(-n+2) b,
-    .rv-flow:has(#p3:checked) .rv-step:nth-child(-n+3) b,
-    .rv-flow:has(#p4:checked) .rv-step:nth-child(-n+4) b{background:var(--accent)}
+    .rv-flow:has(:is(#p3,#p3b):checked) .rv-step:nth-child(-n+3) b,
+    .rv-flow:has(:is(#p4,#p4f):checked) .rv-step:nth-child(-n+4) b{background:var(--accent)}
     .rv-flow:has(#p2:checked) .rv-step:nth-child(-n+1):after,
-    .rv-flow:has(#p3:checked) .rv-step:nth-child(-n+2):after,
-    .rv-flow:has(#p4:checked) .rv-step:nth-child(-n+3):after{background:var(--accent)}
+    .rv-flow:has(:is(#p3,#p3b):checked) .rv-step:nth-child(-n+2):after,
+    .rv-flow:has(:is(#p4,#p4f):checked) .rv-step:nth-child(-n+3):after{background:var(--accent)}
     .rv-panel{display:none}
     .rv-flow:has(#p1:checked) #panel1,.rv-flow:has(#p2:checked) #panel2,
-    .rv-flow:has(#p3:checked) #panel3,.rv-flow:has(#p4:checked) #panel4{display:block}
+    .rv-flow:has(:is(#p3,#p3b):checked) #panel3,.rv-flow:has(:is(#p4,#p4f):checked) #panel4{display:block}
     .rv-panel>h2{font-size:30px}
     .rv-sub{color:var(--muted);margin:6px 0 22px}
     .rv-cols{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(280px,1fr);gap:24px;align-items:start}
@@ -87,15 +87,15 @@
     /* Paso 3 */
     .rv-note{display:flex;gap:10px;align-items:center;background:var(--soft);border-radius:10px;padding:13px 16px;margin-bottom:22px}
     .rv-note b{color:var(--accent)}
-    .rv-methods{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0 20px}  
+    .rv-methods{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:14px 0 20px}
     .rv-method{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;border:1px solid var(--line);background:#fff;border-radius:12px;padding:18px 8px;font-weight:600;font-size:14px;cursor:pointer;transition:border-color .2s}
     .rv-method img{height:44px;width:auto;max-width:100%;object-fit:contain}
     .rv-method svg{width:44px;height:44px;color:var(--ink);stroke-width:1.6}
     .rv-method:hover{border-color:var(--accent)}
     .rv-met-in:checked+.rv-method{border:2px solid var(--accent);color:var(--accent)}
     .rv-met-in:checked+.rv-method::after{content:"✓";position:absolute;top:-8px;right:-8px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;display:grid;place-items:center}
-    .rv-met-in:focus-visible+.rv-method{outline:3px solid #e8a17f;outline-offset:2px}
     img.rv-qr{width:150px;height:150px;object-fit:contain;background:#fff;border:1px solid var(--line);padding:4px}
+    .rv-met-in:focus-visible+.rv-method{outline:3px solid #e8a17f;outline-offset:2px}
     .rv-pay{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:22px}
     .rv-pay h3{font-size:19px;margin-bottom:10px}
     .rv-hint{color:var(--muted);font-size:14px;margin:0 0 16px}
@@ -111,8 +111,47 @@
     .rv-actions{display:flex;justify-content:space-between;gap:12px;margin-top:28px}
     .rv-ghost{display:inline-flex;align-items:center;border:1.5px solid var(--ink);border-radius:9px;padding:13px 26px;font-weight:700;background:#fff}
     .rv-ghost:hover{background:var(--paper)}
-    @media(max-width:900px){.rv-cols{grid-template-columns:1fr}.rv-methods{grid-template-columns:1fr 1fr}.rv-rest img{display:none}.rv-step span{display:none}}
-    @media(max-width:520px){.rv-body{padding:20px 16px}.rv-two,.rv-card-form{grid-template-columns:1fr}.rv-panel>h2{font-size:26px}}
+
+    /* Paso 4: resultado. p4 = pago aprobado, p4f = pago rechazado */
+    .rv-res{display:none}
+    .rv-flow:has(#p4:checked) #res-ok,.rv-flow:has(#p4f:checked) #res-fail{display:block}
+    .rv-flow:has(#p4f:checked) .rv-steps{display:none}
+    .go-ok,.go-fail{display:none}
+    .rv-flow:has(#p3:checked) .go-ok,.rv-flow:has(#p3b:checked) .go-fail{display:inline-flex}
+    .rv-demolink{display:block;text-align:center;margin-top:18px;color:var(--muted);font-size:13px;text-decoration:underline;cursor:pointer}
+    .rv-badge{width:128px;height:128px;border-radius:50%;display:grid;place-items:center;margin:6px auto 18px}
+    .rv-badge svg{width:62px;height:62px;stroke-width:2.6}
+    .rv-badge.ok{background:var(--accent);color:#fff}
+    .rv-badge.fail{background:#fbe4df;color:#d9443a}
+    .rv-res h2{font-size:34px;text-align:center}
+    .rv-res .rv-sub{text-align:center;margin-bottom:0}
+    .rv-detail{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;margin-top:28px;align-items:stretch}
+    .rv-ticket{padding:22px}
+    .rv-tk-top{display:grid;grid-template-columns:1fr 1.5fr;gap:22px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+    .rv-tk-rest{display:flex;gap:14px;align-items:center}
+    .rv-tk-rest img{width:92px;height:82px;border-radius:10px;object-fit:cover;background:#e9dfd4;flex:none}
+    .rv-tk-rest h3{font-size:18px;margin-bottom:4px}
+    .rv-tk-rest p{margin:2px 0;color:var(--muted);font-size:13px}
+    .rv-tk-facts,.rv-tk-bot{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .rv-tk-bot{padding-top:18px}
+    .rv-fact>span:first-child{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;margin-bottom:6px}
+    .rv-fact svg{width:18px;height:18px;color:var(--accent)}
+    .rv-fact b{font:700 18px var(--heading)}
+    .rv-code{background:var(--soft);border-radius:var(--radius);padding:24px;text-align:center;display:grid;align-content:center;gap:10px}
+    .rv-code h3{font-size:18px}
+    .rv-code strong{font:800 32px var(--heading);letter-spacing:.5px}
+    .rv-code p{margin:0;color:var(--muted);font-size:13px;line-height:1.5}
+    .rv-code svg{width:22px;height:22px;color:var(--accent);margin:0 auto}
+    .rv-help{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:28px}
+    .rv-help .rv-card{display:flex;gap:16px;align-items:flex-start;padding:22px}
+    .rv-help .ic{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:var(--soft);color:var(--accent);flex:none}
+    .rv-help h3{font-size:18px;margin-bottom:6px}
+    .rv-help p{margin:0;color:var(--muted);line-height:1.5}
+    .rv-end{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;margin-top:30px}
+    .rv-end .button svg,.rv-end .rv-ghost svg{width:18px;height:18px;margin-right:8px}
+
+    @media(max-width:900px){.rv-cols,.rv-detail,.rv-help,.rv-tk-top{grid-template-columns:1fr}.rv-methods{grid-template-columns:1fr 1fr}.rv-rest img{display:none}.rv-step span{display:none}}
+    @media(max-width:520px){.rv-body{padding:20px 16px}.rv-two,.rv-card-form,.rv-tk-facts,.rv-tk-bot{grid-template-columns:1fr}.rv-panel>h2{font-size:26px}.rv-res h2{font-size:27px}}
   </style>
   <script defer src="../../vendor/lucide-1.61.0.min.js"></script>
   <script defer src="../../js/icons.js"></script>
@@ -158,7 +197,9 @@
       <input class="sr-only" type="radio" name="paso" id="p1" checked aria-label="Paso 1" />
       <input class="sr-only" type="radio" name="paso" id="p2" aria-label="Paso 2" />
       <input class="sr-only" type="radio" name="paso" id="p3" aria-label="Paso 3" />
-      <input class="sr-only" type="radio" name="paso" id="p4" aria-label="Paso 4" />
+      <input class="sr-only" type="radio" name="paso" id="p3b" aria-label="Paso 3 (segundo intento)" />
+      <input class="sr-only" type="radio" name="paso" id="p4" aria-label="Paso 4, pago aprobado" />
+      <input class="sr-only" type="radio" name="paso" id="p4f" aria-label="Paso 4, pago rechazado" />
 
       <ol class="rv-steps">
         <li class="rv-step"><b>1</b><span>Seleccionar mesa</span></li>
@@ -229,28 +270,13 @@
             <h3>Selecciona un método de pago</h3>
             <div class="rv-methods" role="radiogroup" aria-label="Método de pago">
               <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt1" checked />
-              <label class="rv-method" for="mt1">
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1wHEfIMvk2Iu6PEt52kZuoA5MPAM0Wm4vPhR9pnXjeg&s=10" alt="" referrerpolicy="no-referrer" />
-                <span>Yape</span>
-              </label>
-
+              <label class="rv-method" for="mt1"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1wHEfIMvk2Iu6PEt52kZuoA5MPAM0Wm4vPhR9pnXjeg&s=10" alt="" referrerpolicy="no-referrer" /><span>Yape</span></label>
               <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt2" />
-              <label class="rv-method" for="mt2">
-                <img src="https://images.seeklogo.com/logo-png/38/1/plin-logo-png_seeklogo-386806.png" alt="" referrerpolicy="no-referrer" />
-                <span>Plin</span>
-              </label>
-
+              <label class="rv-method" for="mt2"><img src="https://images.seeklogo.com/logo-png/38/1/plin-logo-png_seeklogo-386806.png" alt="" referrerpolicy="no-referrer" /><span>Plin</span></label>
               <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt3" />
-              <label class="rv-method" for="mt3">
-                <img src="https://i.pinimg.com/736x/c6/a1/fe/c6a1fe7033dc3c76ec28d13c3c7699c2.jpg" alt="" referrerpolicy="no-referrer" />
-                <span>Tarjeta de débito o crédito</span>
-              </label>
-
+              <label class="rv-method" for="mt3"><img src="https://i.pinimg.com/736x/c6/a1/fe/c6a1fe7033dc3c76ec28d13c3c7699c2.jpg" alt="" referrerpolicy="no-referrer" /><span>Tarjeta de débito o crédito</span></label>
               <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt4" />
-              <label class="rv-method" for="mt4">
-                <i data-lucide="landmark" aria-hidden="true"></i>
-                <span>Transferencia bancaria</span>
-              </label>
+              <label class="rv-method" for="mt4"><i data-lucide="landmark" aria-hidden="true"></i><span>Transferencia bancaria</span></label>
             </div>
             <div class="rv-pay">
               <div class="rv-pago pg-yape">
@@ -301,14 +327,71 @@
             <div class="rv-total" style="display:block"><div class="rv-row" style="border:0;padding-top:0"><b>Adelanto (30%)</b><b>S/ 24.00</b></div><div class="rv-row" style="border:0;padding-bottom:0"><span>Saldo pendiente en el restaurante</span><span>S/ 56.00</span></div></div>
           </aside>
         </div>
-        <div class="rv-actions"><label class="rv-ghost" for="p2">Volver</label><label class="button" for="p4">Continuar</label></div>
+        <div class="rv-actions">
+          <label class="rv-ghost" for="p2">Volver</label>
+          <!-- Dos botones apilados: se ve uno u otro según el intento. Uno lleva al aprobado (p4), el otro al rechazado (p4f) -->
+          <label class="button go-ok" for="p4">Continuar</label>
+          <label class="button go-fail" for="p4f">Continuar</label>
+        </div>
       </div>
 
-      <!-- PASO 4: pendiente -->
+      <!-- PASO 4 -->
       <div class="rv-panel" id="panel4">
-        <h2>Confirmación</h2>
-        <p class="rv-sub">Esta pantalla se agrega después.</p>
-        <div class="rv-actions"><label class="rv-ghost" for="p3">Volver</label><span></span></div>
+
+        <!-- Resultado: pago aprobado -->
+        <div class="rv-res" id="res-ok">
+          <div class="rv-badge ok"><i data-lucide="check" aria-hidden="true"></i></div>
+          <h2>¡Tu reserva ha sido confirmada!</h2>
+          <p class="rv-sub">Gracias por elegir MesaSpot. Te esperamos.</p>
+          <div class="rv-detail">
+            <div class="rv-card rv-ticket">
+              <div class="rv-tk-top">
+                <div class="rv-tk-rest">
+                  <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80" alt="El Asador de Surco" />
+                  <div><h3>El Asador de Surco</h3><p>★ 4.8 (1,240 reseñas)</p><p>Surco, Lima</p></div>
+                </div>
+                <div class="rv-tk-facts">
+                  <div class="rv-fact"><span><i data-lucide="calendar-days" aria-hidden="true"></i>Fecha</span><b>Sáb, 7 de nov. 2026</b></div>
+                  <div class="rv-fact"><span><i data-lucide="clock" aria-hidden="true"></i>Hora</span><b>8:00 p. m.</b></div>
+                  <div class="rv-fact"><span><i data-lucide="users" aria-hidden="true"></i>Personas</span><b>4 personas</b></div>
+                </div>
+              </div>
+              <div class="rv-tk-bot">
+                <div class="rv-fact"><span><i data-lucide="armchair" aria-hidden="true"></i>Mesa seleccionada</span><span class="rv-pill pm1">Mesa 1</span><span class="rv-pill pm3">Mesa 3</span><span class="rv-pill pm4">Mesa 4</span></div>
+                <div class="rv-fact"><span><i data-lucide="credit-card" aria-hidden="true"></i>Pago realizado (30%)</span><b>S/ 24.00</b></div>
+                <div class="rv-fact"><span><i data-lucide="coins" aria-hidden="true"></i>Saldo pendiente</span><b>S/ 56.00</b></div>
+              </div>
+            </div>
+            <aside class="rv-code">
+              <h3>Código de reserva</h3>
+              <strong>MS-78453</strong>
+              <i data-lucide="mail" aria-hidden="true"></i>
+              <p>Te hemos enviado un correo con los detalles de tu reserva.</p>
+            </aside>
+          </div>
+          <div class="rv-end">
+            <a class="rv-ghost" href="../perfil/perfil.html"><i data-lucide="chevron-left" aria-hidden="true"></i>Ver mis reservas</a>
+            <a class="button" href="../../index.html"><i data-lucide="house" aria-hidden="true"></i>Volver al inicio</a>
+          </div>
+          <label class="rv-demolink" for="p3b">Demo: volver al pago y ver el otro resultado</label>
+        </div>
+
+        <!-- Resultado: pago rechazado -->
+        <div class="rv-res" id="res-fail">
+          <div class="rv-badge fail"><i data-lucide="x" aria-hidden="true"></i></div>
+          <h2>No se pudo procesar tu pago</h2>
+          <p class="rv-sub">Tu reserva no ha sido confirmada.<br>Por favor, verifica tus datos o intenta nuevamente.</p>
+          <div class="rv-help">
+            <div class="rv-card"><span class="ic"><i data-lucide="credit-card" aria-hidden="true"></i></span><div><h3>¿Qué puedes hacer?</h3><p>Puedes intentar realizar el pago nuevamente o volver a seleccionar una mesa.</p></div></div>
+            <div class="rv-card"><span class="ic"><i data-lucide="headset" aria-hidden="true"></i></span><div><h3>¿Necesitas ayuda?</h3><p>Contáctanos al 987 654 321 o escríbenos por nuestro chat.</p></div></div>
+          </div>
+          <div class="rv-end">
+            <label class="rv-ghost" for="p3"><i data-lucide="chevron-left" aria-hidden="true"></i>Reintentar el pago</label>
+            <label class="rv-ghost" for="p1">Volver a reservar</label>
+            <a class="button" href="../../index.html"><i data-lucide="house" aria-hidden="true"></i>Volver al inicio</a>
+          </div>
+        </div>
+
       </div>
     </section>
   </main>
