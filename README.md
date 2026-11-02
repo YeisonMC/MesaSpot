@@ -135,12 +135,43 @@ MesaSpot/
 
 ---
 
+## 🔌 Backend y API REST
+
+El frontend se conecta con un backend independiente desarrollado con una arquitectura RESTful robusta y escalable:
+
+- **Stack tecnológico**: Desarrollado con **Node.js**, **Express.js** y **MongoDB** (utilizando el ODM Mongoose).
+- **Alojamiento y Servicios**: Desplegado en **Vercel** y con gestión de imágenes/avatares a través de **Cloudinary**.
+- **Repositorio del Backend**: [https://github.com/YeisonMC/mesaspot-backend](https://github.com/YeisonMC/mesaspot-backend)
+- **URL Base de la API**:
+  ```text
+  https://mesaspot-backend.vercel.app/api
+  ```
+
+### Endpoints Principales Utilizados
+
+| Módulo | Método | Endpoint | Descripción | Acceso |
+| :--- | :---: | :--- | :--- | :---: |
+| **Autenticación** | `POST` | `/auth/register` | Registro de nuevos usuarios (clientes o administradores). | Público |
+| | `POST` | `/auth/login` | Inicio de sesión y emisión del token JWT de acceso. | Público |
+| **Usuarios** | `GET` | `/users/me` | Obtiene los datos del perfil del usuario actualmente autenticado. | Autenticado |
+| | `PATCH` | `/users/me` | Permite actualizar nombres, apellidos y número de celular. | Autenticado |
+| | `POST` | `/users/me/avatar/signature` | Genera la firma segura para subir la foto de perfil a Cloudinary. | Autenticado |
+| **Restaurantes** | `GET` | `/restaurants` | Catálogo con paginación y filtros por nombre, distrito, precio y categoría. | Público |
+| | `GET` | `/restaurants/:id` | Ficha técnica completa del restaurante (horarios, locales, servicios, platos). | Público |
+| **Reseñas** | `GET` | `/restaurants/:id/reviews` | Listado de reseñas con desglose de comida, servicio y ambiente. | Público |
+| | `POST` | `/restaurants/:id/reviews` | Registro de una nueva reseña (disponible para rol `CLIENT`). | Cliente |
+| **Promociones** | `GET` | `/promotions` | Listado general de promociones y ofertas vigentes. | Público |
+| **Metadatos** | `GET` | `/metadata` | Listado de distritos, tipos de comida y opciones de configuración. | Público |
+| **Administración** | `*` | `/admin/...` | Gestión de locales, cartas, menús, fotos y promociones (rol `RESTAURANT_ADMIN`). | Admin Restaurante |
+
+---
+
 ## ⚙️ Despliegue y Configuración Local
 
 1. **Ejecución local**:
    - Clona este repositorio:
      ```bash
-     git clone <URL_DEL_REPOSITORIO>
+     git clone https://github.com/YeisonMC/MesaSpot.git
      ```
    - Abre la carpeta en tu editor de preferencia (por ejemplo, VS Code).
    - Inicia un servidor local estático (como la extensión **Live Server** de VS Code) sobre `index.html`.
