@@ -4,10 +4,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description"
-    content="Conoce las promociones de los restaurantes de Lima, Perú." />
+  <meta name="description" content="Conoce las promociones de los restaurantes de Lima, Perú." />
   <meta name="theme-color" content="#c95830" />
   <title>Promociones · MesaSpot</title>
+  <link rel="icon" type="image/x-icon"
+    href="https://res.cloudinary.com/dtsfiwmzt/image/upload/v1793637908/MesaSpot_awonrz.ico" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -32,16 +33,23 @@
 </head>
 
 <body class="promotions-page" data-page="promotions">
-  <a class="skip-link" href="#promociones">Saltar a promociones</a>
-
   <header class="header" id="inicio">
     <div class="container header-inner">
-      <a class="brand" href="../../index.html" aria-label="MesaSpot, inicio"><span class="brand-icon"><i
-            data-lucide="chef-hat" aria-hidden="true"></i></span>MesaSpot</a>
+      <a class="brand" href="/index.html"" aria-label=" MesaSpot, inicio">
+        <span class="brand-icon">
+          <img src="https://res.cloudinary.com/dtsfiwmzt/image/upload/v1793635050/Logo_sin_fondo_d4ibca.png" alt=""
+            class="brand-logo" width="40" height="40" />
+        </span>
+        <span class="brand-name">
+          <span class="brand-name-accent">Mesa</span>Spot
+        </span>
+      </a>
       <button class="menu-toggle icon-button" aria-label="Abrir menú" aria-expanded="false"
         aria-controls="navigation"><i data-lucide="menu" aria-hidden="true"></i></button>
       <nav class="navigation" id="navigation" aria-label="Navegación principal">
-        <a href="../../index.html">Inicio</a><a href="../restaurantes/restaurantes.html">Restaurantes</a><a class="active" aria-current="page" href="promociones.html">Promociones</a>
+        <a class="active" href="/index.html">Inicio</a>
+        <a href="/pages/restaurantes/restaurantes.html">Restaurantes</a>
+        <a href="/pages/promociones/promociones.html">Promociones</a>
       </nav>
       <div class="header-actions">
         <button class="icon-button notifications" aria-label="Notificaciones" data-info="notifications">
@@ -71,7 +79,8 @@
         <div class="promo-filters__field promo-filters__field--search">
           <i data-lucide="search" aria-hidden="true"></i>
           <label class="sr-only" for="promo-query">Buscar promociones, restaurantes o platos</label>
-          <input type="search" id="promo-query" name="query" placeholder="Buscar promociones, restaurantes o platos…" autocomplete="off" />
+          <input type="search" id="promo-query" name="query" placeholder="Buscar promociones, restaurantes o platos…"
+            autocomplete="off" />
         </div>
         <div class="promo-filters__field">
           <i data-lucide="map-pin" aria-hidden="true"></i>
@@ -122,114 +131,147 @@
       <section class="promotions-list" aria-label="Lista de promociones">
         <p class="sr-only" id="promo-count" role="status" aria-live="polite"></p>
         <div class="promo-cards" id="promo-cards">
-        <article class="promo-card" data-distrito="Miraflores" data-precio="38" data-orden="1" data-tipo="mariscos">
-          <div class="promo-card__image">
-            <img src="https://images.unsplash.com/photo-1584747295311-5d129b60411e?q=80&w=1172&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D.jpg" alt="Plato de ceviche clásico" loading="lazy" onerror="this.onerror=null;this.src='../../assets/restaurant-placeholder.svg'" />
-            <span class="promo-card__badge">2x1</span>
-            <input class="promo-card__fav-input" type="checkbox" id="fav-1" />
-            <label class="promo-card__fav" for="fav-1" aria-label="Guardar 2x1 en ceviches en favoritos"><i data-lucide="heart" aria-hidden="true"></i></label>
-          </div>
-          <div class="promo-card__body">
-            <p class="promo-card__restaurant">Cevichería La Mar Azul</p>
-            <p class="promo-card__location"><i data-lucide="map-pin" aria-hidden="true"></i>Miraflores</p>
-            <h3 class="promo-card__title">2x1 en ceviches</h3>
-            <p class="promo-card__text">Pide un ceviche clásico y llévate el segundo sin costo adicional.</p>
-            <p class="promo-card__schedule"><i data-lucide="clock" aria-hidden="true"></i>Lunes a jueves</p>
-            <p class="promo-card__price">S/ 38.00</p>
-            <p class="promo-card__terms">Válido en el local, no acumulable con otras ofertas.</p>
-            <a class="promo-card__link" href="../restaurantes/restaurantes.html">Ver restaurantes<i data-lucide="arrow-right" aria-hidden="true"></i></a>
-          </div>
-        </article>
-        <article class="promo-card" data-distrito="Pueblo Libre" data-precio="22" data-orden="2" data-tipo="criolla">
-          <div class="promo-card__image">
-            <img src="https://plus.unsplash.com/premium_photo-1669261881284-61bc3d7a8c17?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D.jpg" alt="Menú criollo con entrada y plato de fondo" loading="lazy" onerror="this.onerror=null;this.src='../../assets/restaurant-placeholder.svg'" />
-            <span class="promo-card__badge">-20%</span>
-            <input class="promo-card__fav-input" type="checkbox" id="fav-2" />
-            <label class="promo-card__fav" for="fav-2" aria-label="Guardar Menú ejecutivo criollo en favoritos"><i data-lucide="heart" aria-hidden="true"></i></label>
-          </div>
-          <div class="promo-card__body">
-            <p class="promo-card__restaurant">Sabores de Barrio</p>
-            <p class="promo-card__location"><i data-lucide="map-pin" aria-hidden="true"></i>Pueblo Libre</p>
-            <h3 class="promo-card__title">Menú ejecutivo criollo</h3>
-            <p class="promo-card__text">Entrada, plato de fondo, refresco y postre del día.</p>
-            <p class="promo-card__schedule"><i data-lucide="clock" aria-hidden="true"></i>Lunes a viernes, 12:00–16:00</p>
-            <p class="promo-card__price">S/ 22.00</p>
-            <p class="promo-card__terms">Sujeto a disponibilidad del día.</p>
-            <a class="promo-card__link" href="../restaurantes/restaurantes.html">Ver restaurantes<i data-lucide="arrow-right" aria-hidden="true"></i></a>
-          </div>
-        </article>
-        <article class="promo-card" data-distrito="Santiago de Surco" data-precio="95" data-orden="3" data-tipo="carnes">
-          <div class="promo-card__image">
-            <img src="https://plus.unsplash.com/premium_photo-1693221705701-ef83484976b8?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D.jpg" alt="Parrilla mixta con carnes" loading="lazy" onerror="this.onerror=null;this.src='../../assets/restaurant-placeholder.svg'" />
-            <span class="promo-card__badge">-25%</span>
-            <input class="promo-card__fav-input" type="checkbox" id="fav-3" />
-            <label class="promo-card__fav" for="fav-3" aria-label="Guardar Parrilla para dos en favoritos"><i data-lucide="heart" aria-hidden="true"></i></label>
-          </div>
-          <div class="promo-card__body">
-            <p class="promo-card__restaurant">El Asador de Surco</p>
-            <p class="promo-card__location"><i data-lucide="map-pin" aria-hidden="true"></i>Santiago de Surco</p>
-            <h3 class="promo-card__title">Parrilla para dos</h3>
-            <p class="promo-card__text">Parrilla mixta con papas, ensaladas y dos bebidas.</p>
-            <p class="promo-card__schedule"><i data-lucide="clock" aria-hidden="true"></i>Viernes a domingo</p>
-            <p class="promo-card__price">S/ 95.00</p>
-            <p class="promo-card__terms">Reserva previa recomendada.</p>
-            <a class="promo-card__link" href="../restaurantes/restaurantes.html">Ver restaurantes<i data-lucide="arrow-right" aria-hidden="true"></i></a>
-          </div>
-        </article>
-        <article class="promo-card" data-distrito="Barranco" data-precio="69" data-orden="4" data-tipo="makis">
-          <div class="promo-card__image">
-            <img src="https://images.unsplash.com/photo-1580822650092-21e074d73dcd?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D.jpg" alt="Bandeja de makis variados" loading="lazy" onerror="this.onerror=null;this.src='../../assets/restaurant-placeholder.svg'" />
-            <span class="promo-card__badge">Nuevo</span>
-            <input class="promo-card__fav-input" type="checkbox" id="fav-4" />
-            <label class="promo-card__fav" for="fav-4" aria-label="Guardar Combo makis 30 piezas en favoritos"><i data-lucide="heart" aria-hidden="true"></i></label>
-          </div>
-          <div class="promo-card__body">
-            <p class="promo-card__restaurant">Maki Barranco</p>
-            <p class="promo-card__location"><i data-lucide="map-pin" aria-hidden="true"></i>Barranco</p>
-            <h3 class="promo-card__title">Combo makis 30 piezas</h3>
-            <p class="promo-card__text">Treinta piezas variadas para compartir y una bebida.</p>
-            <p class="promo-card__schedule"><i data-lucide="clock" aria-hidden="true"></i>Todos los días</p>
-            <p class="promo-card__price">S/ 69.00</p>
-            <p class="promo-card__terms">Hasta agotar stock.</p>
-            <a class="promo-card__link" href="../restaurantes/restaurantes.html">Ver restaurantes<i data-lucide="arrow-right" aria-hidden="true"></i></a>
-          </div>
-        </article>
-        <article class="promo-card" data-distrito="San Isidro" data-precio="24" data-orden="5" data-tipo="desayunos">
-          <div class="promo-card__image">
-            <img src="https://images.unsplash.com/photo-1636819362831-acdd2d8cd05e?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D.jpg" alt="Desayuno con café y pan" loading="lazy" onerror="this.onerror=null;this.src='../../assets/restaurant-placeholder.svg'" />
-            <span class="promo-card__badge">Nuevo</span>
-            <input class="promo-card__fav-input" type="checkbox" id="fav-5" />
-            <label class="promo-card__fav" for="fav-5" aria-label="Guardar Desayuno de la casa en favoritos"><i data-lucide="heart" aria-hidden="true"></i></label>
-          </div>
-          <div class="promo-card__body">
-            <p class="promo-card__restaurant">Café Central</p>
-            <p class="promo-card__location"><i data-lucide="map-pin" aria-hidden="true"></i>San Isidro</p>
-            <h3 class="promo-card__title">Desayuno de la casa</h3>
-            <p class="promo-card__text">Café, jugo natural y pan con chicharrón o tostadas.</p>
-            <p class="promo-card__schedule"><i data-lucide="clock" aria-hidden="true"></i>Sábados y domingos, 8:00–12:00</p>
-            <p class="promo-card__price">S/ 24.00</p>
-            <p class="promo-card__terms">No incluye propina.</p>
-            <a class="promo-card__link" href="../restaurantes/restaurantes.html">Ver restaurantes<i data-lucide="arrow-right" aria-hidden="true"></i></a>
-          </div>
-        </article>
-        <article class="promo-card" data-distrito="San Miguel" data-precio="55" data-orden="6" data-tipo="polleria">
-          <div class="promo-card__image">
-            <img src="https://plus.unsplash.com/premium_photo-1695931839971-f0bab0925dee?q=80&w=1191&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D.jpg" alt="Pollo a la brasa con papas" loading="lazy" onerror="this.onerror=null;this.src='../../assets/restaurant-placeholder.svg'" />
-            <span class="promo-card__badge">-20%</span>
-            <input class="promo-card__fav-input" type="checkbox" id="fav-6" />
-            <label class="promo-card__fav" for="fav-6" aria-label="Guardar Noche de pollo a la brasa en favoritos"><i data-lucide="heart" aria-hidden="true"></i></label>
-          </div>
-          <div class="promo-card__body">
-            <p class="promo-card__restaurant">Pollería Don Lucho</p>
-            <p class="promo-card__location"><i data-lucide="map-pin" aria-hidden="true"></i>San Miguel</p>
-            <h3 class="promo-card__title">Noche de pollo a la brasa</h3>
-            <p class="promo-card__text">Pollo entero con papas, ensalada y gaseosa familiar.</p>
-            <p class="promo-card__schedule"><i data-lucide="clock" aria-hidden="true"></i>Miércoles</p>
-            <p class="promo-card__price">S/ 55.00</p>
-            <p class="promo-card__terms">Delivery no incluido.</p>
-            <a class="promo-card__link" href="../restaurantes/restaurantes.html">Ver restaurantes<i data-lucide="arrow-right" aria-hidden="true"></i></a>
-          </div>
-        </article>
+          <article class="promo-card" data-distrito="Miraflores" data-precio="38" data-orden="1" data-tipo="mariscos">
+            <div class="promo-card__image">
+              <img
+                src="https://images.unsplash.com/photo-1584747295311-5d129b60411e?q=80&w=1172&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D.jpg"
+                alt="Plato de ceviche clásico" loading="lazy"
+                onerror="this.onerror=null;this.src='../../assets/restaurant-placeholder.svg'" />
+              <span class="promo-card__badge">2x1</span>
+              <input class="promo-card__fav-input" type="checkbox" id="fav-1" />
+              <label class="promo-card__fav" for="fav-1" aria-label="Guardar 2x1 en ceviches en favoritos"><i
+                  data-lucide="heart" aria-hidden="true"></i></label>
+            </div>
+            <div class="promo-card__body">
+              <p class="promo-card__restaurant">Cevichería La Mar Azul</p>
+              <p class="promo-card__location"><i data-lucide="map-pin" aria-hidden="true"></i>Miraflores</p>
+              <h3 class="promo-card__title">2x1 en ceviches</h3>
+              <p class="promo-card__text">Pide un ceviche clásico y llévate el segundo sin costo adicional.</p>
+              <p class="promo-card__schedule"><i data-lucide="clock" aria-hidden="true"></i>Lunes a jueves</p>
+              <p class="promo-card__price">S/ 38.00</p>
+              <p class="promo-card__terms">Válido en el local, no acumulable con otras ofertas.</p>
+              <a class="promo-card__link" href="../restaurantes/restaurantes.html">Ver restaurantes<i
+                  data-lucide="arrow-right" aria-hidden="true"></i></a>
+            </div>
+          </article>
+          <article class="promo-card" data-distrito="Pueblo Libre" data-precio="22" data-orden="2" data-tipo="criolla">
+            <div class="promo-card__image">
+              <img
+                src="https://plus.unsplash.com/premium_photo-1669261881284-61bc3d7a8c17?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D.jpg"
+                alt="Menú criollo con entrada y plato de fondo" loading="lazy"
+                onerror="this.onerror=null;this.src='../../assets/restaurant-placeholder.svg'" />
+              <span class="promo-card__badge">-20%</span>
+              <input class="promo-card__fav-input" type="checkbox" id="fav-2" />
+              <label class="promo-card__fav" for="fav-2" aria-label="Guardar Menú ejecutivo criollo en favoritos"><i
+                  data-lucide="heart" aria-hidden="true"></i></label>
+            </div>
+            <div class="promo-card__body">
+              <p class="promo-card__restaurant">Sabores de Barrio</p>
+              <p class="promo-card__location"><i data-lucide="map-pin" aria-hidden="true"></i>Pueblo Libre</p>
+              <h3 class="promo-card__title">Menú ejecutivo criollo</h3>
+              <p class="promo-card__text">Entrada, plato de fondo, refresco y postre del día.</p>
+              <p class="promo-card__schedule"><i data-lucide="clock" aria-hidden="true"></i>Lunes a viernes, 12:00–16:00
+              </p>
+              <p class="promo-card__price">S/ 22.00</p>
+              <p class="promo-card__terms">Sujeto a disponibilidad del día.</p>
+              <a class="promo-card__link" href="../restaurantes/restaurantes.html">Ver restaurantes<i
+                  data-lucide="arrow-right" aria-hidden="true"></i></a>
+            </div>
+          </article>
+          <article class="promo-card" data-distrito="Santiago de Surco" data-precio="95" data-orden="3"
+            data-tipo="carnes">
+            <div class="promo-card__image">
+              <img
+                src="https://plus.unsplash.com/premium_photo-1693221705701-ef83484976b8?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D.jpg"
+                alt="Parrilla mixta con carnes" loading="lazy"
+                onerror="this.onerror=null;this.src='../../assets/restaurant-placeholder.svg'" />
+              <span class="promo-card__badge">-25%</span>
+              <input class="promo-card__fav-input" type="checkbox" id="fav-3" />
+              <label class="promo-card__fav" for="fav-3" aria-label="Guardar Parrilla para dos en favoritos"><i
+                  data-lucide="heart" aria-hidden="true"></i></label>
+            </div>
+            <div class="promo-card__body">
+              <p class="promo-card__restaurant">El Asador de Surco</p>
+              <p class="promo-card__location"><i data-lucide="map-pin" aria-hidden="true"></i>Santiago de Surco</p>
+              <h3 class="promo-card__title">Parrilla para dos</h3>
+              <p class="promo-card__text">Parrilla mixta con papas, ensaladas y dos bebidas.</p>
+              <p class="promo-card__schedule"><i data-lucide="clock" aria-hidden="true"></i>Viernes a domingo</p>
+              <p class="promo-card__price">S/ 95.00</p>
+              <p class="promo-card__terms">Reserva previa recomendada.</p>
+              <a class="promo-card__link" href="../restaurantes/restaurantes.html">Ver restaurantes<i
+                  data-lucide="arrow-right" aria-hidden="true"></i></a>
+            </div>
+          </article>
+          <article class="promo-card" data-distrito="Barranco" data-precio="69" data-orden="4" data-tipo="makis">
+            <div class="promo-card__image">
+              <img
+                src="https://images.unsplash.com/photo-1580822650092-21e074d73dcd?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D.jpg"
+                alt="Bandeja de makis variados" loading="lazy"
+                onerror="this.onerror=null;this.src='../../assets/restaurant-placeholder.svg'" />
+              <span class="promo-card__badge">Nuevo</span>
+              <input class="promo-card__fav-input" type="checkbox" id="fav-4" />
+              <label class="promo-card__fav" for="fav-4" aria-label="Guardar Combo makis 30 piezas en favoritos"><i
+                  data-lucide="heart" aria-hidden="true"></i></label>
+            </div>
+            <div class="promo-card__body">
+              <p class="promo-card__restaurant">Maki Barranco</p>
+              <p class="promo-card__location"><i data-lucide="map-pin" aria-hidden="true"></i>Barranco</p>
+              <h3 class="promo-card__title">Combo makis 30 piezas</h3>
+              <p class="promo-card__text">Treinta piezas variadas para compartir y una bebida.</p>
+              <p class="promo-card__schedule"><i data-lucide="clock" aria-hidden="true"></i>Todos los días</p>
+              <p class="promo-card__price">S/ 69.00</p>
+              <p class="promo-card__terms">Hasta agotar stock.</p>
+              <a class="promo-card__link" href="../restaurantes/restaurantes.html">Ver restaurantes<i
+                  data-lucide="arrow-right" aria-hidden="true"></i></a>
+            </div>
+          </article>
+          <article class="promo-card" data-distrito="San Isidro" data-precio="24" data-orden="5" data-tipo="desayunos">
+            <div class="promo-card__image">
+              <img
+                src="https://images.unsplash.com/photo-1636819362831-acdd2d8cd05e?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D.jpg"
+                alt="Desayuno con café y pan" loading="lazy"
+                onerror="this.onerror=null;this.src='../../assets/restaurant-placeholder.svg'" />
+              <span class="promo-card__badge">Nuevo</span>
+              <input class="promo-card__fav-input" type="checkbox" id="fav-5" />
+              <label class="promo-card__fav" for="fav-5" aria-label="Guardar Desayuno de la casa en favoritos"><i
+                  data-lucide="heart" aria-hidden="true"></i></label>
+            </div>
+            <div class="promo-card__body">
+              <p class="promo-card__restaurant">Café Central</p>
+              <p class="promo-card__location"><i data-lucide="map-pin" aria-hidden="true"></i>San Isidro</p>
+              <h3 class="promo-card__title">Desayuno de la casa</h3>
+              <p class="promo-card__text">Café, jugo natural y pan con chicharrón o tostadas.</p>
+              <p class="promo-card__schedule"><i data-lucide="clock" aria-hidden="true"></i>Sábados y domingos,
+                8:00–12:00</p>
+              <p class="promo-card__price">S/ 24.00</p>
+              <p class="promo-card__terms">No incluye propina.</p>
+              <a class="promo-card__link" href="../restaurantes/restaurantes.html">Ver restaurantes<i
+                  data-lucide="arrow-right" aria-hidden="true"></i></a>
+            </div>
+          </article>
+          <article class="promo-card" data-distrito="San Miguel" data-precio="55" data-orden="6" data-tipo="polleria">
+            <div class="promo-card__image">
+              <img
+                src="https://plus.unsplash.com/premium_photo-1695931839971-f0bab0925dee?q=80&w=1191&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D.jpg"
+                alt="Pollo a la brasa con papas" loading="lazy"
+                onerror="this.onerror=null;this.src='../../assets/restaurant-placeholder.svg'" />
+              <span class="promo-card__badge">-20%</span>
+              <input class="promo-card__fav-input" type="checkbox" id="fav-6" />
+              <label class="promo-card__fav" for="fav-6" aria-label="Guardar Noche de pollo a la brasa en favoritos"><i
+                  data-lucide="heart" aria-hidden="true"></i></label>
+            </div>
+            <div class="promo-card__body">
+              <p class="promo-card__restaurant">Pollería Don Lucho</p>
+              <p class="promo-card__location"><i data-lucide="map-pin" aria-hidden="true"></i>San Miguel</p>
+              <h3 class="promo-card__title">Noche de pollo a la brasa</h3>
+              <p class="promo-card__text">Pollo entero con papas, ensalada y gaseosa familiar.</p>
+              <p class="promo-card__schedule"><i data-lucide="clock" aria-hidden="true"></i>Miércoles</p>
+              <p class="promo-card__price">S/ 55.00</p>
+              <p class="promo-card__terms">Delivery no incluido.</p>
+              <a class="promo-card__link" href="../restaurantes/restaurantes.html">Ver restaurantes<i
+                  data-lucide="arrow-right" aria-hidden="true"></i></a>
+            </div>
+          </article>
         </div>
         <div class="promo-empty" id="promo-empty" hidden>
           <h3>No encontramos promociones</h3>
@@ -261,7 +303,8 @@
         <div>
           <h3>Descubre</h3>
           <a href="../../index.html#restaurantes">Restaurantes destacados</a><button data-info="favorites">Favoritos del
-            mes</button><button data-info="experiences">Experiencias culinarias</button><a href="promociones.html">Promociones activas</a>
+            mes</button><button data-info="experiences">Experiencias culinarias</button><a
+            href="promociones.html">Promociones activas</a>
         </div>
         <div>
           <h3>Legal</h3>
