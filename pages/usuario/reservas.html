@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#c95830" />
+  <title>Reservar mesa · MesaSpot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../styles/main.css" />
+  <link rel="stylesheet" href="../../styles/auth.css" />
+  <link rel="stylesheet" href="../../styles/integration.css" />
+  <link rel="stylesheet" href="../../styles/navbar.css" />
+  <link rel="stylesheet" href="../../styles/reserva.css" />
+  <script defer src="../../vendor/lucide-1.61.0.min.js"></script>
+  <script defer src="../../js/icons.js"></script>
+  <script defer src="../../js/config.js"></script>
+  <script defer src="../../js/api.js"></script>
+  <script defer src="../../js/ui.js"></script>
+  <script defer src="../../js/navbar.js"></script>
+  <script defer src="../../js/app.js"></script>
+  <script defer src="../../js/auth.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#reserva">Saltar a la reserva</a>
+
+  <header class="header" id="inicio">
+    <div class="container header-inner">
+      <a class="brand" href="../../index.html" aria-label="MesaSpot, inicio"><span class="brand-icon"><i data-lucide="chef-hat" aria-hidden="true"></i></span>MesaSpot</a>
+      <button class="menu-toggle icon-button" aria-label="Abrir menú" aria-expanded="false" aria-controls="navigation"><i data-lucide="menu" aria-hidden="true"></i></button>
+      <nav class="navigation" id="navigation" aria-label="Navegación principal">
+        <a href="../../index.html">Inicio</a><a class="active" href="../restaurantes/restaurantes.html">Restaurantes</a><button data-info="promotions">Promociones</button>
+      </nav>
+      <div class="header-actions">
+        <button class="icon-button notifications" aria-label="Notificaciones" data-info="notifications"><i data-lucide="bell" aria-hidden="true"></i></button><span class="header-divider"></span><button class="login" data-account="login">Iniciar sesión</button><button class="button register" data-account="register">Registrarse</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container rv-page" id="reserva">
+    <section class="rv-card rv-rest" aria-label="Restaurante">
+      <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80" alt="El Asador de Surco" />
+      <div>
+        <h1>El Asador de Surco</h1>
+        <div class="rv-meta">
+          <span class="rating"><i data-lucide="star" aria-hidden="true"></i>4.8</span><span>(1,240 reseñas)</span>
+          <span><i data-lucide="utensils" aria-hidden="true"></i>Carnes y parrillas</span>
+          <span><i data-lucide="map-pin" aria-hidden="true"></i>Surco, Lima</span>
+          <span class="price">S/ 50 - S/120</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="rv-card rv-body rv-flow">
+      <!-- Radios ocultos: controlan el paso actual (solo CSS) -->
+      <input class="sr-only" type="radio" name="paso" id="p1" checked aria-label="Paso 1" />
+      <input class="sr-only" type="radio" name="paso" id="p2" aria-label="Paso 2" />
+      <input class="sr-only" type="radio" name="paso" id="p3" aria-label="Paso 3" />
+      <input class="sr-only" type="radio" name="paso" id="p3b" aria-label="Paso 3 (segundo intento)" />
+      <input class="sr-only" type="radio" name="paso" id="p4" aria-label="Paso 4, pago aprobado" />
+      <input class="sr-only" type="radio" name="paso" id="p4f" aria-label="Paso 4, pago rechazado" />
+
+      <ol class="rv-steps">
+        <li class="rv-step"><b>1</b><span>Seleccionar mesa</span></li>
+        <li class="rv-step"><b>2</b><span>Datos de la reserva</span></li>
+        <li class="rv-step"><b>3</b><span>Pago del adelanto</span></li>
+        <li class="rv-step"><b>4</b><span>Confirmación</span></li>
+      </ol>
+
+      <!-- PASO 1 -->
+      <div class="rv-panel" id="panel1">
+        <h2>Selecciona tu mesa</h2>
+        <p class="rv-sub">Elige la mesa que prefieras según la disponibilidad.</p>
+        <div class="rv-cols">
+          <div class="rv-plano">
+            <img src="../../assets/plano de restaurante.png" alt="Plano del restaurante El Asador de Surco" />
+          </div>
+          <aside class="rv-card rv-side">
+            <div class="rv-legend">
+              <p><i class="ok"></i>Disponible</p>
+              <p><i class="sel"></i>Seleccionada</p>
+              <p><i class="occ"></i>Ocupada</p>
+            </div>
+            <div class="rv-mesas" role="radiogroup" aria-label="Mesas">
+              <input class="sr-only rv-mesa-in" type="radio" name="mesa" id="m1" /><label class="rv-mesa" for="m1" aria-label="Mesa 1, disponible"><span>1</span></label>
+              <input class="sr-only rv-mesa-in" type="radio" name="mesa" id="m2" disabled /><label class="rv-mesa occ" for="m2" aria-label="Mesa 2, ocupada"><span>2</span></label>
+              <input class="sr-only rv-mesa-in" type="radio" name="mesa" id="m3" /><label class="rv-mesa" for="m3" aria-label="Mesa 3, disponible"><span>3</span></label>
+              <input class="sr-only rv-mesa-in" type="radio" name="mesa" id="m4" /><label class="rv-mesa" for="m4" aria-label="Mesa 4, disponible"><span>4</span></label>
+            </div>
+          </aside>
+        </div>
+        <div class="rv-actions"><span></span><label class="button" id="next1" for="p2">Siguiente</label></div>
+      </div>
+
+      <!-- PASO 2 -->
+      <div class="rv-panel" id="panel2">
+        <h2>Datos de la reserva</h2>
+        <p class="rv-sub">Completa la información para confirmar tu reserva.</p>
+        <div class="rv-cols">
+          <div class="rv-card rv-sum rv-form">
+            <div class="rv-two">
+              <label>Fecha de la reserva<input type="date" value="2026-11-07" /></label>
+              <label>Hora<select><option>7:00 p. m.</option><option selected>8:00 p. m.</option><option>9:00 p. m.</option></select></label>
+            </div>
+            <label>Número de personas<select><option>2 personas</option><option>3 personas</option><option selected>4 personas</option><option>5 personas</option><option>6 personas</option></select></label>
+            <label>Teléfono de contacto<input type="tel" placeholder="987 654 321" autocomplete="tel" /></label>
+            <label>Correo electrónico (opcional)<input type="email" placeholder="usuario@correo.com" autocomplete="email" /></label>
+            <label class="rv-check"><input type="checkbox" id="tyc" /> Acepto los <a href="#" data-info="terms">términos y condiciones</a></label>
+          </div>
+          <aside class="rv-card rv-sum">
+            <h3>Resumen de tu reserva</h3>
+            <div class="rv-row"><span>Mesa seleccionada</span><span><span class="rv-pill pm1">Mesa 1</span><span class="rv-pill pm3">Mesa 3</span><span class="rv-pill pm4">Mesa 4</span></span></div>
+            <div class="rv-row"><span>Fecha</span><span>Sáb, 7 de nov. 2026</span></div>
+            <div class="rv-row"><span>Hora</span><span>8:00 p. m.</span></div>
+            <div class="rv-row"><span>Personas</span><span>4 personas</span></div>
+            <div class="rv-total"><span>Total a pagar (adelanto)</span><span><strong>S/ 24.00</strong><small>(30% del total)</small></span></div>
+          </aside>
+        </div>
+        <div class="rv-actions"><label class="rv-ghost" for="p1">Volver</label><label class="button" id="next3" for="p3">Continuar al pago</label></div>
+      </div>
+
+      <!-- PASO 3 -->
+      <div class="rv-panel" id="panel3">
+        <h2>Pago adelantado</h2>
+        <p class="rv-sub">Realiza el pago del adelanto para confirmar tu reserva.</p>
+        <div class="rv-cols">
+          <div>
+            <div class="rv-note"><i data-lucide="info" aria-hidden="true" class="rv-note-ic"></i><span><b>Importante:</b> el adelanto es del 30% del total de tu reserva.</span></div>
+            <h3>Selecciona un método de pago</h3>
+            <div class="rv-methods" role="radiogroup" aria-label="Método de pago">
+              <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt1" checked />
+              <label class="rv-method" for="mt1"><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1wHEfIMvk2Iu6PEt52kZuoA5MPAM0Wm4vPhR9pnXjeg&s=10" alt="" referrerpolicy="no-referrer" /><span>Yape</span></label>
+              <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt2" />
+              <label class="rv-method" for="mt2"><img src="https://images.seeklogo.com/logo-png/38/1/plin-logo-png_seeklogo-386806.png" alt="" referrerpolicy="no-referrer" /><span>Plin</span></label>
+              <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt3" />
+              <label class="rv-method" for="mt3"><img src="https://i.pinimg.com/736x/c6/a1/fe/c6a1fe7033dc3c76ec28d13c3c7699c2.jpg" alt="" referrerpolicy="no-referrer" /><span>Tarjeta de débito o crédito</span></label>
+              <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt4" />
+              <label class="rv-method" for="mt4"><i data-lucide="landmark" aria-hidden="true"></i><span>Transferencia bancaria</span></label>
+            </div>
+            <div class="rv-pay">
+              <div class="rv-pago pg-yape">
+                <h3>Paga con Yape</h3>
+                <p class="rv-hint">Escanea el código QR o ingresa el número del comercio.</p>
+                <div class="rv-pay-body">
+                  <img class="rv-qr" src="https://www.lanacion.com.ar/resizer/v2/U5SE7L2DWRCV7JWVQHMVSOARXE.jpg?auth=118965a2e5344b2e8f9baa30519d4afcbb0240978456c2e6a6c099d76b43946d&width=1200&height=900&quality=70&smart=true" alt="Código QR de Yape" referrerpolicy="no-referrer" />
+                  <div><small>Número de Yape</small><div class="rv-form"><input value="987 654 321" readonly aria-label="Número de Yape" /></div></div>
+                </div>
+              </div>
+              <div class="rv-pago pg-plin">
+                <h3>Paga con Plin</h3>
+                <p class="rv-hint">Escanea el código QR o ingresa el número del comercio.</p>
+                <div class="rv-pay-body">
+                  <img class="rv-qr" src="https://www.lanacion.com.ar/resizer/v2/U5SE7L2DWRCV7JWVQHMVSOARXE.jpg?auth=118965a2e5344b2e8f9baa30519d4afcbb0240978456c2e6a6c099d76b43946d&width=1200&height=900&quality=70&smart=true" alt="Código QR de Plin" referrerpolicy="no-referrer" />
+                  <div><small>Número de Plin</small><div class="rv-form"><input value="987 654 321" readonly aria-label="Número de Plin" /></div></div>
+                </div>
+              </div>
+              <div class="rv-pago pg-tarjeta">
+                <h3>Paga con tarjeta de débito o crédito</h3>
+                <div class="rv-form rv-card-form">
+                  <label class="rv-full">Número de tarjeta<input inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000" autocomplete="cc-number" /></label>
+                  <label class="rv-full">Nombre en la tarjeta<input placeholder="Como aparece en la tarjeta" autocomplete="cc-name" /></label>
+                  <label>Vencimiento<input inputmode="numeric" maxlength="5" placeholder="MM/AA" autocomplete="cc-exp" /></label>
+                  <label>CVV<input inputmode="numeric" maxlength="4" placeholder="123" autocomplete="cc-csc" /></label>
+                </div>
+              </div>
+              <div class="rv-pago pg-transf">
+                <h3>Paga con transferencia bancaria</h3>
+                <p class="rv-hint">Transfiere el adelanto a la cuenta del restaurante y guarda tu constancia.</p>
+                <div class="rv-cuenta">
+                  <div class="rv-row"><span>Banco</span><b>BCP</b></div>
+                  <div class="rv-row"><span>Titular</span><b>El Asador de Surco S.A.C.</b></div>
+                  <div class="rv-row"><span>Cuenta corriente (S/)</span><b>191-0000000-0-00</b></div>
+                  <div class="rv-row"><span>CCI</span><b>002-191-000000000000-00</b></div>
+                  <div class="rv-row"><span>Monto a transferir</span><b>S/ 24.00</b></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="rv-card rv-sum">
+            <h3>Resumen de tu reserva</h3>
+            <div class="rv-row"><span>Mesa seleccionada</span><span><span class="rv-pill pm1">Mesa 1</span><span class="rv-pill pm3">Mesa 3</span><span class="rv-pill pm4">Mesa 4</span></span></div>
+            <div class="rv-row"><span>Fecha</span><span>Sáb, 7 de nov. 2026</span></div>
+            <div class="rv-row"><span>Hora</span><span>8:00 p. m.</span></div>
+            <div class="rv-row"><span>Personas</span><span>4 personas</span></div>
+            <div class="rv-row"><b>Total de la reserva</b><b>S/ 80.00</b></div>
+            <div class="rv-total rv-total-col"><div class="rv-row"><b>Adelanto (30%)</b><b>S/ 24.00</b></div><div class="rv-row"><span>Saldo pendiente en el restaurante</span><span>S/ 56.00</span></div></div>
+          </aside>
+        </div>
+        <div class="rv-actions">
+          <label class="rv-ghost" for="p2">Volver</label>
+          <!-- Dos botones apilados: se ve uno u otro según el intento. Uno lleva al aprobado (p4), el otro al rechazado (p4f) -->
+          <label class="button go-ok" for="p4">Continuar</label>
+          <label class="button go-fail" for="p4f">Continuar</label>
+        </div>
+      </div>
+
+      <!-- PASO 4 -->
+      <div class="rv-panel" id="panel4">
+
+        <!-- Resultado: pago aprobado -->
+        <div class="rv-res" id="res-ok">
+          <div class="rv-badge ok"><i data-lucide="check" aria-hidden="true"></i></div>
+          <h2>¡Tu reserva ha sido confirmada!</h2>
+          <p class="rv-sub">Gracias por elegir MesaSpot. Te esperamos.</p>
+          <div class="rv-detail">
+            <div class="rv-card rv-ticket">
+              <div class="rv-tk-top">
+                <div class="rv-tk-rest">
+                  <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80" alt="El Asador de Surco" />
+                  <div><h3>El Asador de Surco</h3><p>★ 4.8 (1,240 reseñas)</p><p>Surco, Lima</p></div>
+                </div>
+                <div class="rv-tk-facts">
+                  <div class="rv-fact"><span><i data-lucide="calendar-days" aria-hidden="true"></i>Fecha</span><b>Sáb, 7 de nov. 2026</b></div>
+                  <div class="rv-fact"><span><i data-lucide="clock" aria-hidden="true"></i>Hora</span><b>8:00 p. m.</b></div>
+                  <div class="rv-fact"><span><i data-lucide="users" aria-hidden="true"></i>Personas</span><b>4 personas</b></div>
+                </div>
+              </div>
+              <div class="rv-tk-bot">
+                <div class="rv-fact"><span><i data-lucide="armchair" aria-hidden="true"></i>Mesa seleccionada</span><span class="rv-pill pm1">Mesa 1</span><span class="rv-pill pm3">Mesa 3</span><span class="rv-pill pm4">Mesa 4</span></div>
+                <div class="rv-fact"><span><i data-lucide="credit-card" aria-hidden="true"></i>Pago realizado (30%)</span><b>S/ 24.00</b></div>
+                <div class="rv-fact"><span><i data-lucide="coins" aria-hidden="true"></i>Saldo pendiente</span><b>S/ 56.00</b></div>
+              </div>
+            </div>
+            <aside class="rv-code">
+              <h3>Código de reserva</h3>
+              <strong>MS-78453</strong>
+              <i data-lucide="mail" aria-hidden="true"></i>
+              <p>Te hemos enviado un correo con los detalles de tu reserva.</p>
+            </aside>
+          </div>
+          <div class="rv-end">
+            <a class="rv-ghost" href="../perfil/perfil.html"><i data-lucide="chevron-left" aria-hidden="true"></i>Ver mis reservas</a>
+            <a class="button" href="../../index.html"><i data-lucide="house" aria-hidden="true"></i>Volver al inicio</a>
+          </div>
+          <label class="rv-demolink" for="p3b">Demo: volver al pago y ver el otro resultado</label>
+        </div>
+
+        <!-- Resultado: pago rechazado -->
+        <div class="rv-res" id="res-fail">
+          <div class="rv-badge fail"><i data-lucide="x" aria-hidden="true"></i></div>
+          <h2>No se pudo procesar tu pago</h2>
+          <p class="rv-sub">Tu reserva no ha sido confirmada.<br>Por favor, verifica tus datos o intenta nuevamente.</p>
+          <div class="rv-help">
+            <div class="rv-card"><span class="ic"><i data-lucide="credit-card" aria-hidden="true"></i></span><div><h3>¿Qué puedes hacer?</h3><p>Puedes intentar realizar el pago nuevamente o volver a seleccionar una mesa.</p></div></div>
+            <div class="rv-card"><span class="ic"><i data-lucide="headset" aria-hidden="true"></i></span><div><h3>¿Necesitas ayuda?</h3><p>Contáctanos al 987 654 321 o escríbenos por nuestro chat.</p></div></div>
+          </div>
+          <div class="rv-end">
+            <label class="rv-ghost" for="p3"><i data-lucide="chevron-left" aria-hidden="true"></i>Reintentar el pago</label>
+            <label class="rv-ghost" for="p1">Volver a reservar</label>
+            <a class="button" href="../../index.html"><i data-lucide="house" aria-hidden="true"></i>Volver al inicio</a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <a class="brand" href="../../index.html"><span class="brand-icon"><i data-lucide="chef-hat" aria-hidden="true"></i></span>MesaSpot</a>
+          <p>Tu plataforma de descubrimiento gastronómico en Lima, Perú. Encuentra tu próxima experiencia culinaria inolvidable.</p>
+          <div class="socials" aria-label="Redes sociales">
+            <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i data-lucide="external-link" aria-hidden="true"></i></a><a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i data-lucide="camera" aria-hidden="true"></i></a><a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><i data-lucide="circle-play" aria-hidden="true"></i></a>
+          </div>
+        </div>
+        <div><h3>Descubre</h3><a href="../restaurantes/restaurantes.html">Restaurantes destacados</a><button data-info="favorites">Favoritos del mes</button><button data-info="experiences">Experiencias culinarias</button><button data-info="promotions">Promociones activas</button></div>
+        <div><h3>Legal</h3><button data-info="terms">Términos de servicio</button><button data-info="privacy">Política de privacidad</button><button data-info="cookies">Política de cookies</button><button data-info="conditions">Condiciones de reserva</button></div>
+        <div><h3>Contacto</h3><button data-info="support">Soporte al cliente</button><button data-info="join">Únete como restaurante</button><button data-info="faq">Preguntas frecuentes</button><button data-info="press">Prensa y media</button></div>
+      </div>
+      <div class="footer-bottom"><p>© 2026 MesaSpot. Diseñado con pasión gastronómica.</p><p>Hecho en la clase :3</p></div>
+    </div>
+  </footer>
+
+  <dialog id="modal" aria-labelledby="modal-title">
+    <button class="modal-close icon-button" id="close-modal" aria-label="Cerrar ventana"><i data-lucide="x" aria-hidden="true"></i></button>
+    <div id="modal-content"></div>
+  </dialog>
+  <div class="toast" id="toast" role="status" hidden></div>
+</body>
+</html>
