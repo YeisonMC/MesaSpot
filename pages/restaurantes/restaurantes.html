@@ -8,6 +8,8 @@
     content="Explora restaurantes en Lima, Perú. Filtra por distrito, cocina y precios en soles para encontrar tu próxima mesa." />
   <meta name="theme-color" content="#c95830" />
   <title>Restaurantes en Lima · MesaSpot</title>
+  <link rel="icon" type="image/x-icon"
+    href="https://res.cloudinary.com/dtsfiwmzt/image/upload/v1793637908/MesaSpot_awonrz.ico" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -29,21 +31,28 @@
   <script defer src="../../js/auth.js"></script>
   <script defer src="../../js/price-range.js"></script>
   <script defer src="../../js/restaurants.js"></script>
+  <script defer src="../../js/restaurants-mobile.js"></script>
   <link rel="stylesheet" href="../../styles/navbar.css" />
 </head>
 
 <body class="catalog-page" data-page="restaurants">
-  <a class="skip-link" href="#restaurantes">Saltar a restaurantes</a>
-
   <header class="header" id="inicio">
     <div class="container header-inner">
-      <a class="brand" href="../../index.html" aria-label="MesaSpot, inicio"><span class="brand-icon"><i
-            data-lucide="chef-hat" aria-hidden="true"></i></span>MesaSpot</a>
+      <a class="brand" href="/index.html"" aria-label=" MesaSpot, inicio">
+        <span class="brand-icon">
+          <img src="https://res.cloudinary.com/dtsfiwmzt/image/upload/v1793635050/Logo_sin_fondo_d4ibca.png" alt=""
+            class="brand-logo" width="40" height="40" />
+        </span>
+        <span class="brand-name">
+          <span class="brand-name-accent">Mesa</span>Spot
+        </span>
+      </a>
       <button class="menu-toggle icon-button" aria-label="Abrir menú" aria-expanded="false"
         aria-controls="navigation"><i data-lucide="menu" aria-hidden="true"></i></button>
       <nav class="navigation" id="navigation" aria-label="Navegación principal">
-        <a href="../../index.html">Inicio</a><a class="active" aria-current="page"
-          href="restaurantes.html">Restaurantes</a><button data-info="promotions">Promociones</button>
+        <a class="active" href="/index.html">Inicio</a>
+        <a href="/pages/restaurantes/restaurantes.html">Restaurantes</a>
+        <a href="/pages/promociones/promociones.html">Promociones</a>
       </nav>
       <div class="header-actions">
         <button class="icon-button notifications" aria-label="Notificaciones" data-info="notifications">
@@ -56,10 +65,14 @@
     </div>
   </header>
   <main class="container catalog-layout" id="restaurantes">
-    <aside class="filters-panel" aria-labelledby="filters-title" data-aos="fade-up">
-      <h2 id="filters-title">Filtros de Búsqueda</h2>
+    <aside class="filters-panel" id="filters-panel" aria-labelledby="filters-title" data-aos="fade-up">
+      <div class="filters-panel__header">
+        <h2 id="filters-title">Filtros de Búsqueda</h2>
+        <button class="filters-close" id="close-filters" type="button" aria-label="Cerrar filtros"><i data-lucide="x"
+            aria-hidden="true"></i></button>
+      </div>
       <form id="filters-form" role="search">
-        <div class="filter-field">
+        <div class="filter-field filter-field--query">
           <label for="filter-query">Buscar por nombre</label>
           <div class="filter-input">
             <i data-lucide="search" aria-hidden="true"></i><input type="search" id="filter-query" name="query"
@@ -109,13 +122,26 @@
           <p class="price-hint" id="price-hint">Desliza para elegir el rango en soles. Lleva el máximo al extremo
             derecho para buscar sin límite.</p>
         </fieldset>
-        <button class="button filters-submit" type="submit">
-          Buscar ahora
-        </button>
+        <div class="filters-actions">
+          <button class="button filters-submit" type="submit">
+            <span class="filters-submit__desktop">Buscar ahora</span>
+            <span class="filters-submit__mobile">Filtrar</span>
+          </button>
+          <button class="filters-clear" id="clear-filters" type="button"><i data-lucide="trash-2"
+              aria-hidden="true"></i>Limpiar todo</button>
+        </div>
       </form>
     </aside>
     <section class="catalog-results" aria-labelledby="results-title">
+      <form class="mobile-search" id="mobile-search-form" role="search">
+        <label class="sr-only" for="mobile-query">Buscar restaurantes por nombre</label>
+        <i data-lucide="search" aria-hidden="true"></i>
+        <input type="search" id="mobile-query" name="mobile-query" placeholder="Buscar restaurantes"
+          autocomplete="off" />
+      </form>
       <div class="results-toolbar">
+        <button class="mobile-filter-button" id="open-filters" type="button" aria-controls="filters-panel"
+          aria-expanded="false"><i data-lucide="sliders-horizontal" aria-hidden="true"></i>Filtrar</button>
         <div class="results-title-group">
           <h1 id="results-title" tabindex="-1">Resultados de búsqueda</h1>
           <p id="result-count" role="status" aria-live="polite"></p>
@@ -163,8 +189,8 @@
         <div>
           <h3>Descubre</h3>
           <a href="../../index.html#restaurantes">Restaurantes destacados</a><button data-info="favorites">Favoritos del
-            mes</button><button data-info="experiences">Experiencias culinarias</button><button
-            data-info="promotions">Promociones activas</button>
+            mes</button><button data-info="experiences">Experiencias culinarias</button><a
+            href="../promociones/promociones.html">Promociones activas</a>
         </div>
         <div>
           <h3>Legal</h3>

@@ -1,0 +1,34 @@
+
+/* Insignias: solo se ve la del estado marcado */
+.data-table .badge {
+  display: none;
+}
+.data-table tr:has(.st-ok:checked) .badge-ok,
+.data-table tr:has(.st-wait:checked) .badge-wait,
+.data-table tr:has(.st-cancel:checked) .badge-cancel {
+  display: inline-block;
+}
+
+/* Botones: el check solo aparece si esta pendiente */
+.data-table .action-ok {
+  display: none;
+}
+.data-table tr:has(.st-wait:checked) .action-ok {
+  display: grid;
+}
+.action-ok,
+.action-no {
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.action-ok:hover,
+.action-no:hover {
+  transform: scale(1.12);
+}
+
+/* Cancelada: queda solo la X, apagada y sin accion */
+.data-table tr:has(.st-cancel:checked) .action-no {
+  opacity: 0.45;
+  cursor: default;
+  pointer-events: none;
+}

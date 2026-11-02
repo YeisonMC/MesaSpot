@@ -147,6 +147,7 @@
     "restaurante.html": "restaurantes",
     "perfil.html": "perfil",
     "administracion.html": "administracion",
+    "promociones.html": "promociones",
   };
   const pageUrl = (file) => {
     const name = file.split(/[?#]/)[0];

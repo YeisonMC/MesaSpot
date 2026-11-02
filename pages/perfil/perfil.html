@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Gestiona tu perfil de MesaSpot y consulta tus reseñas." />
   <title>Mi perfil · MesaSpot</title>
+  <link rel="icon" type="image/x-icon"
+    href="https://res.cloudinary.com/dtsfiwmzt/image/upload/v1793637908/MesaSpot_awonrz.ico" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -28,16 +30,23 @@
 </head>
 
 <body class="profile-page" data-page="profile">
-  <a class="skip-link" href="#profile-main">Saltar a mi perfil</a>
   <header class="header" id="inicio">
     <div class="container header-inner">
-      <a class="brand" href="../../index.html" aria-label="MesaSpot, inicio"><span class="brand-icon"><i
-            data-lucide="chef-hat" aria-hidden="true"></i></span>MesaSpot</a>
+      <a class="brand" href="/index.html"" aria-label=" MesaSpot, inicio">
+        <span class="brand-icon">
+          <img src="https://res.cloudinary.com/dtsfiwmzt/image/upload/v1793635050/Logo_sin_fondo_d4ibca.png" alt=""
+            class="brand-logo" width="40" height="40" />
+        </span>
+        <span class="brand-name">
+          <span class="brand-name-accent">Mesa</span>Spot
+        </span>
+      </a>
       <button class="menu-toggle icon-button" aria-label="Abrir menú" aria-expanded="false"
         aria-controls="navigation"><i data-lucide="menu" aria-hidden="true"></i></button>
       <nav class="navigation" id="navigation" aria-label="Navegación principal">
-        <a href="../../index.html">Inicio</a><a href="../restaurantes/restaurantes.html">Restaurantes</a><button
-          data-info="promotions">Promociones</button>
+        <a class="active" href="/index.html">Inicio</a>
+        <a href="/pages/restaurantes/restaurantes.html">Restaurantes</a>
+        <a href="/pages/promociones/promociones.html">Promociones</a>
       </nav>
       <div class="header-actions">
         <button class="icon-button notifications" aria-label="Notificaciones" data-info="notifications">
@@ -96,8 +105,8 @@
         <div>
           <h3>Descubre</h3>
           <a href="../../index.html#restaurantes">Restaurantes destacados</a><button data-info="favorites">Favoritos del
-            mes</button><button data-info="experiences">Experiencias culinarias</button><button
-            data-info="promotions">Promociones activas</button>
+            mes</button><button data-info="experiences">Experiencias culinarias</button><a
+            href="../promociones/promociones.html">Promociones activas</a>
         </div>
         <div>
           <h3>Legal</h3>

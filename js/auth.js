@@ -503,69 +503,178 @@
   function openAuth(mode = "login") {
     if (mode === "register") return openRegister();
     const version = ++formVersion;
-    const content = modal("Iniciar sesión", "auth-modal");
-    content.append(
-      element("p", "modal-description", "Accede a tu perfil de MesaSpot."),
+    // La clase register-modal reutiliza el diseño del registro y hace que el modal solo se cierre con la X (ver app.js).
+    const content = modal(
+      "Iniciar sesión",
+      "auth-modal register-modal login-modal",
     );
-    const form = element("form", "modal-form auth-form");
-
-    field(form, "email", "Correo electrónico", "email", "", {
-      required: true,
-      autocomplete: "email",
-    });
-    const password = field(form, "password", "Contraseña", "password", "", {
-      required: true,
-      minlength: "1",
-      maxlength: "72",
-      autocomplete: "current-password",
-    });
-    form.append(
-      button(
-        "Mostrar contraseña",
-        (event) => {
-          password.type = password.type === "password" ? "text" : "password";
-          event.currentTarget.textContent =
-            password.type === "password"
-              ? "Mostrar contraseña"
-              : "Ocultar contraseña";
-          event.currentTarget.prepend(
-            MesaIcons.icon(password.type === "password" ? "eye" : "eye-off"),
-          );
-        },
-        "auth-link",
+    const heading = content.firstElementChild;
+    const brand = element("div", "register-brand", "MesaSpot");
+    const brandIcon = element("span", "brand-icon");
+    brandIcon.append(MesaIcons.icon("chef-hat"));
+    brand.prepend(brandIcon);
+    content.prepend(brand);
+    heading.classList.add("register-title");
+    content.append(
+      element(
+        "p",
+        "register-description",
+        "Bienvenido de nuevo. Ingresa a tu cuenta para continuar.",
       ),
     );
-    let remember;
-    {
-      const label = element("label", "auth-checkbox");
-      remember = element("input");
-      remember.type = "checkbox";
-      label.append(
-        remember,
-        element("span", "", "Mantener mi sesión en este navegador"),
-      );
-      form.append(label);
+    // El acceso con Google aún no existe: se muestra identificado y deshabilitado.
+    const google = button("Continuar con Google", () => {}, "register-google");
+    google.prepend(MesaIcons.icon("circle-user-round"));
+    google.disabled = true;
+    google.setAttribute("aria-describedby", "login-google-note");
+    const googleNote = element(
+      "p",
+      "register-google-note",
+      "El acceso con Google estará disponible próximamente.",
+    );
+    googleNote.id = "login-google-note";
+    const divider = element("div", "auth-divider register-divider");
+    divider.append(element("span", "", "o continúa con tu correo"));
+    content.append(google, googleNote, divider);
+
+    const form = element("form", "register-form login-form");
+    form.noValidate = true;
+    const fields = {},
+      errors = {};
+    // Cada campo lleva etiqueta, icono a la izquierda y un mensaje de error debajo.
+    function addField(name, title, type, placeholder, icon, autocomplete) {
+      const group = element("div", "register-field");
+      const label = element("label", "", title);
+      label.htmlFor = "login-" + name;
+      const wrap = element("div", "register-input");
+      const input = element("input");
+      input.id = label.htmlFor;
+      input.name = name;
+      input.type = type;
+      input.placeholder = placeholder;
+      input.autocomplete = autocomplete;
+      input.required = true;
+      input.maxLength = name === "email" ? 254 : 72;
+      const error = element("p", "register-error");
+      error.id = input.id + "-error";
+      error.hidden = true;
+      input.setAttribute("aria-describedby", error.id);
+      wrap.append(MesaIcons.icon(icon), input);
+      if (type === "password") {
+        // El ojo alterna entre mostrar y ocultar la contraseña.
+        const toggle = button(
+          "",
+          () => {
+            const visible = input.type === "password";
+            input.type = visible ? "text" : "password";
+            toggle.replaceChildren(MesaIcons.icon(visible ? "eye-off" : "eye"));
+            toggle.setAttribute(
+              "aria-label",
+              visible ? "Ocultar contraseña" : "Mostrar contraseña",
+            );
+            toggle.setAttribute("aria-pressed", String(visible));
+          },
+          "register-password-toggle",
+        );
+        toggle.setAttribute("aria-label", "Mostrar contraseña");
+        toggle.setAttribute("aria-pressed", "false");
+        toggle.append(MesaIcons.icon("eye"));
+        wrap.append(toggle);
+      }
+      group.append(label, wrap, error);
+      form.append(group);
+      fields[name] = input;
+      errors[name] = error;
+      input.addEventListener("input", () => {
+        if (!errors[name].hidden) validate(name);
+        status.hidden = true;
+      });
     }
-    const submit = element("button", "button auth-submit", "Iniciar sesión");
+    function validate(name) {
+      const value = fields[name].value.trim();
+      let message = "";
+      if (name === "email")
+        message = !value
+          ? "Ingresa tu correo electrónico."
+          : !fields.email.validity.valid
+            ? "Ingresa un correo válido, por ejemplo nombre@correo.com."
+            : "";
+      else message = fields.password.value ? "" : "Ingresa tu contraseña.";
+      errors[name].textContent = message;
+      errors[name].hidden = !message;
+      fields[name].setAttribute("aria-invalid", String(Boolean(message)));
+      return !message;
+    }
+    addField(
+      "email",
+      "Correo electrónico",
+      "email",
+      "ejemplo@correo.com",
+      "mail",
+      "email",
+    );
+    addField(
+      "password",
+      "Contraseña",
+      "password",
+      "Ingresa tu contraseña",
+      "lock-keyhole",
+      "current-password",
+    );
+
+    // Fila de opciones: en escritorio van en una línea; en móvil el enlace baja (ver auth.css).
+    const options = element("div", "login-options");
+    const rememberLabel = element("label", "register-terms login-remember");
+    const remember = element("input");
+    remember.type = "checkbox";
+    remember.name = "remember";
+    remember.id = "login-remember";
+    rememberLabel.append(
+      remember,
+      element("span", "", "Mantener mi sesión iniciada"),
+    );
+    // La recuperación de contraseña aún no existe: se deja visible pero deshabilitada.
+    const forgot = button("¿Olvidaste tu contraseña?", () => {}, "login-forgot");
+    forgot.disabled = true;
+    forgot.title = "Próximamente";
+    forgot.setAttribute(
+      "aria-label",
+      "¿Olvidaste tu contraseña? Disponible próximamente",
+    );
+    options.append(rememberLabel, forgot);
+
+    const submit = element(
+      "button",
+      "button register-submit login-submit",
+      "Iniciar sesión",
+    );
     submit.type = "submit";
-    const status = element("p", "auth-feedback");
+    const status = element("p", "auth-feedback register-status");
     status.setAttribute("role", "status");
     status.hidden = true;
-    form.append(submit, status);
+    form.append(options, submit, status);
+
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
+      // Se validan ambos campos antes de llamar a la API.
+      const valid = [validate("email"), validate("password")].every(Boolean);
+      if (!valid) {
+        form.querySelector('[aria-invalid="true"]')?.focus();
+        return;
+      }
       submit.disabled = true;
       feedback(status, "Conectando…");
       try {
-        const values = Object.fromEntries(new FormData(form));
-        const body = { email: values.email.trim(), password: values.password };
-
+        const body = {
+          email: fields.email.value.trim(),
+          password: fields.password.value,
+        };
         const result = await MesaAPI.request("/auth/login", {
           method: "POST",
           body,
         });
         validatedUser = true;
-        MesaAPI.saveSession(result.data, remember?.checked);
+        MesaAPI.saveSession(result.data, remember.checked);
         if (
           version === formVersion &&
           $("#modal-content") === content &&
@@ -576,20 +685,14 @@
         if (form.isConnected) feedback(status, error.message, true);
       } finally {
         submit.disabled = false;
-        password.value = "";
+        fields.password.value = "";
       }
     });
-    content.append(
-      form,
-      button("Crear una cuenta", () => openAuth("register"), "auth-link"),
+    const switcher = element("p", "register-switch", "¿No tienes cuenta? ");
+    switcher.append(
+      button("Regístrate aquí", () => openAuth("register"), "auth-link"),
     );
-    content.append(
-      element(
-        "p",
-        "muted",
-        "La recuperación de contraseña y el acceso con Google todavía no están disponibles.",
-      ),
-    );
+    content.append(form, switcher);
   }
   async function openProfile() {
     const content = modal("Mi perfil", "auth-modal");

@@ -104,17 +104,7 @@ h3,
   clip-path: inset(50%);
   white-space: nowrap;
 }
-.skip-link {
-  position: fixed;
-  top: -80px;
-  left: 20px;
-  padding: 12px;
-  background: white;
-  z-index: 100;
-}
-.skip-link:focus {
-  top: 10px;
-}
+
 .button {
   display: inline-flex;
   align-items: center;
@@ -151,7 +141,7 @@ h3,
   white-space: nowrap;
   letter-spacing: -0.6px;
 }
-.brand-icon {
+/* .brand-icon {
   display: grid;
   place-items: center;
   width: 36px;
@@ -159,7 +149,7 @@ h3,
   border-radius: 10px;
   background: var(--accent);
   color: white;
-}
+} */
 .brand-icon svg {
   width: 23px;
   height: 23px;

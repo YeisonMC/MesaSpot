@@ -1,92 +1,188 @@
-# MesaSpot
+# MesaSpot 🍽️
 
-Frontend estático en HTML, CSS y JavaScript para descubrir restaurantes de Lima Metropolitana. Consume la API `https://mesaspot-backend.vercel.app/api` y no requiere Node.js, npm ni compilación para publicarse.
+> Plataforma web inteligente para el descubrimiento gastronómico en Lima Metropolitana. Proyecto desarrollado para el curso de **Interacción Humano-Computador y Programación Web (IHC)** en la **Universidad Peruana de Ciencias Aplicadas (UPC)**.
 
-## Ramas y trabajo en equipo
+---
 
-| Rama | Propósito |
-| --- | --- |
-| `main` | Versión estable del sitio lista para publicar. |
-| `develop` | Integración del trabajo de todo el equipo. |
-| `test` | Frontend acompañado de pruebas automatizadas y dependencias de desarrollo. |
-| `feature/nombre-del-cambio` | Un cambio concreto, creado desde `develop`. |
-| `feature/perfil-cliente` y `feature/redisenar-resenas` | Avances anteriores conservados con sus commits originales, ya integrados en las ramas principales. |
+## 🚀 Sobre la Startup: Saboría
 
-No se crean ramas `develop/...` ni una rama llamada únicamente `feature`: Git no permite que convivan con `develop` y `feature/...`, respectivamente. El mismo flujo se aplica a todos los integrantes.
+**Saboría** es una startup tecnológica enfocada en transformar la experiencia culinaria y comercial en el sector gastronómico de Lima Metropolitana. 
 
-Para iniciar un trabajo nuevo, con el directorio de trabajo limpio:
+### Problemática
+En Lima Metropolitana se concentra más del 42 % de empresas del país, de las cuales el sector de comidas y bebidas representa una parte vital de la economía cotidiana. Sin embargo, los comensales enfrentan un problema recurrente: **la dispersión de información**. Precios, promociones, menús, horarios y opiniones reales se encuentran fragmentados entre múltiples redes sociales, buscadores y mapas digitales, generando pérdida de tiempo e incertidumbre al momento de decidir dónde comer.
 
-```bash
-git switch develop
-git pull --ff-only origin develop
-git switch -c feature/nombre-del-cambio
+Por otro lado, los dueños de restaurantes independientes y pequeños negocios gastronómicos tienen dificultades para ganar visibilidad digital, actualizar sus ofertas en tiempo real y gestionar reservas o pedidos sin saturar sus canales convencionales (como WhatsApp o llamadas).
+
+### Nuestra Solución: MesaSpot
+**MesaSpot** centraliza la oferta culinaria en una experiencia digital accesible, intuitiva y transparente. Permite a los usuarios:
+- Buscar y filtrar restaurantes por ubicación cercana, distrito, rango de precio y especialidad gastronómica.
+- Consultar información fidedigna: cartas actualizadas, fotos, promociones vigentes, calificaciones y reseñas de la comunidad.
+- Facilitar reservas y pedidos anticipados para reducir esperas.
+- Ofrecer a los dueños de restaurantes un panel de administración para actualizar su perfil, platos, promociones y gestionar la interacción con sus clientes.
+
+---
+
+## 👥 Integrantes del Equipo
+
+Proyecto desarrollado por estudiantes de la carrera de **Ciencias de la Computación**:
+
+| Integrante | Código | Carrera | Habilidades y Enfoque Técnico |
+| :--- | :---: | :---: | :--- |
+| **Carrillo Alor, Iván Leonardo** | `U20241C412` | Ciencias de la Computación | Programación en C++ y Python, maquetación web en HTML/CSS y trabajo colaborativo. |
+| **Chavez Pino, Paula Brenda** | `U20241F697` | Ciencias de la Computación | Desarrollo en C++ y Python, diseño y estructura web, documentación y coordinación de equipo. |
+| **Macalupu Marchan, Yeissen Beckam** | `U202423813` | Ciencias de la Computación | Desarrollo full-stack con stack MERN, C++, integración de APIs, JavaScript y metodologías ágiles. |
+| **Quispe Valdez, Elim Zabdi** | `U20241F731` | Ciencias de la Computación | Lógica algorítmica con C++ y Python, desarrollo de software y análisis de requisitos. |
+
+**Docente:** Henry Antonio Mendoza Puerta  
+**Sección:** 4931  
+**Periodo:** 2026-20  
+
+---
+
+## 🌿 Flujo de Ramas (Git Branching Model)
+
+El desarrollo del proyecto sigue una metodología colaborativa y controlada de control de versiones con Git:
+
+```
+[ main ]          <--- Rama de producción (despliegue final)
+   ▲
+   │ (Pull Request validado)
+[ develop ]       <--- Integración continua del equipo
+   ▲         ▲
+   │         │ (Merge de feature)
+   │     [ feature/nombre-tarea ]  <--- Desarrollo de cada funcionalidad
+   │
+   └──► [ test ]  <--- Entorno para pruebas automatizadas y QA
 ```
 
-Publica la rama y abre un pull request hacia `develop`:
+### Descripción de Ramas
 
-```bash
-git push -u origin feature/nombre-del-cambio
+| Rama | Propósito | Reglas de Uso |
+| :--- | :--- | :--- |
+| `main` | **Producción:** Versión estable, depurada y lista para despliegue público. | Solo recibe cambios verificados desde `develop` vía Pull Request. |
+| `develop` | **Integración:** Rama principal de trabajo donde convergen las funcionalidades terminadas. | Base común para crear nuevas ramas y realizar integración continua. |
+| `test` | **Pruebas y QA:** Rama dedicada a la ejecución de suites de pruebas automáticas y validaciones. | Recibe actualizaciones desde `develop` para verificar estabilidad. No se fusiona de vuelta a `develop`. |
+| `feature/...` | **Nuevas características:** Ramas temporales creadas para implementar una tarea o historia de usuario específica. | Se originan desde `develop` y se integran de regreso mediante Pull Request con revisión de código. |
+
+### Flujo de Trabajo para Nuevas Funcionalidades
+1. Asegurarse de tener la última versión de `develop`:
+   ```bash
+   git switch develop
+   git pull --ff-only origin develop
+   ```
+2. Crear una rama de trabajo descriptiva:
+   ```bash
+   git switch -c feature/nombre-de-la-funcionalidad
+   ```
+3. Realizar los commits con mensajes claros y publicar la rama:
+   ```bash
+   git push -u origin feature/nombre-de-la-funcionalidad
+   ```
+4. Abrir un **Pull Request** hacia `develop` para su revisión e integración.
+
+---
+
+## 📁 Estructura del Proyecto
+
+El frontend está construido con tecnologías web estándares (**HTML5, CSS3 y JavaScript Vanilla**), sin necesidad de compilación o empaquetadores complejos:
+
+```text
+MesaSpot/
+├── index.html                   # Página principal (Landing Page de MesaSpot)
+├── assets/                      # Recursos multimedia, logotipos e iconos vectoriales
+│   └── restaurant-placeholder.svg
+├── pages/                       # Vistas y pantallas del aplicativo
+│   ├── restaurantes/            # Catálogo general y detalle de restaurantes
+│   │   ├── restaurantes.html    # Directorio de búsqueda con filtros avanzados
+│   │   └── restaurante.html     # Ficha detallada de un restaurante por ID
+│   ├── perfil/                  # Gestión de usuario
+│   │   └── perfil.html          # Perfil de usuario, historial y reseñas personales
+│   ├── promociones/             # Sección de ofertas y descuentos gastronómicos
+│   │   └── promociones.html
+│   └── administracion/          # Panel administrativo para restaurantes
+│       ├── administracion.html  # Gestión de locales, cartas, fotos y promociones
+│       └── administracionDemo.html
+├── js/                          # Lógica frontend modularizada en JavaScript
+│   ├── api.js                   # Módulo de comunicación HTTP con la API REST
+│   ├── config.js                # Variables de configuración del cliente (URL de API)
+│   ├── auth.js                  # Control de autenticación, login, registro y tokens
+│   ├── profile.js               # Lógica del perfil de usuario y avatar
+│   ├── restaurants.js           # Búsqueda, ordenamiento y renderizado del catálogo
+│   ├── restaurant-detail.js     # Carga de datos de la ficha del restaurante
+│   ├── restaurant-tabs.js       # Navegación entre pestañas (menú, horarios, mapa)
+│   ├── reviews.js               # Creación, lectura y calificación de reseñas
+│   ├── gallery.js               # Galería interactiva de imágenes y carrusel
+│   ├── admin.js                 # Lógica del panel de administración gastronómico
+│   ├── promotions.js            # Filtros y despliegue de promociones
+│   ├── navbar.js                # Comportamiento del menú de navegación responsive
+│   ├── icons.js                 # Inicialización y manejo de iconos
+│   └── ui.js                    # Componentes UI reutilizables (modales, alertas)
+├── styles/                      # Hojas de estilo modulares en CSS
+│   ├── main.css                 # Estilos globales, variables y tipografías
+│   ├── navbar.css               # Estilos de la barra de navegación
+│   ├── restaurants.css          # Estilos del catálogo de búsqueda
+│   ├── restaurant-detail.css    # Estilos de la vista de detalle
+│   ├── restaurant-tabs.css      # Estilos de pestañas de navegación interna
+│   ├── reviews.css              # Estilos del sistema de reseñas y estrellas
+│   ├── gallery.css              # Estilos del visualizador de fotos
+│   ├── promotions.css           # Estilos para tarjetas de promociones
+│   ├── profile.css              # Estilos del perfil de usuario
+│   └── auth.css                 # Estilos de formularios de autenticación
+└── vendor/                      # Librerías cliente locales de producción
+    ├── lucide-1.61.0.min.js     # Librería de iconografía Lucide
+    └── lucide-LICENSE.txt
 ```
 
-### Validar y publicar cambios
+---
 
-1. El equipo integra los cambios mediante pull requests de `feature/...` hacia `develop`.
-2. Actualiza `test` incorporando `develop`; ejecuta allí las pruebas descritas en `tests/README.md`.
-3. Si aparece un fallo del producto, corrígelo en una rama `feature/...` desde `develop` e incorpora la corrección por el mismo flujo.
-4. Cuando las pruebas pasen, abre un pull request de `develop` hacia `main`.
+## 🔌 Backend y API REST
 
-**No integres `test` hacia `develop` ni `main`**: volverían a aparecer las herramientas y archivos de pruebas. La rama `test` es permanente y recibe cambios desde `develop`; sus herramientas se mantienen únicamente allí. Evita eliminarla automáticamente al cerrar pull requests.
+El frontend se conecta con un backend independiente desarrollado con una arquitectura RESTful robusta y escalable:
 
-`main` y `develop` conservan páginas, estilos, scripts, imágenes y la documentación/licencia necesaria. No incluyen `tests/`, `.tests/`, `package.json`, `package-lock.json` ni `.gitignore`. Las exclusiones de `.git/info/exclude` son locales y no se comparten al clonar; evita colocar secretos, dependencias o herramientas en estas ramas y revisa `git status` antes de confirmar cambios.
+- **Stack tecnológico**: Desarrollado con **Node.js**, **Express.js** y **MongoDB** (utilizando el ODM Mongoose).
+- **Alojamiento y Servicios**: Desplegado en **Vercel** y con gestión de imágenes/avatares a través de **Cloudinary**.
+- **Repositorio del Backend**: [https://github.com/YeisonMC/mesaspot-backend](https://github.com/YeisonMC/mesaspot-backend)
+- **URL Base de la API**:
+  ```text
+  https://mesaspot-backend.vercel.app/api
+  ```
 
-## Abrir y configurar
+### Endpoints Principales Utilizados
 
-1. Abre el proyecto con Live Server o cualquier servidor HTTP estático; no abras las páginas mediante `file://`.
-2. Configura el dominio del backend en `js/config.js`. No añadas claves privadas al frontend.
-3. En el backend, `CORS_ORIGINS` debe incluir el origen exacto del frontend, sin barra final ni `/api`. Después de cambiarlo, vuelve a desplegar el backend.
-4. Publica `main` como sitio estático, sin comando de compilación ni instalación npm.
+| Módulo | Método | Endpoint | Descripción | Acceso |
+| :--- | :---: | :--- | :--- | :---: |
+| **Autenticación** | `POST` | `/auth/register` | Registro de nuevos usuarios (clientes o administradores). | Público |
+| | `POST` | `/auth/login` | Inicio de sesión y emisión del token JWT de acceso. | Público |
+| **Usuarios** | `GET` | `/users/me` | Obtiene los datos del perfil del usuario actualmente autenticado. | Autenticado |
+| | `PATCH` | `/users/me` | Permite actualizar nombres, apellidos y número de celular. | Autenticado |
+| | `POST` | `/users/me/avatar/signature` | Genera la firma segura para subir la foto de perfil a Cloudinary. | Autenticado |
+| **Restaurantes** | `GET` | `/restaurants` | Catálogo con paginación y filtros por nombre, distrito, precio y categoría. | Público |
+| | `GET` | `/restaurants/:id` | Ficha técnica completa del restaurante (horarios, locales, servicios, platos). | Público |
+| **Reseñas** | `GET` | `/restaurants/:id/reviews` | Listado de reseñas con desglose de comida, servicio y ambiente. | Público |
+| | `POST` | `/restaurants/:id/reviews` | Registro de una nueva reseña (disponible para rol `CLIENT`). | Cliente |
+| **Promociones** | `GET` | `/promotions` | Listado general de promociones y ofertas vigentes. | Público |
+| **Metadatos** | `GET` | `/metadata` | Listado de distritos, tipos de comida y opciones de configuración. | Público |
+| **Administración** | `*` | `/admin/...` | Gestión de locales, cartas, menús, fotos y promociones (rol `RESTAURANT_ADMIN`). | Admin Restaurante |
 
-## Funcionalidades
+---
 
-- Catálogo con nombre, distrito, tipo de comida, rango de precios en soles, orden y paginación.
-- Tipos de comida: Criolla, Chifa, Pollería, Makis, Mariscos, Carnes, Desayunos y Cafeterías. La selección múltiple combina categorías mediante OR.
-- Ficha genérica `pages/restaurantes/restaurante.html?id=OBJECT_ID`, con información, locales, horarios, servicios, galería, platos, promociones, reseñas y ubicación. La ficha específica de El Asador se retiró porque el catálogo y las reseñas ya utilizan la ficha genérica por ID.
-- Galería con filtros, visor Swiper, miniaturas, teclado y gestos táctiles.
-- Reseñas con comida, servicio y ambiente, validaciones y modal de confirmación. Solo `CLIENT` puede publicar; la verificación de visita depende de la API.
-- Login, registro, sesión, avatar y perfil de cliente, edición de nombres, apellidos y celular, y listado de reseñas propias.
-- Subida de avatar a Cloudinary mediante firma del backend. Las credenciales se configuran exclusivamente en el backend.
-- Administración de restaurantes, locales, fotografías, platos y promociones para `RESTAURANT_ADMIN`, con permisos comprobados en el servidor.
-- Navbar responsive compartido, estados de carga/error, navegación por teclado y respeto al movimiento reducido.
+## ⚙️ Despliegue y Configuración Local
 
-Reservas, pagos, favoritos y notificaciones siguen pendientes. No se simulan confirmaciones de operaciones inexistentes. Las fotografías y los datos comerciales de demostración son referenciales.
+1. **Ejecución local**:
+   - Clona este repositorio:
+     ```bash
+     git clone https://github.com/YeisonMC/MesaSpot.git
+     ```
+   - Abre la carpeta en tu editor de preferencia (por ejemplo, VS Code).
+   - Inicia un servidor local estático (como la extensión **Live Server** de VS Code) sobre `index.html`.
+   *(Nota: No abrir directamente mediante doble clic o protocolo `file://` para permitir el correcto funcionamiento de las peticiones HTTP y módulos).*
 
-## Archivos principales
+2. **Conexión con el Backend**:
+   - El frontend consume el API REST configurado en [js/config.js](file:///c:/Users/YeisonMC/Desktop/Proyectos/IHC/MesaSpot/js/config.js).
+   - Verifica que el backend contemple en sus orígenes permitidos (CORS) la URL local donde se ejecuta el cliente.
 
-- `index.html`: portada.
-- `pages/restaurantes/`: `restaurantes.html` y `restaurante.html`.
-- `pages/perfil/`: `perfil.html`.
-- `pages/administracion/`: `administracion.html`.
-- `styles/`: estilos compartidos y específicos de cada pantalla.
-- `js/api.js` y `js/config.js`: acceso y configuración de la API.
-- `js/auth.js`, `js/profile.js`: sesión y perfil.
-- `js/restaurants.js`, `js/restaurant-detail.js`, `js/restaurant-tabs.js`: catálogo y ficha.
-- `js/gallery.js`, `js/reviews.js`, `js/admin.js`: galería, reseñas y administración.
-- `js/navbar.js`, `js/ui.js`, `js/icons.js`: navegación, componentes e iconos.
-- `assets/`: recursos estáticos, incluida la imagen de respaldo.
-- `vendor/`: Lucide de producción y su licencia.
+---
 
-Los datos de la API se insertan mediante nodos DOM y `textContent`; las URLs externas se validan. Los precios se reciben y envían en céntimos y se presentan en soles.
+## 📄 Licencia
 
-## Bibliotecas del navegador
-
-Se conserva **`vendor/lucide-1.61.0.min.js`** porque las seis páginas lo cargan y `js/icons.js` utiliza sus funciones para generar iconos estáticos y dinámicos. Es una dependencia del sitio en ejecución, no una herramienta de pruebas. Su copia local fija la versión y permite cargar los iconos sin depender de un CDN. `vendor/lucide-LICENSE.txt` conserva la licencia de distribución. No se necesita `package.json` para ejecutar esta copia en el navegador.
-
-AOS 2.3.4 y Swiper 12.0.3 se cargan desde CDN donde se necesitan. El visor mantiene navegación básica si Swiper no está disponible.
-
-- [Lucide: instalación y versiones fijas](https://lucide.dev/guide/lucide/getting-started)
-- [Swiper desde CDN](https://swiperjs.com/get-started#use-swiper-from-cdn)
-- [AOS](https://github.com/michalsnik/aos)
-
-## Peticiones y caché CORS
-
-El cliente solicita la API con `cache: "no-store"` para evitar reutilizar respuestas condicionales del navegador con cabeceras de otro origen local. El backend debe conservar una lista explícita de `CORS_ORIGINS`, responder con el origen permitido que recibe y `Vary: Origin`, y marcar `/api` como `Cache-Control: no-store`. Despliega la corrección del backend para completar la solución. No se usa `no-cors` ni se omiten los permisos.
+Este proyecto ha sido desarrollado con fines académicos para el curso de **Interacción Humano-Computador y Programación Web (UPC)**.
