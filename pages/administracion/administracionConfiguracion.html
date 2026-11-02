@@ -19,8 +19,10 @@
       <div class="sidebar-top">
         <div class="brand"><span class="logo-badge"><i class="fa-solid fa-table-cells-large"></i></span><span class="brand-text"><strong>MesaSpot</strong><small>SOCIO ADMIN</small></span></div>
         <section class="restaurant-profile" aria-label="Restaurante">
-          <span class="avatar" aria-hidden="true"><i class="fa-solid fa-fire"></i></span>
-          <div><strong>Asador de Segovia</strong><small>Segovia, España</small></div>
+          <span class="avatar" aria-hidden="true" style="overflow: hidden; display: inline-flex; align-items: center; justify-content: center;">
+            <img src="https://i.pinimg.com/736x/f5/83/31/f583318e7c8582114ffc3615c2edff81.jpg" alt="Logo" style="width: 100%; height: 100%; object-fit: cover;" />
+          </span>
+          <div><strong>Asador Limeño</strong><small>Lima, Perú</small></div>
         </section>
         <nav class="nav" aria-label="Navegación principal">
           <a class="nav-link nav-demo" href="administracionDemo.html"><i class="fa-solid fa-table-columns"></i>Dashboard</a>
@@ -46,11 +48,21 @@
         <!-- ============ PERFIL ============ -->
         <section class="card" aria-labelledby="t-perfil">
           <h2 id="t-perfil">Perfil del Restaurante</h2>
-          <div class="profile-row"><span class="avatar" aria-hidden="true"><i class="fa-solid fa-fire"></i></span><div><button type="button" class="btn btn-small">Subir Nueva</button> <button type="button" class="btn btn-small btn-soft">Eliminar</button><small>JPG, PNG o GIF. Máximo 1MB.</small></div></div>
+          <div class="profile-row">
+            <span class="avatar" aria-hidden="true" style="overflow: hidden; display: inline-flex; align-items: center; justify-content: center;">
+              <img src="https://i.pinimg.com/736x/f5/83/31/f583318e7c8582114ffc3615c2edff81.jpg" alt="Perfil del restaurante" style="width: 100%; height: 100%; object-fit: cover;" />
+            </span>
+            <div>
+              <input class="sr-only" type="file" id="subir-foto-perfil" name="foto_perfil" accept="image/png, image/jpeg, image/gif" />
+              <label for="subir-foto-perfil" class="btn btn-small">Subir Nueva</label>
+              <button type="submit" name="eliminar_foto" value="true" class="btn btn-small btn-soft">Eliminar</button>
+              <small>JPG, PNG o GIF. Máximo 1MB.</small>
+            </div>
+          </div>
           <div class="field"><label for="nombre">Nombre del Establecimiento</label><input type="text" id="nombre" name="nombre" value="Asador de Segovia" /></div>
-          <div class="field"><label for="direccion">Dirección Física</label><input type="text" id="direccion" name="direccion" value="Calle Mayor, 14, Segovia, España" /></div>
+          <div class="field"><label for="direccion">Dirección Física</label><input type="text" id="direccion" name="direccion" value="Francisco Masías 505, 14, Lima, Perú" /></div>
           <div class="field-row">
-            <div class="field"><label for="telefono">Teléfono</label><input type="text" id="telefono" name="telefono" value="+34 921 444 555" /></div>
+            <div class="field"><label for="telefono">Teléfono</label><input type="text" id="telefono" name="telefono" value="+51 992 392 239" /></div>
             <div class="field"><label for="email">Email de Contacto</label><input type="email" id="email" name="email" value="contacto@asadorsegovia.com" /></div>
           </div>
         </section>
