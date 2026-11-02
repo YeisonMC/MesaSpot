@@ -681,3 +681,26 @@ html {
     overflow-y: auto;
   }
 }
+
+/* ---------- Estilos globales definitivos ---------- */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+label:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.nav-link,
+.btn,
+.icon-btn {
+  transition: background 0.2s, color 0.2s;
+}
+::selection {
+  background: var(--accent);
+  color: white;
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
