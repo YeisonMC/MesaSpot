@@ -87,15 +87,29 @@
     const node = element("button", className, text);
     node.type = "button";
     const symbols = {
-      'Volver a intentar': 'rotate-cw', 'Crear restaurante': 'plus',
-      'Editar restaurante': 'pencil', 'Editar': 'pencil', 'Archivar': 'archive',
-      'Archivar restaurante': 'archive', 'Eliminar mi reseña': 'trash-2',
-      'Eliminar respuesta': 'trash-2', 'Iniciar sesión': 'log-in', 'Salir': 'log-out',
-      'Crear una cuenta': 'user-plus', 'Ya tengo cuenta': 'log-in',
-      'Mostrar contraseña': 'eye', 'Restaurante': 'store', 'Locales': 'map-pin',
-      'Galería': 'images', 'Carta': 'book-open', 'Promociones': 'badge-percent',
-      'Reseñas': 'message-square', 'Agregar local': 'plus', 'Agregar foto': 'image-plus',
-      'Agregar plato': 'utensils', 'Agregar promoción': 'badge-percent'
+      "Volver a intentar": "rotate-cw",
+      "Crear restaurante": "plus",
+      "Editar restaurante": "pencil",
+      Editar: "pencil",
+      Archivar: "archive",
+      "Archivar restaurante": "archive",
+      "Eliminar mi reseña": "trash-2",
+      "Eliminar respuesta": "trash-2",
+      "Iniciar sesión": "log-in",
+      Salir: "log-out",
+      "Crear una cuenta": "user-plus",
+      "Ya tengo cuenta": "log-in",
+      "Mostrar contraseña": "eye",
+      Restaurante: "store",
+      Locales: "map-pin",
+      Galería: "images",
+      Carta: "book-open",
+      Promociones: "badge-percent",
+      Reseñas: "message-square",
+      "Agregar local": "plus",
+      "Agregar foto": "image-plus",
+      "Agregar plato": "utensils",
+      "Agregar promoción": "badge-percent",
     };
     if (symbols[text]) node.prepend(MesaIcons.icon(symbols[text]));
     if (handler) node.addEventListener("click", handler);
@@ -110,17 +124,33 @@
     const url = safeUrl(value, protocols);
     if (!url) return element("span", "", "No disponible");
     const node = link(text, url);
-    node.prepend(MesaIcons.icon(protocols?.includes('tel:') ? 'phone' : protocols?.includes('mailto:') ? 'mail' : 'external-link'));
+    node.prepend(
+      MesaIcons.icon(
+        protocols?.includes("tel:")
+          ? "phone"
+          : protocols?.includes("mailto:")
+            ? "mail"
+            : "external-link",
+      ),
+    );
     node.rel = "noopener noreferrer";
     if (!protocols) node.target = "_blank";
     return node;
   }
   // Resolvemos las páginas desde el script compartido para admitir carpetas y subdirectorios.
-  const siteRoot = new URL('../', document.querySelector('script[src$="js/ui.js"]').src);
-  const pageFolders = { 'restaurantes.html': 'restaurantes', 'restaurante.html': 'restaurantes', 'perfil.html': 'perfil', 'administracion.html': 'administracion' };
+  const siteRoot = new URL(
+    "../",
+    document.querySelector('script[src$="js/ui.js"]').src,
+  );
+  const pageFolders = {
+    "restaurantes.html": "restaurantes",
+    "restaurante.html": "restaurantes",
+    "perfil.html": "perfil",
+    "administracion.html": "administracion",
+  };
   const pageUrl = (file) => {
     const name = file.split(/[?#]/)[0];
-    return new URL('pages/' + pageFolders[name] + '/' + file, siteRoot).href;
+    return new URL("pages/" + pageFolders[name] + "/" + file, siteRoot).href;
   };
   const detailUrl = (item) =>
     pageUrl(`restaurante.html?id=${encodeURIComponent(item._id)}`);
@@ -142,26 +172,45 @@
     photo.append(picture);
     const body = element("div", "card-body");
     const badges = element("div", "card-labels");
-    const cuisines = element('div', 'card-cuisines');
-    (item.cuisineTypes || []).forEach(code => cuisines.append(element('span', 'tag', label(code))));
-    const rating = element('span', 'rating', item.ratingSummary?.reviewCount ? item.ratingSummary.overall.toFixed(1) : 'Nuevo');
-    rating.prepend(MesaIcons.icon('star'));
-    rating.setAttribute('aria-label', item.ratingSummary?.reviewCount ? `Valoración ${item.ratingSummary.overall.toFixed(1)} de 5` : 'Todavía no tiene reseñas');
+    const cuisines = element("div", "card-cuisines");
+    (item.cuisineTypes || []).forEach((code) =>
+      cuisines.append(element("span", "tag", label(code))),
+    );
+    const rating = element(
+      "span",
+      "rating",
+      item.ratingSummary?.reviewCount
+        ? item.ratingSummary.overall.toFixed(1)
+        : "Nuevo",
+    );
+    rating.prepend(MesaIcons.icon("star"));
+    rating.setAttribute(
+      "aria-label",
+      item.ratingSummary?.reviewCount
+        ? `Valoración ${item.ratingSummary.overall.toFixed(1)} de 5`
+        : "Todavía no tiene reseñas",
+    );
     badges.append(cuisines, rating);
     const h3 = element("h3");
     h3.append(link(item.name, detailUrl(item)));
-    const meta = element('p', 'card-meta');
-    const location = element('span', 'card-location', item.displayBranch?.address?.district || 'Local por confirmar');
-    location.prepend(MesaIcons.icon('map-pin'));
-    meta.append(location, element('span', 'price', money(item.displayBranch?.averagePricePerPersonCents)));
-    const action = link('Conocer restaurante', detailUrl(item), 'reserve');
-    action.append(MesaIcons.icon('arrow-right'));
-    body.append(
-      badges,
-      h3,
-      meta,
-      action,
+    const meta = element("p", "card-meta");
+    const location = element(
+      "span",
+      "card-location",
+      item.displayBranch?.address?.district || "Local por confirmar",
     );
+    location.prepend(MesaIcons.icon("map-pin"));
+    meta.append(
+      location,
+      element(
+        "span",
+        "price",
+        money(item.displayBranch?.averagePricePerPersonCents),
+      ),
+    );
+    const action = link("Conocer restaurante", detailUrl(item), "reserve");
+    action.append(MesaIcons.icon("arrow-right"));
+    body.append(badges, h3, meta, action);
     article.append(photo, body);
     return article;
   }
@@ -184,7 +233,7 @@
     container.replaceChildren();
     container.hidden = totalPages <= 1;
     const previous = button("", () => callback(page - 1));
-    previous.append(MesaIcons.icon('chevron-left'));
+    previous.append(MesaIcons.icon("chevron-left"));
     previous.disabled = page <= 1;
     previous.setAttribute("aria-label", "Página anterior");
     container.append(previous);
@@ -196,7 +245,7 @@
         container.append(b);
       });
     const next = button("", () => callback(page + 1));
-    next.append(MesaIcons.icon('chevron-right'));
+    next.append(MesaIcons.icon("chevron-right"));
     next.disabled = page >= totalPages;
     next.setAttribute("aria-label", "Página siguiente");
     container.append(next);
