@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Panel de administracion de MesaSpot: Pedidos anticipados." />
+  <title>Pedidos anticipados · Administración · MesaSpot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="../../styles/administracionPedidos.css" />
+</head>
+
+<body class="admin-page">
+  <div class="shell">
+    <header class="sidebar">
+      <div class="sidebar-top">
+        <div class="brand"><span class="logo-badge"><i class="fa-solid fa-table-cells-large"></i></span><span class="brand-text"><strong>MesaSpot</strong><small>SOCIO ADMIN</small></span></div>
+        <section class="restaurant-profile" aria-label="Restaurante">
+          <span class="avatar" aria-hidden="true" style="overflow: hidden; display: inline-flex; align-items: center; justify-content: center;">
+            <img src="https://i.pinimg.com/736x/f5/83/31/f583318e7c8582114ffc3615c2edff81.jpg" alt="Logo" style="width: 100%; height: 100%; object-fit: cover;" />
+          </span>
+          <div><strong>Asador Limeño</strong><small>Lima, Perú</small></div>
+        </section>
+        <nav class="nav" aria-label="Navegación principal">
+          <a class="nav-link nav-demo" href="administracionDemo.html"><i class="fa-solid fa-table-columns"></i>Dashboard</a>
+          <a class="nav-link nav-reservas" href="administracionReservas.html"><i class="fa-solid fa-calendar-check"></i>Reservas</a>
+          <a class="nav-link nav-pedidos active" aria-current="page" href="administracionPedidos.html"><i class="fa-solid fa-bag-shopping"></i>Pedidos anticipados</a>
+          <a class="nav-link nav-menu" href="administracionMenu.html"><i class="fa-solid fa-bars"></i>Menú</a>
+          <a class="nav-link nav-resenas" href="administracionResenas.html"><i class="fa-solid fa-star-half-stroke"></i>Reseñas</a>
+          <a class="nav-link nav-promociones" href="administracionPromociones.html"><i class="fa-solid fa-ticket"></i>Promociones</a>
+          <a class="nav-link nav-configuracion" href="administracionConfiguracion.html"><i class="fa-solid fa-sliders"></i>Configuración</a>
+        </nav>
+      </div>
+      <div class="user-bar">
+        <span class="avatar-round">CG</span>
+        <div><strong>Carlos Gómez</strong><small>Propietario</small></div>
+        <button type="button" class="icon-btn" aria-label="Cerrar sesión"><i class="fa-solid fa-right-from-bracket"></i></button>
+      </div>
+    </header>
+
+    <main class="main" aria-labelledby="t-pedidos">
+    <header class="page-header"><div><h1 id="t-pedidos">Pedidos Anticipados</h1><p>Revisa los pedidos para recojo y prepara los platos antes de que lleguen tus clientes.</p></div><div class="date-chip"><i class="fa-solid fa-calendar-days"></i>Hoy, 15 de Octubre<i class="fa-solid fa-chevron-down"></i></div></header>
+    <div class="content">
+      <section class="kpis" aria-label="Indicadores de pedidos">
+        <article class="kpi"><div class="kpi-head"><p>Pedidos de Hoy</p><span class="kpi-icon"><i class="fa-solid fa-bag-shopping"></i></span></div><p class="kpi-value">9 pedidos</p><p class="kpi-trend"><strong>+3</strong> vs ayer</p></article>
+        <article class="kpi"><div class="kpi-head"><p>Pendientes de Preparar</p><span class="kpi-icon"><i class="fa-solid fa-clock"></i></span></div><p class="kpi-value">4 pedidos</p><p class="kpi-trend">Revisa la hora de recojo</p></article>
+        <article class="kpi"><div class="kpi-head"><p>Listos para Recoger</p><span class="kpi-icon green"><i class="fa-solid fa-check"></i></span></div><p class="kpi-value">3 pedidos</p><p class="kpi-trend"><strong>Entregando a tiempo</strong></p></article>
+        <article class="kpi"><div class="kpi-head"><p>Ingresos Estimados (Hoy)</p><span class="kpi-icon green"><i class="fa-solid fa-sack-dollar"></i></span></div><p class="kpi-value">312 S/.</p><p class="kpi-trend"><strong>+12%</strong> vs ayer</p></article>
+      </section>
+      <div class="orders-layout">
+        <section class="card" aria-labelledby="t-lista">
+          <div class="card-head"><h2 id="t-lista">Pedidos Recibidos</h2><div class="filter-row"><label class="search-box" for="buscar-pedido"><i class="fa-solid fa-magnifying-glass"></i><input type="search" id="buscar-pedido" name="q" placeholder="Buscar cliente o código..." /></label><button type="button" class="btn btn-soft">Todos</button></div></div>
+          <div class="table-wrap"><table class="data-table">
+            <thead><tr><th>Cliente</th><th>Platos</th><th>Hora de recojo</th><th>Estado</th><th>Acción</th></tr></thead>
+            <tbody>
+              <tr>
+                <td data-label="Cliente">Iván Carrillo<br /><small class="order-items">Código MS-PA-204</small></td>
+                <td data-label="Platos"><span class="order-items">2x Lomo saltado, 1x Chicha morada</span></td>
+                <td data-label="Hora de recojo">Hoy, 13:30</td>
+                <td data-label="Estado"><span class="badge badge-wait">Pendiente</span></td>
+                <td data-label="Acción"><div class="actions"><button type="button" class="btn">Marcar listo</button></div></td>
+              </tr>
+              <tr>
+                <td data-label="Cliente">Elim Quispe<br /><small class="order-items">Código MS-PA-205</small></td>
+                <td data-label="Platos"><span class="order-items">1x Ají de gallina, 1x Causa limeña</span></td>
+                <td data-label="Hora de recojo">Hoy, 13:45</td>
+                <td data-label="Estado"><span class="badge badge-wait">En preparación</span></td>
+                <td data-label="Acción"><div class="actions"><button type="button" class="btn">Marcar listo</button></div></td>
+              </tr>
+              <tr>
+                <td data-label="Cliente">Marta Sánchez<br /><small class="order-items">Código MS-PA-201</small></td>
+                <td data-label="Platos"><span class="order-items">3x Anticuchos, 2x Chicha morada</span></td>
+                <td data-label="Hora de recojo">Hoy, 14:00</td>
+                <td data-label="Estado"><span class="badge badge-ok">Listo para recoger</span></td>
+                <td data-label="Acción"><div class="actions"><button type="button" class="btn btn-soft" disabled>Entregado</button></div></td>
+              </tr>
+              <tr>
+                <td data-label="Cliente">Pedro Almodóvar<br /><small class="order-items">Código MS-PA-199</small></td>
+                <td data-label="Platos"><span class="order-items">1x Parrillada familiar</span></td>
+                <td data-label="Hora de recojo">Hoy, 14:15</td>
+                <td data-label="Estado"><span class="badge badge-cancel">Cancelado</span></td>
+                <td data-label="Acción"><div class="actions"><button type="button" class="btn btn-soft" disabled>Sin acción</button></div></td>
+              </tr>
+              <tr>
+                <td data-label="Cliente">Lucía Jiménez<br /><small class="order-items">Código MS-PA-206</small></td>
+                <td data-label="Platos"><span class="order-items">2x Tallarín saltado</span></td>
+                <td data-label="Hora de recojo">Mañana, 13:00</td>
+                <td data-label="Estado"><span class="badge badge-wait">Pendiente</span></td>
+                <td data-label="Acción"><div class="actions"><button type="button" class="btn">Marcar listo</button></div></td>
+              </tr>
+            </tbody>
+          </table></div>
+        </section>
+        <aside class="card" aria-labelledby="t-dist-pedidos">
+          <div class="card-head"><h2 id="t-dist-pedidos">Estado de Pedidos (Hoy)</h2></div>
+          <ul class="distribution">
+            <li><div><span>Pendientes</span><span>4 (44%)</span></div><div class="bar-track"><span class="bar-fill" style="width:44%"></span></div></li>
+            <li><div><span>En preparación</span><span>2 (22%)</span></div><div class="bar-track"><span class="bar-fill" style="width:22%"></span></div></li>
+            <li><div><span>Listos para recoger</span><span>3 (34%)</span></div><div class="bar-track"><span class="bar-fill green" style="width:34%"></span></div></li>
+          </ul>
+          <div class="key-stats"><h3>Estadísticas Clave</h3><p>Tiempo medio de preparación<strong style="color:var(--text)">18 min</strong></p><p>Pedidos recogidos a tiempo<strong style="color:var(--green)">96%</strong></p></div>
+        </aside>
+      </div>
+    </div>
+    </main>
+  </div>
+</body>
+
+</html>

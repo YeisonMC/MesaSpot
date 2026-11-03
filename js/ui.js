@@ -146,7 +146,7 @@
     "restaurantes.html": "restaurantes",
     "restaurante.html": "restaurantes",
     "perfil.html": "perfil",
-    "administracion.html": "administracion",
+    "administracioDemo.html": "administracion",
     "promociones.html": "promociones",
   };
   const pageUrl = (file) => {

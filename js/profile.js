@@ -510,7 +510,7 @@
         status.append(button("Iniciar sesión", () => MesaAuth.open("login")));
       else
         status.append(
-          link("Ir a administración", pageUrl("administracion.html"), "button"),
+          link("Ir a administración", pageUrl("administracionDemo.html"), "button"),
         );
       return;
     }

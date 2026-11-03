@@ -98,14 +98,14 @@
       // En móvil el acceso administrativo permanece dentro del menú de cuenta.
       const compactAdmin = link(
         "Administrar",
-        pageUrl("administracion.html"),
+        pageUrl("administracionDemo.html"),
         "account-option account-admin-option",
       );
       compactAdmin.prepend(MesaIcons.icon("layout-dashboard"));
       menu.insertBefore(compactAdmin, logout);
       const admin = link(
         "Administrar",
-        pageUrl("administracion.html"),
+        pageUrl("administracionDemo.html"),
         "button header-admin",
       );
       admin.prepend(MesaIcons.icon("layout-dashboard"));
