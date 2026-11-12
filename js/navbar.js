@@ -1,3 +1,7 @@
+// ==========================================
+// Menú de navegación y accesos en móvil
+// ==========================================
+
 (() => {
   "use strict";
   const header = document.querySelector(".header");
@@ -25,7 +29,10 @@
   toggle.setAttribute("aria-controls", navigation.id);
 
   // El estado accesible y el icono se mantienen sincronizados al abrir o cerrar el panel.
-  function setOpen(open, restoreFocus = false) {
+  // ==========================================
+  // Abrir o cerrar el menú y actualizar el foco
+  // ==========================================
+  function cambiarEstadoDelMenu(open, restoreFocus = false) {
     const expanded = Boolean(open && mobile.matches);
     header.classList.toggle("menu-open", expanded);
     navigation.hidden = mobile.matches && !expanded;
@@ -34,22 +41,36 @@
     toggle.replaceChildren(MesaIcons.icon(expanded ? "x" : "menu"));
     if (restoreFocus) toggle.focus();
   }
-  function synchronize() {
+  // ==========================================
+  // Sincronizar la navegación con la sesión y el ancho de pantalla
+  // ==========================================
+  function sincronizarNavegacion() {
     account.hidden = Boolean(MesaAPI.session?.user);
-    setOpen(false);
+    cambiarEstadoDelMenu(false);
   }
-  toggle.addEventListener("click", () => {
+  // ==========================================
+  // Alternar el menú móvil desde su botón
+  // ==========================================
+  const alternarMenuMovil = () => {
     const open = !header.classList.contains("menu-open");
     // Evita superponer el panel de navegación con el menú del avatar.
     const profile = document.getElementById("account-trigger");
     if (open && profile?.getAttribute("aria-expanded") === "true")
       profile.click();
-    setOpen(open);
-  });
-  navigation.addEventListener("click", (event) => {
-    if (event.target.closest("a,button")) setOpen(false);
-  });
-  document.addEventListener("click", (event) => {
+    cambiarEstadoDelMenu(open);
+  };
+
+  // ==========================================
+  // Cerrar el menú al elegir una opción
+  // ==========================================
+  const cerrarTrasElegirOpcion = (event) => {
+    if (event.target.closest("a,button")) cambiarEstadoDelMenu(false);
+  };
+
+  // ==========================================
+  // Cerrar el menú al pulsar fuera de la cabecera
+  // ==========================================
+  const cerrarMenuAlPulsarFuera = (event) => {
     // La ruta original evita interpretar como clic exterior el icono que acabamos de reemplazar.
     const path = event.composedPath();
     if (
@@ -59,16 +80,26 @@
           node instanceof Element && node.classList.contains("header-account"),
       )
     )
-      setOpen(false);
-  });
-  document.addEventListener("keydown", (event) => {
+      cambiarEstadoDelMenu(false);
+  };
+
+  // ==========================================
+  // Cerrar el menú con Escape y devolver el foco
+  // ==========================================
+  const cerrarMenuConEscape = (event) => {
     if (event.key === "Escape" && header.classList.contains("menu-open")) {
       event.preventDefault();
-      setOpen(false, true);
+      cambiarEstadoDelMenu(false, true);
     }
-  });
+  };
+
+  // Eventos de la interfaz.
+  toggle.addEventListener("click", alternarMenuMovil);
+  navigation.addEventListener("click", cerrarTrasElegirOpcion);
+  document.addEventListener("click", cerrarMenuAlPulsarFuera);
+  document.addEventListener("keydown", cerrarMenuConEscape);
   // El cambio de ancho y de sesión elimina estados de navegación que ya no corresponden.
-  mobile.addEventListener?.("change", synchronize);
-  window.addEventListener("mesa:session", synchronize);
-  synchronize();
+  mobile.addEventListener?.("change", sincronizarNavegacion);
+  window.addEventListener("mesa:session", sincronizarNavegacion);
+  sincronizarNavegacion();
 })();

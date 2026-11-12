@@ -1,8 +1,24 @@
+// ==========================================
+// Perfil del cliente, avatar y reseñas propias
+// ==========================================
+
 (() => {
   "use strict";
-  const { $, element, button, field, state, link, feedback, modal, pageUrl } =
-    MesaUI;
-  const icon = (name) => MesaIcons.icon(name);
+  const {
+    $: seleccionar,
+    element: crearElemento,
+    button: crearBoton,
+    field: crearCampo,
+    state: mostrarEstado,
+    link: crearEnlace,
+    feedback: mostrarMensaje,
+    modal: abrirModal,
+    pageUrl: rutaDePagina,
+  } = MesaUI;
+  // ==========================================
+  // Crear un icono del perfil
+  // ==========================================
+  const crearIcono = (name) => MesaIcons.icon(name);
   const maxBytes = 5 * 1024 * 1024;
   const formats = ["image/jpeg", "image/png", "image/webp"];
   let user,
@@ -11,35 +27,47 @@
     pendingPublicId,
     saving = false,
     viewVersion = 0;
-  const host = $("#profile-content");
+  const host = seleccionar("#profile-content");
 
   // Liberamos las vistas previas locales al cancelar, cambiar de sección o salir de la página.
-  function clearPhoto() {
+  // ==========================================
+  // Liberar la vista previa y limpiar la foto pendiente
+  // ==========================================
+  function limpiarVistaPrevia() {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     previewUrl = null;
     selectedFile = null;
     pendingPublicId = null;
   }
-  window.addEventListener("pagehide", clearPhoto);
-  function identity() {
-    const area = $("#profile-identity");
-    const text = element("div");
+  window.addEventListener("pagehide", limpiarVistaPrevia);
+  // ==========================================
+  // Actualizar el nombre y el avatar del cliente
+  // ==========================================
+  function mostrarIdentidadDelCliente() {
+    const area = seleccionar("#profile-identity");
+    const text = crearElemento("div");
     text.append(
-      element(
+      crearElemento(
         "strong",
         "",
         [user.firstName, user.lastName].filter(Boolean).join(" "),
       ),
-      element("span", "", user.email),
+      crearElemento("span", "", user.email),
     );
     area.replaceChildren(MesaAuth.avatar(user, "profile-sidebar-avatar"), text);
   }
-  function heading(title, copy) {
-    const area = element("div", "profile-heading");
-    area.append(element("h1", "", title), element("p", "", copy));
+  // ==========================================
+  // Crear el título y la descripción de la vista
+  // ==========================================
+  function crearCabeceraDePerfil(title, copy) {
+    const area = crearElemento("div", "profile-heading");
+    area.append(crearElemento("h1", "", title), crearElemento("p", "", copy));
     return area;
   }
-  function selectView() {
+  // ==========================================
+  // Abrir la vista del perfil indicada por el enlace
+  // ==========================================
+  function seleccionarVistaDelPerfil() {
     const view = ["profile", "reviews", "help"].includes(location.hash.slice(1))
       ? location.hash.slice(1)
       : "profile";
@@ -48,13 +76,16 @@
         item.setAttribute("aria-current", "page");
       else item.removeAttribute("aria-current");
     });
-    if (view === "reviews") renderReviews();
-    else if (view === "help") renderHelp();
-    else renderProfile();
+    if (view === "reviews") mostrarMisResenas();
+    else if (view === "help") mostrarAyudaDelPerfil();
+    else mostrarFormularioDePerfil();
   }
 
   // La imagen viaja directamente a Cloudinary con firma del backend; no pasa por el disco de Vercel.
-  async function uploadAvatar(file) {
+  // ==========================================
+  // Firmar y subir la foto de perfil
+  // ==========================================
+  async function subirFotoDePerfil(file) {
     if (pendingPublicId) return pendingPublicId;
     const { data } = await MesaAPI.request("/users/me/avatar/signature", {
       method: "POST",
@@ -98,63 +129,69 @@
   }
 
   // El formulario permite editar nombres, apellidos y celular; el correo permanece de solo lectura.
-  function renderProfile() {
+  // ==========================================
+  // Mostrar el formulario de datos personales
+  // ==========================================
+  function mostrarFormularioDePerfil() {
     ++viewVersion;
-    clearPhoto();
+    limpiarVistaPrevia();
     host.replaceChildren(
-      heading(
+      crearCabeceraDePerfil(
         "Mi perfil",
         "Gestiona tu información personal y mantén tus datos actualizados.",
       ),
     );
-    const form = element("form", "profile-form");
-    const photo = element("section", "profile-photo-card");
-    const portrait = element("div", "profile-portrait-wrap");
-    const avatar = element("div", "profile-portrait");
+    const form = crearElemento("form", "profile-form");
+    const photo = crearElemento("section", "profile-photo-card");
+    const portrait = crearElemento("div", "profile-portrait-wrap");
+    const avatar = crearElemento("div", "profile-portrait");
     avatar.append(MesaAuth.avatar(user, "profile-large-avatar"));
-    const file = element("input");
+    const file = crearElemento("input");
     file.type = "file";
     file.name = "avatar";
     file.id = "profile-photo-input";
     file.accept = formats.join(",");
     file.hidden = true;
-    const camera = button("", () => file.click(), "profile-camera");
+    const camera = crearBoton("", () => file.click(), "profile-camera");
     camera.setAttribute("aria-label", "Elegir foto de perfil");
-    camera.append(icon("camera"));
+    camera.append(crearIcono("camera"));
     portrait.append(avatar, camera);
-    const photoCopy = element("div", "profile-photo-copy");
+    const photoCopy = crearElemento("div", "profile-photo-copy");
     photoCopy.append(
-      element("h2", "", "Foto de perfil"),
-      element(
+      crearElemento("h2", "", "Foto de perfil"),
+      crearElemento(
         "p",
         "",
         "Una foto ayuda a personalizar tu experiencia en MesaSpot.",
       ),
     );
-    const change = button(
+    const change = crearBoton(
       "Cambiar foto",
       () => file.click(),
       "profile-outline-button",
     );
-    change.prepend(icon("upload"));
+    change.prepend(crearIcono("upload"));
     photoCopy.append(
       change,
-      element(
+      crearElemento(
         "p",
         "profile-photo-hint",
         "Formatos permitidos: JPG, PNG y WebP. Tamaño máximo: 5 MB.",
       ),
     );
-    const photoStatus = element("p", "profile-photo-status");
+    const photoStatus = crearElemento("p", "profile-photo-status");
     photoStatus.setAttribute("role", "status");
     photoCopy.append(photoStatus);
     photo.append(portrait, photoCopy, file);
     form.append(photo);
     // La selección solo genera una vista previa; la subida se realiza al guardar los cambios.
-    file.addEventListener("change", () => {
+    // ==========================================
+    // Validar el archivo y mostrar la vista previa
+    // ==========================================
+    const prepararFotoSeleccionada = () => {
       const candidate = file.files?.[0];
       if (!candidate) return;
-      clearPhoto();
+      limpiarVistaPrevia();
       if (
         !formats.includes(candidate.type) ||
         !candidate.size ||
@@ -162,7 +199,7 @@
       ) {
         file.value = "";
         avatar.replaceChildren(MesaAuth.avatar(user, "profile-large-avatar"));
-        feedback(
+        mostrarMensaje(
           photoStatus,
           "Selecciona una imagen JPG, PNG o WebP de hasta 5 MB.",
           true,
@@ -171,17 +208,17 @@
       }
       selectedFile = candidate;
       previewUrl = URL.createObjectURL(candidate);
-      const picture = element("img");
+      const picture = crearElemento("img");
       picture.src = previewUrl;
       picture.alt = "Vista previa de tu nueva foto de perfil";
       picture.addEventListener(
         "error",
         () => {
           if (!picture.isConnected) return;
-          clearPhoto();
+          limpiarVistaPrevia();
           file.value = "";
           avatar.replaceChildren(MesaAuth.avatar(user, "profile-large-avatar"));
-          feedback(
+          mostrarMensaje(
             photoStatus,
             "No se pudo leer esta imagen. Selecciona otra foto.",
             true,
@@ -190,22 +227,24 @@
         { once: true },
       );
       avatar.replaceChildren(picture);
-      feedback(
+      mostrarMensaje(
         photoStatus,
         "Foto seleccionada. Guarda los cambios para actualizarla.",
       );
-    });
-    const info = element("section", "profile-info-card");
+    };
+
+    file.addEventListener("change", prepararFotoSeleccionada);
+    const info = crearElemento("section", "profile-info-card");
     info.append(
-      element("h2", "", "Información personal"),
-      element(
+      crearElemento("h2", "", "Información personal"),
+      crearElemento(
         "p",
         "profile-section-description",
         "Actualiza tus datos personales. Tu nombre y foto se muestran en tus reseñas.",
       ),
     );
-    const fields = element("div", "profile-fields");
-    const firstName = field(
+    const fields = crearElemento("div", "profile-fields");
+    const firstName = crearCampo(
       fields,
       "firstName",
       "Nombres *",
@@ -213,7 +252,7 @@
       user.firstName,
       { required: true, maxlength: "80", autocomplete: "given-name" },
     );
-    const lastName = field(
+    const lastName = crearCampo(
       fields,
       "lastName",
       "Apellidos *",
@@ -221,8 +260,8 @@
       user.lastName,
       { required: true, maxlength: "80", autocomplete: "family-name" },
     );
-    const emailWrap = element("div", "profile-email-field");
-    const email = field(
+    const emailWrap = crearElemento("div", "profile-email-field");
+    const email = crearCampo(
       emailWrap,
       "email",
       "Correo electrónico",
@@ -231,7 +270,7 @@
       { readonly: true, autocomplete: "email" },
     );
     email.setAttribute("aria-describedby", "profile-email-hint");
-    const emailHint = element(
+    const emailHint = crearElemento(
       "p",
       "profile-field-hint",
       "El correo electrónico no se puede modificar.",
@@ -239,14 +278,14 @@
     emailHint.id = "profile-email-hint";
     emailWrap.append(emailHint);
     fields.append(emailWrap);
-    const phoneWrap = element(
+    const phoneWrap = crearElemento(
       "label",
       "form-field profile-phone-field",
       "Número de celular",
     );
-    const phoneRow = element("span", "profile-phone-control");
-    phoneRow.append(element("span", "profile-country-code", "+51"));
-    const phone = element("input");
+    const phoneRow = crearElemento("span", "profile-phone-control");
+    phoneRow.append(crearElemento("span", "profile-country-code", "+51"));
+    const phone = crearElemento("input");
     phone.type = "tel";
     phone.name = "phone";
     phone.inputMode = "numeric";
@@ -257,7 +296,7 @@
     phone.setAttribute("aria-describedby", "profile-phone-hint");
     phoneRow.append(phone);
     phoneWrap.append(phoneRow);
-    const phoneHint = element(
+    const phoneHint = crearElemento(
       "span",
       "profile-field-hint",
       "Celular peruano de 9 dígitos. Campo opcional.",
@@ -265,7 +304,10 @@
     phoneHint.id = "profile-phone-hint";
     phoneWrap.append(phoneHint);
     fields.append(phoneWrap);
-    function validateFields() {
+    // ==========================================
+    // Validar nombre, apellidos y celular
+    // ==========================================
+    function validarCamposDelPerfil() {
       [firstName, lastName].forEach((input) =>
         input.setCustomValidity(
           input.value.trim()
@@ -280,34 +322,34 @@
       );
     }
     [firstName, lastName].forEach((input) =>
-      input.addEventListener("input", validateFields),
+      input.addEventListener("input", validarCamposDelPerfil),
     );
     phone.addEventListener("input", () => {
       phone.value = phone.value.replace(/\D/g, "").replace(/^51(?=\d{9}$)/, "");
-      validateFields();
+      validarCamposDelPerfil();
     });
     info.append(fields);
-    const status = element("p", "profile-save-status");
+    const status = crearElemento("p", "profile-save-status");
     status.setAttribute("role", "alert");
     status.hidden = true;
-    const actions = element("div", "profile-form-actions");
-    const cancel = button(
+    const actions = crearElemento("div", "profile-form-actions");
+    const cancel = crearBoton(
       "Cancelar",
-      () => renderProfile(),
+      () => mostrarFormularioDePerfil(),
       "profile-outline-button",
     );
-    const submit = element("button", "button", "Guardar cambios");
+    const submit = crearElemento("button", "button", "Guardar cambios");
     submit.type = "submit";
     actions.append(cancel, submit);
     info.append(status, actions);
     form.append(info);
     host.append(form);
-    const privacy = element("div", "profile-privacy");
-    privacy.append(icon("shield-check"));
-    const privacyCopy = element("div");
+    const privacy = crearElemento("div", "profile-privacy");
+    privacy.append(crearIcono("shield-check"));
+    const privacyCopy = crearElemento("div");
     privacyCopy.append(
-      element("strong", "", "Tu información personal"),
-      element(
+      crearElemento("strong", "", "Tu información personal"),
+      crearElemento(
         "p",
         "",
         "Tu nombre y avatar acompañan tus reseñas. El correo y el celular no se muestran públicamente.",
@@ -315,9 +357,12 @@
     );
     privacy.append(privacyCopy);
     host.append(privacy);
-    form.addEventListener("submit", async (event) => {
+    // ==========================================
+    // Subir la foto pendiente y guardar el perfil
+    // ==========================================
+    const guardarDatosDelPerfil = async (event) => {
       event.preventDefault();
-      validateFields();
+      validarCamposDelPerfil();
       if (saving || !form.reportValidity()) return;
       saving = true;
       submit.disabled = true;
@@ -333,7 +378,7 @@
         };
         if (selectedFile) {
           submit.textContent = "Subiendo foto…";
-          body.avatarPublicId = await uploadAvatar(selectedFile);
+          body.avatarPublicId = await subirFotoDePerfil(selectedFile);
         }
         if (MesaAPI.session?.user?._id !== ownerId) return;
         submit.textContent = "Guardando…";
@@ -346,19 +391,26 @@
         // La respuesta actualiza la sesión y el avatar del header sin recargar toda la página.
         MesaAPI.updateUser(data);
         user = data;
-        clearPhoto();
-        identity();
-        renderProfile();
-        const content = modal("¡Cambios guardados!", "profile-success-modal");
-        const check = element("span", "profile-success-icon");
-        check.append(icon("check"));
+        limpiarVistaPrevia();
+        mostrarIdentidadDelCliente();
+        mostrarFormularioDePerfil();
+        const content = abrirModal(
+          "¡Cambios guardados!",
+          "profile-success-modal",
+        );
+        const check = crearElemento("span", "profile-success-icon");
+        check.append(crearIcono("check"));
         content.prepend(check);
         content.append(
-          element("p", "", "Tu perfil se actualizó correctamente."),
-          button("Continuar", () => $("#modal").close(), "button"),
+          crearElemento("p", "", "Tu perfil se actualizó correctamente."),
+          crearBoton(
+            "Continuar",
+            () => seleccionar("#modal").close(),
+            "button",
+          ),
         );
       } catch (error) {
-        if (form.isConnected) feedback(status, error.message, true);
+        if (form.isConnected) mostrarMensaje(status, error.message, true);
       } finally {
         saving = false;
         submit.disabled = false;
@@ -367,22 +419,27 @@
         camera.disabled = false;
         submit.textContent = "Guardar cambios";
       }
-    });
+    };
+
+    form.addEventListener("submit", guardarDatosDelPerfil);
   }
 
   // Mis reseñas consulta únicamente opiniones del usuario autenticado y enlaza cada restaurante.
-  async function renderReviews() {
-    clearPhoto();
+  // ==========================================
+  // Cargar y mostrar las reseñas del cliente
+  // ==========================================
+  async function mostrarMisResenas() {
+    limpiarVistaPrevia();
     const version = ++viewVersion;
     host.replaceChildren(
-      heading(
+      crearCabeceraDePerfil(
         "Mis reseñas",
         "Estas son las experiencias que has compartido con la comunidad.",
       ),
     );
-    const list = element("div", "profile-reviews-list");
+    const list = crearElemento("div", "profile-reviews-list");
     host.append(list);
-    state(list, "Cargando tus reseñas…");
+    mostrarEstado(list, "Cargando tus reseñas…");
     try {
       const records = await MesaAPI.all(
         "/users/me/reviews",
@@ -392,30 +449,38 @@
       if (version !== viewVersion) return;
       list.replaceChildren();
       if (!records.length) {
-        state(list, "Todavía no has publicado reseñas.");
+        mostrarEstado(list, "Todavía no has publicado reseñas.");
         list.append(
-          link("Explorar restaurantes", pageUrl("restaurantes.html"), "button"),
+          crearEnlace(
+            "Explorar restaurantes",
+            rutaDePagina("restaurantes.html"),
+            "button",
+          ),
         );
         return;
       }
       records.forEach((review) => {
-        const card = element("article", "profile-review-card");
+        const card = crearElemento("article", "profile-review-card");
         if (review.restaurant?.name)
           card.append(
-            element("p", "profile-review-restaurant", review.restaurant.name),
+            crearElemento(
+              "p",
+              "profile-review-restaurant",
+              review.restaurant.name,
+            ),
           );
-        const meta = element("div", "profile-review-meta");
-        const score = element(
+        const meta = crearElemento("div", "profile-review-meta");
+        const score = crearElemento(
           "span",
           "",
           Number(review.ratings.overall).toFixed(1) + " / 5",
         );
-        score.prepend(icon("star"));
+        score.prepend(crearIcono("star"));
         meta.append(score);
         const date = new Date(review.visitedAt);
         if (Number.isFinite(date.getTime()))
           meta.append(
-            element(
+            crearElemento(
               "span",
               "",
               "Visita: " +
@@ -427,40 +492,46 @@
           );
         card.append(
           meta,
-          element("h2", "", review.title),
-          element("p", "", review.comment),
+          crearElemento("h2", "", review.title),
+          crearElemento("p", "", review.comment),
         );
-        const scores = element("div", "profile-review-scores");
+        const scores = crearElemento("div", "profile-review-scores");
         [
           ["food", "Comida"],
           ["service", "Servicio"],
           ["ambience", "Ambiente"],
         ].forEach(([key, name]) =>
-          scores.append(element("span", "", name + " " + review.ratings[key])),
+          scores.append(
+            crearElemento("span", "", name + " " + review.ratings[key]),
+          ),
         );
-        const url = pageUrl(
+        const url = rutaDePagina(
           "restaurante.html?id=" +
             encodeURIComponent(review.restaurantId) +
             "#reviews",
         );
-        const detail = link(
+        const detail = crearEnlace(
           "Ver mi reseña en el restaurante",
           url,
           "text-link",
         );
-        detail.append(icon("arrow-right"));
+        detail.append(crearIcono("arrow-right"));
         card.append(scores, detail);
         list.append(card);
       });
     } catch (error) {
-      if (version === viewVersion) state(list, error.message, renderReviews);
+      if (version === viewVersion)
+        mostrarEstado(list, error.message, mostrarMisResenas);
     }
   }
-  function renderHelp() {
+  // ==========================================
+  // Mostrar la ayuda para el cliente
+  // ==========================================
+  function mostrarAyudaDelPerfil() {
     ++viewVersion;
-    clearPhoto();
+    limpiarVistaPrevia();
     host.replaceChildren(
-      heading(
+      crearCabeceraDePerfil(
         "¿Cómo podemos ayudarte?",
         "Resuelve las dudas más frecuentes sobre tu cuenta.",
       ),
@@ -483,53 +554,68 @@
         "Estas funciones todavía están en preparación. Por ahora puedes explorar restaurantes y compartir tu experiencia.",
       ],
     ].forEach(([question, answer]) => {
-      const block = element("details", "profile-help-item");
-      block.append(element("summary", "", question), element("p", "", answer));
+      const block = crearElemento("details", "profile-help-item");
+      block.append(
+        crearElemento("summary", "", question),
+        crearElemento("p", "", answer),
+      );
       host.append(block);
     });
   }
 
   // La pantalla privada se habilita después de verificar la sesión y se limpia al cerrarla.
-  function sessionChanged(value) {
+  // ==========================================
+  // Actualizar el perfil cuando cambia la sesión
+  // ==========================================
+  function actualizarPerfilSegunSesion(value) {
     const previousId = user?._id;
     user = value;
     const allowed = user?.role === "CLIENT";
-    $("#profile-shell").hidden = !allowed;
+    seleccionar("#profile-shell").hidden = !allowed;
     if (!allowed) {
       ++viewVersion;
-      clearPhoto();
+      limpiarVistaPrevia();
       host.replaceChildren();
-      const status = $("#profile-status");
-      state(
+      const status = seleccionar("#profile-status");
+      mostrarEstado(
         status,
         user
           ? "Esta pantalla está disponible para cuentas de cliente."
           : "Inicia sesión para gestionar tu perfil.",
       );
       if (!user)
-        status.append(button("Iniciar sesión", () => MesaAuth.open("login")));
+        status.append(
+          crearBoton("Iniciar sesión", () => MesaAuth.open("login")),
+        );
       else
         status.append(
-          link("Ir a administración", pageUrl("administracion.html"), "button"),
+          crearEnlace(
+            "Ir a administración",
+            rutaDePagina("administracion.html"),
+            "button",
+          ),
         );
       return;
     }
-    $("#profile-status").replaceChildren();
-    identity();
-    if (previousId !== user._id || !host.children.length) selectView();
+    seleccionar("#profile-status").replaceChildren();
+    mostrarIdentidadDelCliente();
+    if (previousId !== user._id || !host.children.length)
+      seleccionarVistaDelPerfil();
   }
   window.addEventListener("hashchange", () => {
-    if (user?.role === "CLIENT") selectView();
+    if (user?.role === "CLIENT") seleccionarVistaDelPerfil();
   });
   document.querySelector(".profile-nav").addEventListener("click", (event) => {
     if (saving) event.preventDefault();
   });
-  $("#profile-logout").addEventListener("click", () => MesaAPI.logout());
-  state($("#profile-status"), "Cargando tu perfil…");
+  seleccionar("#profile-logout").addEventListener("click", () =>
+    MesaAPI.logout(),
+  );
+  mostrarEstado(seleccionar("#profile-status"), "Cargando tu perfil…");
   MesaAuth.ready.then((verified) => {
-    sessionChanged(verified);
+    actualizarPerfilSegunSesion(verified);
     window.addEventListener("mesa:session", (event) =>
-      sessionChanged(event.detail),
+      actualizarPerfilSegunSesion(event.detail),
     );
   });
 })();

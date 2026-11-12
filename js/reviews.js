@@ -1,45 +1,75 @@
+// ==========================================
+// Reseñas, puntuaciones y publicación de opiniones
+// ==========================================
+
 (() => {
   "use strict";
-  const { element, button, image, field, state, modal, feedback } = MesaUI;
-  const icon = (name) => MesaIcons.icon(name);
+  const {
+    element: crearElemento,
+    button: crearBoton,
+    image: crearImagen,
+    field: crearCampo,
+    state: mostrarEstado,
+    modal: abrirModal,
+    feedback: mostrarMensaje,
+  } = MesaUI;
+  // ==========================================
+  // Crear un icono de reseñas
+  // ==========================================
+  const crearIcono = (name) => MesaIcons.icon(name);
   const criteria = [
     ["food", "Comida"],
     ["service", "Servicio"],
     ["ambience", "Ambiente"],
   ];
-  const wordCount = (value) =>
+  // ==========================================
+  // Contar las palabras del comentario
+  // ==========================================
+  const contarPalabras = (value) =>
     value.trim().split(/\s+/u).filter(Boolean).length;
   let version = 0,
     sort = "recent",
     context;
 
   // Las animaciones se aplican a bloques completos y respetan el movimiento reducido.
-  function animate(node) {
+  // ==========================================
+  // Preparar la animación de la reseña
+  // ==========================================
+  function prepararAnimacion(node) {
     if (!matchMedia("(prefers-reduced-motion: reduce)").matches)
       node.dataset.aos = "fade-up";
     return node;
   }
-  function stars(value) {
-    const row = element("div", "review-stars");
+  // ==========================================
+  // Mostrar la puntuación con estrellas accesibles
+  // ==========================================
+  function crearEstrellas(value) {
+    const row = crearElemento("div", "review-stars");
     row.setAttribute(
       "aria-label",
       Number(value).toFixed(1) + " de 5 estrellas",
     );
     for (let i = 1; i <= 5; i++) {
-      const star = icon("star");
+      const star = crearIcono("star");
       star.classList.toggle("filled", i <= Math.round(value));
       row.append(star);
     }
     return row;
   }
-  function authorName(user) {
+  // ==========================================
+  // Preparar el nombre público del autor
+  // ==========================================
+  function formatearNombreDelAutor(user) {
     return (
       [user?.firstName, user?.lastName ? user.lastName[0] + "." : ""]
         .filter(Boolean)
         .join(" ") || "Cliente de MesaSpot"
     );
   }
-  function timeAgo(value) {
+  // ==========================================
+  // Mostrar cuánto tiempo pasó desde la publicación
+  // ==========================================
+  function formatearTiempoTranscurrido(value) {
     const stamp = new Date(value).getTime();
     if (!Number.isFinite(stamp)) return "";
     const days = Math.max(0, Math.floor((Date.now() - stamp) / 86400000));
@@ -54,23 +84,28 @@
   }
 
   // Cada opinión usa texto seguro y solo muestra verificación cuando la API la confirma.
-  function reviewCard(review) {
-    const card = element("article", "review-card customer-review");
-    const header = element("div", "customer-review-header");
-    const author = element("div", "customer-review-author");
+  // ==========================================
+  // Construir una tarjeta con la opinión del cliente
+  // ==========================================
+  function crearTarjetaDeResena(review) {
+    const card = crearElemento("article", "review-card customer-review");
+    const header = crearElemento("div", "customer-review-header");
+    const author = crearElemento("div", "customer-review-author");
     const initials =
       [review.user?.firstName?.[0], review.user?.lastName?.[0]]
         .filter(Boolean)
         .join("")
         .toUpperCase() || "MS";
     const avatar = MesaUI.safeUrl(review.user?.avatarUrl)
-      ? image(review.user.avatarUrl, "", "review-avatar")
-      : element("span", "review-initials", initials);
-    const name = element("div", "review-person");
-    const top = element("div", "review-person-name");
-    top.append(element("strong", "", authorName(review.user)));
+      ? crearImagen(review.user.avatarUrl, "", "review-avatar")
+      : crearElemento("span", "review-initials", initials);
+    const name = crearElemento("div", "review-person");
+    const top = crearElemento("div", "review-person-name");
+    top.append(
+      crearElemento("strong", "", formatearNombreDelAutor(review.user)),
+    );
     if (review.verifiedVisit) {
-      const verified = icon("badge-check");
+      const verified = crearIcono("badge-check");
       verified.setAttribute("role", "img");
       verified.setAttribute("aria-label", "Visita verificada");
       verified.removeAttribute("aria-hidden");
@@ -79,7 +114,7 @@
     name.append(top);
     const date = new Date(review.createdAt || review.visitedAt);
     if (Number.isFinite(date.getTime())) {
-      const time = element("time", "", timeAgo(date));
+      const time = crearElemento("time", "", formatearTiempoTranscurrido(date));
       time.dateTime = date.toISOString();
       time.title = new Intl.DateTimeFormat("es-PE", {
         dateStyle: "long",
@@ -88,26 +123,26 @@
       name.append(time);
     }
     author.append(avatar, name);
-    header.append(author, stars(review.ratings.overall));
+    header.append(author, crearEstrellas(review.ratings.overall));
     card.append(
       header,
-      element("h3", "", review.title),
-      element("p", "review-comment", review.comment),
+      crearElemento("h3", "", review.title),
+      crearElemento("p", "review-comment", review.comment),
     );
-    const scores = element("div", "review-score-chips");
+    const scores = crearElemento("div", "review-score-chips");
     criteria.forEach(([code, title]) => {
-      const chip = element("span", "", title + " ");
+      const chip = crearElemento("span", "", title + " ");
       chip.append(
-        element("strong", "", Number(review.ratings[code]).toFixed(1)),
+        crearElemento("strong", "", Number(review.ratings[code]).toFixed(1)),
       );
       scores.append(chip);
     });
     card.append(scores);
     if (review.adminReply) {
-      const reply = element("blockquote", "admin-reply");
+      const reply = crearElemento("blockquote", "admin-reply");
       reply.append(
-        element("strong", "", "Respuesta del restaurante"),
-        element("p", "", review.adminReply.comment),
+        crearElemento("strong", "", "Respuesta del restaurante"),
+        crearElemento("p", "", review.adminReply.comment),
       );
       card.append(reply);
     }
@@ -115,62 +150,71 @@
   }
 
   // La política describe capacidades reales: todavía no existe verificación automática de reservas.
-  function policies() {
-    const card = element("section", "detail-panel review-policies");
-    const title = element("h3", "");
+  // ==========================================
+  // Mostrar las reglas de publicación de reseñas
+  // ==========================================
+  function crearPanelDePoliticas() {
+    const card = crearElemento("section", "detail-panel review-policies");
+    const title = crearElemento("h3", "");
     title.append(
-      icon("shield-check"),
+      crearIcono("shield-check"),
       document.createTextNode("Políticas de reseña"),
     );
     card.append(
       title,
-      element(
+      crearElemento(
         "p",
         "",
         "Comparte una opinión honesta sobre tu experiencia. Las reseñas se publican desde cuentas de cliente.",
       ),
     );
-    const list = element("ul");
+    const list = crearElemento("ul");
     [
       "Experiencias propias y recientes",
       "Comentarios respetuosos y útiles",
       "Sin incentivos por puntuar mejor",
     ].forEach((text) => {
-      const li = element("li", "", text);
-      li.prepend(icon("check"));
+      const li = crearElemento("li", "", text);
+      li.prepend(crearIcono("check"));
       list.append(li);
     });
-    const more = button(
+    const more = crearBoton(
       "Ver políticas completas",
       () => {
-        const content = modal("Políticas de reseña", "review-policy-modal");
+        const content = abrirModal(
+          "Políticas de reseña",
+          "review-policy-modal",
+        );
         [
           "Publica una sola reseña por restaurante; puedes editarla o retirarla desde tu cuenta.",
           "Valora comida, servicio y ambiente de 1 a 5. El promedio de estas tres puntuaciones determina la valoración general.",
           "Escribe entre 10 y 5000 caracteres, con un máximo de 500 palabras. Evita datos personales, publicidad, insultos y contenido ajeno a tu visita.",
           "Los administradores pueden responder opiniones de sus restaurantes, pero no publicar reseñas como clientes.",
           "Una cuenta registrada no equivale a una visita verificada. Actualmente MesaSpot no comprueba reservas ni modera automáticamente el contenido.",
-        ].forEach((text) => content.append(element("p", "", text)));
+        ].forEach((text) => content.append(crearElemento("p", "", text)));
       },
       "text-link review-policy-link",
     );
-    more.append(icon("arrow-right"));
+    more.append(crearIcono("arrow-right"));
     card.append(list, more);
     return card;
   }
 
   // El formulario modal envía únicamente las tres calificaciones; el servidor calcula la general.
-  function openForm(ownReview) {
+  // ==========================================
+  // Abrir el formulario para publicar o editar una reseña
+  // ==========================================
+  function abrirFormularioDeResena(ownReview) {
     const user = MesaAPI.session?.user;
     if (user?.role !== "CLIENT")
       return user ? undefined : MesaAuth.open("login");
     const { restaurant, branches, selectedBranch } = context;
-    const content = modal(
+    const content = abrirModal(
       ownReview ? "Editar tu reseña" : "Escribir una reseña",
       "review-modal",
     );
     content.append(
-      element(
+      crearElemento(
         "p",
         "review-modal-intro",
         "Comparte tu experiencia en " +
@@ -178,16 +222,16 @@
           ". Tu opinión ayuda a otros comensales.",
       ),
     );
-    const note = element(
+    const note = crearElemento(
       "p",
       "review-form-notice",
       "Opina sobre una visita que hayas realizado. Tu reseña se publicará con tu nombre de perfil.",
     );
-    note.prepend(icon("info"));
+    note.prepend(crearIcono("info"));
     content.append(note);
-    const form = element("form", "review-form");
-    const visit = element("div", "review-visit-fields");
-    field(
+    const form = crearElemento("form", "review-form");
+    const visit = crearElemento("div", "review-visit-fields");
+    crearCampo(
       visit,
       "branchId",
       "Local visitado",
@@ -204,7 +248,7 @@
       day: "2-digit",
       timeZone: "America/Lima",
     }).format(new Date());
-    field(
+    crearCampo(
       visit,
       "visitedAt",
       "Fecha de visita",
@@ -213,16 +257,18 @@
       { required: true, max: today },
     );
     form.append(visit);
-    form.append(element("h3", "review-ratings-heading", "Calificaciones"));
-    const groups = element("div", "review-rating-groups");
+    form.append(
+      crearElemento("h3", "review-ratings-heading", "Calificaciones"),
+    );
+    const groups = crearElemento("div", "review-rating-groups");
     criteria.forEach(([code, title]) => {
-      const group = element("fieldset", "review-rating-group");
-      group.append(element("legend", "", title));
-      const choices = element("div", "review-rating-choices");
+      const group = crearElemento("fieldset", "review-rating-group");
+      group.append(crearElemento("legend", "", title));
+      const choices = crearElemento("div", "review-rating-choices");
       const labels = [];
       for (let i = 1; i <= 5; i++) {
-        const choice = element("label", "review-rating-star");
-        const input = element("input");
+        const choice = crearElemento("label", "review-rating-star");
+        const input = crearElemento("input");
         input.type = "radio";
         input.name = code;
         input.value = String(i);
@@ -241,7 +287,7 @@
             node.classList.toggle("selected", index < i),
           ),
         );
-        choice.append(input, icon("star"));
+        choice.append(input, crearIcono("star"));
         labels.push(choice);
         choices.append(choice);
       }
@@ -249,7 +295,7 @@
       groups.append(group);
     });
     form.append(groups);
-    const comment = field(
+    const comment = crearCampo(
       form,
       "comment",
       "Comentario",
@@ -263,12 +309,15 @@
         placeholder: "¿Qué te gustó? ¿Qué podríamos mejorar?",
       },
     );
-    const counter = element("p", "review-word-count");
+    const counter = crearElemento("p", "review-word-count");
     counter.id = "review-word-count";
     counter.setAttribute("aria-live", "polite");
     comment.setAttribute("aria-describedby", counter.id);
-    function validateComment() {
-      const words = wordCount(comment.value);
+    // ==========================================
+    // Validar el comentario y actualizar su contador
+    // ==========================================
+    function validarComentario() {
+      const words = contarPalabras(comment.value);
       counter.textContent =
         words + "/500 palabras · " + comment.value.length + "/5000 caracteres";
       counter.classList.toggle("is-error", words > 500);
@@ -280,19 +329,19 @@
             : "",
       );
     }
-    comment.addEventListener("input", validateComment);
-    validateComment();
+    comment.addEventListener("input", validarComentario);
+    validarComentario();
     form.append(counter);
-    const status = element("p", "auth-feedback");
+    const status = crearElemento("p", "auth-feedback");
     status.setAttribute("role", "alert");
     status.hidden = true;
-    const actions = element("div", "review-form-actions");
-    const cancel = button(
+    const actions = crearElemento("div", "review-form-actions");
+    const cancel = crearBoton(
       "Cancelar",
       () => document.getElementById("modal").close(),
       "review-cancel",
     );
-    const submit = element(
+    const submit = crearElemento(
       "button",
       "button",
       ownReview ? "Guardar cambios" : "Publicar reseña",
@@ -302,12 +351,15 @@
     form.append(status, actions);
     content.append(form);
     let saving = false;
-    form.addEventListener("submit", async (event) => {
+    // ==========================================
+    // Validar y guardar la opinión del cliente
+    // ==========================================
+    const guardarResena = async (event) => {
       event.preventDefault();
-      validateComment();
+      validarComentario();
       if (saving || !form.reportValidity()) return;
       if (MesaAPI.session?.user?.role !== "CLIENT")
-        return feedback(
+        return mostrarMensaje(
           status,
           "Inicia sesión con una cuenta de cliente para publicar.",
           true,
@@ -340,31 +392,36 @@
           { method: ownReview ? "PATCH" : "POST", body, authenticated: true },
         );
         // Una lectura fallida tras guardar no debe inducir una segunda publicación.
-        if (form.isConnected) showSuccess(Boolean(ownReview));
+        if (form.isConnected) mostrarConfirmacionDeResena(Boolean(ownReview));
         await context.onPublished().catch(() => {});
-        await render(context);
+        await mostrarPanelDeResenas(context);
       } catch (error) {
-        if (form.isConnected) feedback(status, error.message, true);
+        if (form.isConnected) mostrarMensaje(status, error.message, true);
       } finally {
         saving = false;
         submit.disabled = false;
         cancel.disabled = false;
         submit.textContent = ownReview ? "Guardar cambios" : "Publicar reseña";
       }
-    });
+    };
+
+    form.addEventListener("submit", guardarResena);
   }
 
   // La confirmación se muestra únicamente después de que la API acepte la escritura.
-  function showSuccess(edited) {
-    const content = modal(
+  // ==========================================
+  // Confirmar que se publicó o actualizó la reseña
+  // ==========================================
+  function mostrarConfirmacionDeResena(edited) {
+    const content = abrirModal(
       edited ? "¡Reseña actualizada!" : "¡Reseña publicada!",
       "review-modal review-success-modal",
     );
-    const badge = element("span", "review-success-icon");
-    badge.append(icon("check"));
+    const badge = crearElemento("span", "review-success-icon");
+    badge.append(crearIcono("check"));
     content.prepend(badge);
     content.append(
-      element(
+      crearElemento(
         "p",
         "",
         "Gracias por compartir tu experiencia en " +
@@ -373,7 +430,7 @@
       ),
     );
     content.append(
-      button(
+      crearBoton(
         "Ver todas las reseñas",
         () => {
           document.getElementById("modal").close();
@@ -388,18 +445,21 @@
   }
 
   // Solo el cliente autor puede editar o retirar una reseña; el servidor valida la propiedad.
-  function removeOwnReview(review) {
-    const content = modal("Retirar mi reseña", "review-policy-modal");
+  // ==========================================
+  // Confirmar y retirar la reseña propia
+  // ==========================================
+  function retirarResenaPropia(review) {
+    const content = abrirModal("Retirar mi reseña", "review-policy-modal");
     content.append(
-      element(
+      crearElemento(
         "p",
         "",
         "Tu opinión dejará de aparecer en el restaurante. Podrás compartir una nueva experiencia más adelante.",
       ),
     );
-    const status = element("p", "auth-feedback");
+    const status = crearElemento("p", "auth-feedback");
     status.setAttribute("role", "alert");
-    const remove = button(
+    const remove = crearBoton(
       "Retirar reseña",
       async () => {
         remove.disabled = true;
@@ -410,9 +470,9 @@
           );
           document.getElementById("modal").close();
           await context.onPublished().catch(() => {});
-          await render(context);
+          await mostrarPanelDeResenas(context);
         } catch (error) {
-          feedback(status, error.message, true);
+          mostrarMensaje(status, error.message, true);
           remove.disabled = false;
         }
       },
@@ -422,34 +482,37 @@
   }
 
   // El listado conserva orden y paginación, y descarta respuestas de sesiones anteriores.
-  async function render(options) {
+  // ==========================================
+  // Mostrar el resumen, las opiniones y sus acciones
+  // ==========================================
+  async function mostrarPanelDeResenas(options) {
     context = options;
     const current = ++version;
     const { panel, restaurant, branches } = options;
     panel.replaceChildren();
-    const layout = element("div", "reviews-layout");
-    const main = animate(element("div", "reviews-main"));
-    const title = element("div", "reviews-heading");
+    const layout = crearElemento("div", "reviews-layout");
+    const main = prepararAnimacion(crearElemento("div", "reviews-main"));
+    const title = crearElemento("div", "reviews-heading");
     title.append(
-      element("h2", "", "Reseñas de comensales"),
-      element("p", "", "Experiencias y opiniones de nuestra comunidad."),
+      crearElemento("h2", "", "Reseñas de comensales"),
+      crearElemento("p", "", "Experiencias y opiniones de nuestra comunidad."),
     );
     main.append(title);
-    const summary = element("section", "review-overview");
+    const summary = crearElemento("section", "review-overview");
     summary.setAttribute("aria-label", "Resumen de valoraciones");
     const average = restaurant.ratingSummary || {};
-    const overall = element("div", "review-overall");
-    const score = element(
+    const overall = crearElemento("div", "review-overall");
+    const score = crearElemento(
       "strong",
       "",
       average.reviewCount
         ? Number(average.overall).toFixed(1) + " de 5.0"
         : "Sin valoraciones",
     );
-    score.prepend(icon("star"));
+    score.prepend(crearIcono("star"));
     overall.append(
       score,
-      element(
+      crearElemento(
         "p",
         "",
         average.reviewCount
@@ -459,75 +522,77 @@
           : "Sé la primera persona en compartir tu opinión.",
       ),
     );
-    const dimensions = element("div", "review-dimensions");
+    const dimensions = crearElemento("div", "review-dimensions");
     criteria.forEach(([code, name]) => {
-      const item = element("div");
+      const item = crearElemento("div");
       item.append(
-        element(
+        crearElemento(
           "strong",
           "",
           average.reviewCount && Number.isFinite(average[code])
             ? average[code].toFixed(1)
             : "—",
         ),
-        element("span", "", name),
+        crearElemento("span", "", name),
       );
       dimensions.append(item);
     });
     summary.append(overall, dimensions);
     main.append(summary);
-    const toolbar = element("div", "reviews-toolbar");
-    const orderText = element("span", "", "Mostrando las más recientes");
-    const select = element("select");
+    const toolbar = crearElemento("div", "reviews-toolbar");
+    const orderText = crearElemento("span", "", "Mostrando las más recientes");
+    const select = crearElemento("select");
     select.setAttribute("aria-label", "Ordenar reseñas");
     [
       ["recent", "Más recientes"],
       ["highest", "Mejor valoradas"],
       ["lowest", "Menor valoración"],
     ].forEach(([code, text]) => {
-      const option = element("option", "", text);
+      const option = crearElemento("option", "", text);
       option.value = code;
       select.append(option);
     });
     select.value = sort;
     toolbar.append(orderText, select);
     main.append(toolbar);
-    const list = element("div", "customer-review-list");
+    const list = crearElemento("div", "customer-review-list");
     list.setAttribute("aria-live", "polite");
-    const listStatus = element("div");
-    const more = button(
+    const listStatus = crearElemento("div");
+    const more = crearBoton(
       "Ver más reseñas",
-      () => loadPage(page + 1),
+      () => cargarPaginaDeResenas(page + 1),
       "reviews-load-more",
     );
     more.hidden = true;
     main.append(list, listStatus, more);
-    const sidebar = animate(element("aside", "reviews-sidebar"));
-    const action = element("section", "detail-panel review-action-card");
-    const badge = element("span", "review-action-icon");
-    badge.append(icon("message-square-plus"));
-    action.append(badge, element("h3", "", "Cuéntanos tu experiencia"));
-    sidebar.append(action, policies());
+    const sidebar = prepararAnimacion(
+      crearElemento("aside", "reviews-sidebar"),
+    );
+    const action = crearElemento("section", "detail-panel review-action-card");
+    const badge = crearElemento("span", "review-action-icon");
+    badge.append(crearIcono("message-square-plus"));
+    action.append(badge, crearElemento("h3", "", "Cuéntanos tu experiencia"));
+    sidebar.append(action, crearPanelDePoliticas());
     layout.append(main, sidebar);
     panel.append(layout);
     const user = MesaAPI.session?.user;
     if (!user) {
       action.append(
-        element(
+        crearElemento(
           "p",
           "",
           "Inicia sesión para compartir una opinión útil con la comunidad.",
         ),
       );
-      const locked = element(
+      const locked = crearElemento(
         "p",
         "review-account-required",
         "Necesitas una cuenta de cliente para escribir una reseña.",
       );
-      locked.prepend(icon("lock-keyhole"));
+      locked.prepend(crearIcono("lock-keyhole"));
       action.append(
         locked,
-        button(
+        crearBoton(
           "Iniciar sesión",
           () => MesaAuth.open("login"),
           "button review-login",
@@ -535,7 +600,7 @@
       );
     } else if (user.role !== "CLIENT") {
       action.append(
-        element(
+        crearElemento(
           "p",
           "",
           "Los administradores no pueden publicar reseñas. Puedes responder las opiniones de tus restaurantes desde Administrar.",
@@ -543,7 +608,7 @@
       );
     } else if (!branches.length) {
       action.append(
-        element(
+        crearElemento(
           "p",
           "",
           "El restaurante necesita un local publicado para recibir reseñas.",
@@ -551,16 +616,19 @@
       );
     } else {
       action.append(
-        element(
+        crearElemento(
           "p",
           "",
           "Cuéntanos cómo fue tu visita y ayuda a otros comensales a elegir.",
         ),
       );
-      const ownStatus = element("div");
+      const ownStatus = crearElemento("div");
       action.append(ownStatus);
-      async function ownAction() {
-        state(ownStatus, "Comprobando tus reseñas…");
+      // ==========================================
+      // Consultar la reseña propia para habilitar su gestión
+      // ==========================================
+      async function mostrarAccionesDeResenaPropia() {
+        mostrarEstado(ownStatus, "Comprobando tus reseñas…");
         try {
           const mine = await MesaAPI.all(
             "/users/me/reviews",
@@ -572,36 +640,44 @@
             (review) => review.restaurantId === restaurant._id,
           );
           ownStatus.replaceChildren();
-          const write = button(
+          const write = crearBoton(
             own ? "Editar mi reseña" : "Escribir una reseña",
-            () => openForm(own),
+            () => abrirFormularioDeResena(own),
             "button review-write",
           );
-          write.prepend(icon("square-pen"));
+          write.prepend(crearIcono("square-pen"));
           ownStatus.append(write);
           if (own)
             ownStatus.append(
-              button(
+              crearBoton(
                 "Retirar mi reseña",
-                () => removeOwnReview(own),
+                () => retirarResenaPropia(own),
                 "text-link review-remove",
               ),
             );
         } catch (error) {
-          if (current === version) state(ownStatus, error.message, ownAction);
+          if (current === version)
+            mostrarEstado(
+              ownStatus,
+              error.message,
+              mostrarAccionesDeResenaPropia,
+            );
         }
       }
-      ownAction();
+      mostrarAccionesDeResenaPropia();
     }
     let page = 0,
       loading = false,
       loadVersion = 0;
-    async function loadPage(next) {
+    // ==========================================
+    // Cargar la página de reseñas solicitada
+    // ==========================================
+    async function cargarPaginaDeResenas(next) {
       if (loading) return;
       loading = true;
       more.disabled = true;
       const requestVersion = ++loadVersion;
-      state(listStatus, "Cargando reseñas…");
+      mostrarEstado(listStatus, "Cargando reseñas…");
       try {
         const result = await MesaAPI.request(
           "/restaurants/" +
@@ -611,24 +687,31 @@
         );
         if (current !== version || requestVersion !== loadVersion) return;
         if (next === 1) list.replaceChildren();
-        result.data.forEach((review) => list.append(reviewCard(review)));
+        result.data.forEach((review) =>
+          list.append(crearTarjetaDeResena(review)),
+        );
         page = next;
         listStatus.replaceChildren();
         if (!list.children.length)
-          state(
+          mostrarEstado(
             listStatus,
             "Todavía no hay reseñas. Comparte la primera experiencia.",
           );
         more.hidden = page >= result.meta.totalPages;
       } catch (error) {
         if (current === version)
-          state(listStatus, error.message, () => loadPage(next));
+          mostrarEstado(listStatus, error.message, () =>
+            cargarPaginaDeResenas(next),
+          );
       } finally {
         loading = false;
         more.disabled = false;
       }
     }
-    select.addEventListener("change", () => {
+    // ==========================================
+    // Recargar las reseñas al cambiar el orden
+    // ==========================================
+    const cambiarOrdenDeResenas = () => {
       sort = select.value;
       orderText.textContent =
         sort === "recent"
@@ -637,8 +720,10 @@
             ? "Mostrando las mejor valoradas"
             : "Mostrando las de menor valoración";
       // Un nuevo render cancela lógicamente las respuestas anteriores sin mezclar distintos órdenes.
-      render(context);
-    });
+      mostrarPanelDeResenas(context);
+    };
+
+    select.addEventListener("change", cambiarOrdenDeResenas);
     orderText.textContent =
       sort === "recent"
         ? "Mostrando las más recientes"
@@ -646,7 +731,7 @@
           ? "Mostrando las mejor valoradas"
           : "Mostrando las de menor valoración";
     window.AOS?.refreshHard();
-    await loadPage(1);
+    await cargarPaginaDeResenas(1);
   }
-  window.MesaReviews = { render };
+  window.MesaReviews = { render: mostrarPanelDeResenas };
 })();

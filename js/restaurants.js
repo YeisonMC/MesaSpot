@@ -1,10 +1,23 @@
+// ==========================================
+// Búsqueda, filtros y paginación de restaurantes
+// ==========================================
+
 (() => {
   "use strict";
-  const { $, element, label, card, state, paginate } = MesaUI;
-  const grid = $("#restaurant-grid");
+  const {
+    $: seleccionar,
+    element: crearElemento,
+    label: traducirEtiqueta,
+    card: crearTarjetaDeRestaurante,
+    state: mostrarEstado,
+    paginate: mostrarPaginacion,
+  } = MesaUI;
+  const grid = seleccionar("#restaurant-grid");
   if (!grid) return;
   const home = !document.body.dataset.page;
-  const form = home ? $("#search-form") : $("#filters-form");
+  const form = home
+    ? seleccionar("#search-form")
+    : seleccionar("#filters-form");
   const aliases = {
     Criolla: "CRIOLLA",
     Chifa: "CHIFA",
@@ -40,50 +53,61 @@
     records = [],
     page = 1,
     controller;
-  const pagination = $("#pagination") || element("nav", "pagination");
+  const pagination =
+    seleccionar("#pagination") || crearElemento("nav", "pagination");
   if (home) {
     pagination.setAttribute("aria-label", "Páginas de restaurantes");
     grid.after(pagination);
   }
-  const errorBox = element("div");
+  const errorBox = crearElemento("div");
   grid.before(errorBox);
-  function render() {
+  // ==========================================
+  // Mostrar las tarjetas de la página de resultados
+  // ==========================================
+  function mostrarResultados() {
     const size = home ? 9 : 6;
     const pages = Math.ceil(records.length / size);
     page = Math.max(1, Math.min(page, pages || 1));
     grid.replaceChildren(
-      ...records.slice((page - 1) * size, page * size).map(card),
+      ...records
+        .slice((page - 1) * size, page * size)
+        .map(crearTarjetaDeRestaurante),
     );
-    $("#empty-state").hidden = records.length > 0;
-    $("#result-count").textContent =
+    seleccionar("#empty-state").hidden = records.length > 0;
+    seleccionar("#result-count").textContent =
       records.length +
       (records.length === 1
         ? " restaurante encontrado"
         : " restaurantes encontrados");
-    paginate(pagination, page, pages, (value) => {
+    mostrarPaginacion(pagination, page, pages, (value) => {
       page = value;
-      render();
-      $("#results-title").scrollIntoView({
+      mostrarResultados();
+      seleccionar("#results-title").scrollIntoView({
         behavior: "smooth",
         block: "start",
       });
     });
     window.AOS?.refreshHard();
   }
-  async function load() {
+  // ==========================================
+  // Consultar el catálogo con los filtros seleccionados
+  // ==========================================
+  async function buscarRestaurantes() {
     controller?.abort();
     controller = new AbortController();
     const current = controller;
     errorBox.replaceChildren();
-    $("#empty-state").hidden = true;
+    seleccionar("#empty-state").hidden = true;
     pagination.hidden = true;
-    state(grid, "Buscando restaurantes…");
+    mostrarEstado(grid, "Buscando restaurantes…");
     grid.setAttribute("aria-busy", "true");
     const values = new FormData(form);
     const query = home
-      ? $("#query").value.trim()
+      ? seleccionar("#query").value.trim()
       : String(values.get("query") || "").trim();
-    const district = home ? $("#district").value : values.get("district");
+    const district = home
+      ? seleccionar("#district").value
+      : values.get("district");
     const cuisines = home
       ? category
         ? [category]
@@ -98,13 +122,16 @@
       district,
       ...window.MesaPriceRange?.params(),
     };
-    const normalize = (value) =>
+    // ==========================================
+    // Normalizar la búsqueda para comparar categorías
+    // ==========================================
+    const normalizarBusqueda = (value) =>
       value
         .normalize("NFD")
         .replace(/[\u0300-\u036f]/g, "")
         .toLowerCase();
     const typedCuisine = Object.entries(aliases).find(
-      ([name]) => normalize(name) === normalize(query),
+      ([name]) => normalizarBusqueda(name) === normalizarBusqueda(query),
     )?.[1];
     const homeType = home ? category || typedCuisine : null;
     const homeTypes = homeType ? relatedTypes[homeType] || [homeType] : [];
@@ -123,7 +150,7 @@
         items = items.filter((item) =>
           item.cuisineTypes.some((c) => selectedTypes.has(c)),
         );
-      const sort = $("#sort")?.value || "rating";
+      const sort = seleccionar("#sort")?.value || "rating";
       items.sort((a, b) =>
         sort === "name"
           ? a.name.localeCompare(b.name, "es")
@@ -139,12 +166,12 @@
       if (current !== controller) return;
       records = items;
       page = 1;
-      render();
+      mostrarResultados();
     } catch (error) {
       if (current !== controller || error.name === "AbortError") return;
       grid.replaceChildren();
-      $("#result-count").textContent = "";
-      state(errorBox, error.message, load);
+      seleccionar("#result-count").textContent = "";
+      mostrarEstado(errorBox, error.message, buscarRestaurantes);
     } finally {
       if (current === controller) grid.removeAttribute("aria-busy");
     }
@@ -165,38 +192,38 @@
         text,
         () => {
           category = value;
-          $("#categories")
+          seleccionar("#categories")
             .querySelectorAll("button")
             .forEach((node) =>
               node.setAttribute("aria-pressed", String(node === b)),
             );
-          load();
+          buscarRestaurantes();
         },
         "category",
       );
       b.setAttribute("aria-pressed", String(!value));
-      $("#categories").append(b);
+      seleccionar("#categories").append(b);
     });
   }
   form.addEventListener("submit", (event) => {
     event.preventDefault();
-    load();
+    buscarRestaurantes();
   });
-  $("#sort")?.addEventListener("change", load);
-  $("#reset-filters").addEventListener("click", () => {
+  seleccionar("#sort")?.addEventListener("change", buscarRestaurantes);
+  seleccionar("#reset-filters").addEventListener("click", () => {
     form.reset();
     window.MesaPriceRange?.reset();
     category = "";
     if (home)
-      $("#categories")
+      seleccionar("#categories")
         .querySelectorAll("button")
         .forEach((node, i) =>
           node.setAttribute("aria-pressed", String(i === 0)),
         );
-    load();
+    buscarRestaurantes();
   });
   document
     .querySelectorAll('.price-range-track input[type="range"]')
-    .forEach((slider) => slider.addEventListener("change", load));
-  load();
+    .forEach((slider) => slider.addEventListener("change", buscarRestaurantes));
+  buscarRestaurantes();
 })();
