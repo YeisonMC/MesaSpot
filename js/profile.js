@@ -1,5 +1,5 @@
 // ==========================================
-// Perfil del cliente, avatar y reseñas propias
+// Perfil del cliente, avatar, reservas, favoritos y reseñas propias
 // ==========================================
 
 (() => {
@@ -68,7 +68,9 @@
   // Abrir la vista del perfil indicada por el enlace
   // ==========================================
   function seleccionarVistaDelPerfil() {
-    const view = ["profile", "reviews", "help"].includes(location.hash.slice(1))
+    const view = ["profile", "reservations", "favorites", "reviews", "help"].includes(
+      location.hash.slice(1),
+    )
       ? location.hash.slice(1)
       : "profile";
     document.querySelectorAll("[data-profile-view]").forEach((item) => {
@@ -76,9 +78,25 @@
         item.setAttribute("aria-current", "page");
       else item.removeAttribute("aria-current");
     });
-    if (view === "reviews") mostrarMisResenas();
+    if (view === "reservations") mostrarMisReservas();
+    else if (view === "favorites") mostrarMisFavoritos();
+    else if (view === "reviews") mostrarMisResenas();
     else if (view === "help") mostrarAyudaDelPerfil();
     else mostrarFormularioDePerfil();
+  }
+
+  // ==========================================
+  // Abrir las reservas dentro del perfil del cliente
+  // ==========================================
+  function mostrarMisReservas() {
+    limpiarVistaPrevia();
+    ++viewVersion;
+    const panel = crearElemento("div", "profile-reservations");
+    host.replaceChildren(
+      crearCabeceraDePerfil("Mis reservas", "Consulta tus próximas reservas y tu historial."),
+      panel,
+    );
+    MesaReservas.mostrar(panel);
   }
 
   // La imagen viaja directamente a Cloudinary con firma del backend; no pasa por el disco de Vercel.
@@ -525,6 +543,76 @@
     }
   }
   // ==========================================
+  // Mostrar las tarjetas guardadas y el estado vacío
+  // ==========================================
+  function pintarFavoritos(panel, restaurantes, animar = false) {
+    const resultados = panel.querySelector(".profile-favorites-results");
+    const botones = [...resultados.querySelectorAll("[data-favorito]")];
+    const indiceDeFoco = botones.indexOf(document.activeElement);
+    const cantidad = restaurantes.length;
+    panel.querySelector(".profile-heading p").textContent = `${cantidad} ${
+      cantidad === 1 ? "restaurante guardado" : "restaurantes guardados"
+    }`;
+    const enlace = crearEnlace(
+      "Explorar restaurantes",
+      rutaDePagina("restaurantes.html"),
+      "button",
+    );
+    if (!cantidad) {
+      const vacio = crearElemento("div", "profile-favorites-empty");
+      vacio.append(
+        crearIcono("heart"),
+        crearElemento("p", "", "Aún no tienes restaurantes guardados."),
+        enlace,
+      );
+      resultados.replaceChildren(vacio);
+      if (indiceDeFoco >= 0) enlace.focus();
+      return;
+    }
+
+    const activarAos =
+      animar &&
+      window.AOS &&
+      !matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const rejilla = crearElemento("div", "restaurant-grid");
+    restaurantes.forEach((restaurante, indice) => {
+      const tarjeta = MesaUI.card(restaurante);
+      if (activarAos) {
+        tarjeta.dataset.aos = "fade-up";
+        tarjeta.dataset.aosDuration = "350";
+        tarjeta.dataset.aosDelay = String(Math.min(indice, 3) * 50);
+      }
+      rejilla.append(tarjeta);
+    });
+    resultados.replaceChildren(rejilla);
+    if (activarAos) window.AOS.refreshHard();
+    if (indiceDeFoco >= 0)
+      rejilla.children[Math.min(indiceDeFoco, cantidad - 1)]
+        .querySelector("[data-favorito]")
+        ?.focus();
+  }
+
+  // ==========================================
+  // Abrir la vista de favoritos de la cuenta
+  // ==========================================
+  async function mostrarMisFavoritos() {
+    const version = ++viewVersion;
+    limpiarVistaPrevia();
+    const panel = crearElemento("div", "profile-favorites");
+    const resultados = crearElemento("div", "profile-favorites-results");
+    panel.append(crearCabeceraDePerfil("Favoritos", ""), resultados);
+    host.replaceChildren(panel);
+    mostrarEstado(resultados, "Cargando favoritos…");
+    try {
+      const restaurantes = await MesaFavoritos.listar();
+      if (version === viewVersion) pintarFavoritos(panel, restaurantes, true);
+    } catch (error) {
+      if (version === viewVersion)
+        mostrarEstado(resultados, error.message, mostrarMisFavoritos);
+    }
+  }
+
+  // ==========================================
   // Mostrar la ayuda para el cliente
   // ==========================================
   function mostrarAyudaDelPerfil() {
@@ -550,8 +638,8 @@
         "En Mis reseñas abre el restaurante correspondiente. Desde su pestaña Reseñas puedes editar o retirar tu opinión.",
       ],
       [
-        "¿Puedo gestionar reservas o favoritos?",
-        "Estas funciones todavía están en preparación. Por ahora puedes explorar restaurantes y compartir tu experiencia.",
+        "¿Cómo guardo un restaurante?",
+        "Pulsa el corazón en una tarjeta o en la ficha. Puedes consultar los restaurantes guardados en Favoritos.",
       ],
     ].forEach(([question, answer]) => {
       const block = crearElemento("details", "profile-help-item");
@@ -604,6 +692,10 @@
   }
   window.addEventListener("hashchange", () => {
     if (user?.role === "CLIENT") seleccionarVistaDelPerfil();
+  });
+  window.addEventListener("mesa:favoritos", (evento) => {
+    const panel = host.querySelector(".profile-favorites");
+    if (panel) pintarFavoritos(panel, evento.detail);
   });
   document.querySelector(".profile-nav").addEventListener("click", (event) => {
     if (saving) event.preventDefault();

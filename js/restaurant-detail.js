@@ -372,6 +372,9 @@
         "/restaurants/" + encodeURIComponent(id),
       );
       restaurant = data;
+      seleccionar("#detail-favorite")?.replaceChildren(
+        MesaFavoritos.crearBoton(restaurant, "detail"),
+      );
       document.title = restaurant.name + " · MesaSpot";
       seleccionar("#restaurant-title").textContent = restaurant.name;
       document.querySelector('meta[name="description"]').content =

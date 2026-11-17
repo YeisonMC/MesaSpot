@@ -51,6 +51,7 @@
     { method = "GET", body, signal, authenticated = false } = {},
   ) {
     const form = body instanceof FormData;
+    const token = authenticated ? session?.token : undefined;
     let response;
     try {
       response = await fetch(
@@ -64,9 +65,7 @@
             : AbortSignal.timeout(25000),
           headers: {
             ...(body && !form ? { "Content-Type": "application/json" } : {}),
-            ...(authenticated && session?.token
-              ? { Authorization: `Bearer ${session.token}` }
-              : {}),
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
           body:
             body === undefined ? undefined : form ? body : JSON.stringify(body),
@@ -80,7 +79,8 @@
     }
     const result = await response.json().catch(() => null);
     if (!response.ok || !result?.success) {
-      if (response.status === 401 && authenticated) guardarSesion(null);
+      if (response.status === 401 && token && session?.token === token)
+        guardarSesion(null);
       throw new ErrorDeApi(
         result?.message || `Error del servidor (${response.status}).`,
         response.status,

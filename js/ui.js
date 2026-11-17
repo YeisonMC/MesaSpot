@@ -260,6 +260,7 @@
     action.append(MesaIcons.icon("arrow-right"));
     body.append(badges, h3, meta, action);
     article.append(photo, body);
+    if (window.MesaFavoritos) article.append(MesaFavoritos.crearBoton(item));
     return article;
   }
   // ==========================================
