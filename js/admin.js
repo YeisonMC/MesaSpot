@@ -4,6 +4,14 @@
 
 (() => {
   "use strict";
+  // El editor anterior sigue disponible para las secciones del siguiente bloque.
+  const parametrosDelPanel = new URLSearchParams(location.search);
+  if (
+    document.body.dataset.page === "admin-owner" &&
+    (parametrosDelPanel.get("vista") !== "clasica" ||
+      parametrosDelPanel.get("seccion") === "promotions")
+  )
+    return;
   const {
     $: seleccionar,
     element: crearElemento,
@@ -18,7 +26,11 @@
   let restaurants = [],
     selected,
     metadata,
-    activeType = "restaurants",
+    activeType = ["branches", "promotions", "reviews"].includes(
+      parametrosDelPanel.get("seccion"),
+    )
+      ? parametrosDelPanel.get("seccion")
+      : "restaurants",
     resources = {},
     operation = 0;
   const names = {
@@ -83,7 +95,10 @@
       metadata ||= (await MesaAPI.request("/metadata")).data;
       if (token !== operation) return;
       selected =
-        restaurants.find((r) => r._id === selected?._id) || restaurants[0];
+        restaurants.find(
+          (r) =>
+            r._id === (selected?._id || parametrosDelPanel.get("restaurante")),
+        ) || restaurants[0];
       await cargarRecursosDelRestaurante();
     } catch (error) {
       mostrarEstado(root, error.message, cargarRestaurantesAdministrados);
@@ -159,6 +174,17 @@
       const b = crearBoton(
         title,
         () => {
+          // Las promociones utilizan su propia vista dentro del sidebar actual.
+          if (
+            type === "promotions" &&
+            document.body.dataset.page === "admin-owner"
+          ) {
+            location.href =
+              "administracion.html?restaurante=" +
+              encodeURIComponent(selected._id) +
+              "#promociones";
+            return;
+          }
           activeType = type;
           mostrarPanelAdministrativo();
         },
