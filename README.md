@@ -100,8 +100,7 @@ MesaSpot/
 │   ├── promociones/             # Sección de ofertas y descuentos gastronómicos
 │   │   └── promociones.html
 │   └── administracion/          # Panel administrativo para restaurantes
-│       ├── administracion.html  # Gestión de locales, cartas, fotos y promociones
-│       └── administracionDemo.html
+│       └── administracion.html  # Entrada única al panel del dueño del restaurante
 ├── js/                          # Lógica frontend modularizada en JavaScript
 │   ├── api.js                   # Módulo de comunicación HTTP con la API REST
 │   ├── config.js                # Variables de configuración del cliente (URL de API)
@@ -112,7 +111,13 @@ MesaSpot/
 │   ├── restaurant-tabs.js       # Navegación entre pestañas (menú, horarios, mapa)
 │   ├── reviews.js               # Creación, lectura y calificación de reseñas
 │   ├── gallery.js               # Galería interactiva de imágenes y carrusel
-│   ├── admin.js                 # Lógica del panel de administración gastronómico
+│   ├── admin-panel.js           # Acceso, sidebar y selección de restaurante
+│   ├── admin-componentes.js     # Formularios y componentes administrativos compartidos
+│   ├── admin-restaurante.js     # Consulta y edición de la información del restaurante
+│   ├── admin-fotos.js           # Galería y gestión de fotografías
+│   ├── admin-platos.js          # Carta, precios y disponibilidad por local
+│   ├── admin-promociones.js     # Promociones, platos incluidos y vigencia
+│   ├── admin.js                 # Herramientas existentes de locales y reseñas
 │   ├── promotions.js            # Filtros y despliegue de promociones
 │   ├── navbar.js                # Comportamiento del menú de navegación responsive
 │   ├── icons.js                 # Inicialización y manejo de iconos
@@ -127,11 +132,15 @@ MesaSpot/
 │   ├── gallery.css              # Estilos del visualizador de fotos
 │   ├── promotions.css           # Estilos para tarjetas de promociones
 │   ├── profile.css              # Estilos del perfil de usuario
+│   ├── admin-panel.css          # Diseño responsive del panel del propietario
+│   ├── admin-promociones.css    # Listado y editor de promociones del propietario
 │   └── auth.css                 # Estilos de formularios de autenticación
 └── vendor/                      # Librerías cliente locales de producción
     ├── lucide-1.61.0.min.js     # Librería de iconografía Lucide
     └── lucide-LICENSE.txt
 ```
+
+El acceso administrativo se realiza desde `pages/administracion/administracion.html`. Restaurante, Fotos, Platos y Promociones se muestran dentro de esta página mediante módulos JavaScript. Los locales y las reseñas mantienen sus herramientas existentes dentro de la misma entrada mientras se avanza con su rediseño. Las páginas HTML de los prototipos anteriores y sus hojas de estilo exclusivas fueron retiradas.
 
 ---
 
