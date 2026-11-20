@@ -20,8 +20,14 @@
     ["PAST", "Historial", "history"],
   ];
   const zona = { timeZone: "America/Lima" };
-  const fechaDeLima = new Intl.DateTimeFormat("es-PE", { ...zona, dateStyle: "medium" });
-  const horaDeLima = new Intl.DateTimeFormat("es-PE", { ...zona, timeStyle: "short" });
+  const fechaDeLima = new Intl.DateTimeFormat("es-PE", {
+    ...zona,
+    dateStyle: "medium",
+  });
+  const horaDeLima = new Intl.DateTimeFormat("es-PE", {
+    ...zona,
+    timeStyle: "short",
+  });
 
   // ==========================================
   // Construir el resumen desplegable de una reserva
@@ -29,12 +35,20 @@
   function crearDetalleDeReserva(reserva) {
     const detalle = crearElemento("details", "reservation-details");
     const control = crearElemento("summary", "", "Ver detalles");
-    control.setAttribute("aria-label", `Detalles de la reserva ${reserva.code}`);
+    control.setAttribute(
+      "aria-label",
+      `Detalles de la reserva ${reserva.code}`,
+    );
     control.append(crearIcono("chevron-down"));
     const datos = crearElemento("dl", "reservation-fields");
     const campos = [
       ["Código de reserva", reserva.code],
-      ["Dirección", [reserva.branch?.street, reserva.branch?.district].filter(Boolean).join(", ")],
+      [
+        "Dirección",
+        [reserva.branch?.street, reserva.branch?.district]
+          .filter(Boolean)
+          .join(", "),
+      ],
       ["Teléfono de contacto", reserva.contactPhone],
       ["Correo de confirmación", reserva.contactEmail],
       ["Total de la reserva", mostrarImporte(reserva.pricing?.totalCents)],
@@ -44,7 +58,10 @@
     for (const [etiqueta, valor] of campos) {
       if (!valor) continue;
       const campo = crearElemento("div");
-      campo.append(crearElemento("dt", "", etiqueta), crearElemento("dd", "", valor));
+      campo.append(
+        crearElemento("dt", "", etiqueta),
+        crearElemento("dd", "", valor),
+      );
       datos.append(campo);
     }
     detalle.append(control, datos);
@@ -64,14 +81,25 @@
     );
     const estado = crearElemento("span", "reservation-status", "Confirmada");
     estado.prepend(crearIcono("circle-check"));
-    cabecera.append(crearImagen(reserva.restaurant?.thumbnailUrl, "", "reservation-thumbnail"), restaurante, estado);
+    cabecera.append(
+      crearImagen(
+        reserva.restaurant?.thumbnailUrl,
+        "",
+        "reservation-thumbnail",
+      ),
+      restaurante,
+      estado,
+    );
 
     const turno = new Date(reserva.startsAt);
     const datos = crearElemento("ul", "reservation-overview");
     const campos = [
       ["calendar-days", fechaDeLima.format(turno)],
       ["clock", horaDeLima.format(turno)],
-      ["users", reserva.partySize === 1 ? "1 persona" : `${reserva.partySize} personas`],
+      [
+        "users",
+        reserva.partySize === 1 ? "1 persona" : `${reserva.partySize} personas`,
+      ],
       ["armchair", `Mesa ${reserva.tableNumber}`],
     ];
     for (const [icono, valor] of campos) {
@@ -91,10 +119,20 @@
     const proximas = grupo === "UPCOMING";
     vacio.append(
       crearIcono(proximas ? "calendar-days" : "history"),
-      crearElemento("h2", "", proximas ? "No tienes reservas próximas" : "Todavía no tienes reservas anteriores"),
+      crearElemento(
+        "h2",
+        "",
+        proximas
+          ? "No tienes reservas próximas"
+          : "Todavía no tienes reservas anteriores",
+      ),
     );
     if (proximas) {
-      const enlace = crearEnlace("Explorar restaurantes", rutaDePagina("restaurantes.html"), "button");
+      const enlace = crearEnlace(
+        "Explorar restaurantes",
+        rutaDePagina("restaurantes.html"),
+        "button",
+      );
       enlace.append(crearIcono("arrow-right"));
       vacio.append(enlace);
     }
@@ -128,17 +166,21 @@
 
       try {
         const consulta = MesaAPI.query({ view: grupo, page: pagina, limit: 6 });
-        const { data: reservas, meta } = await MesaAPI.request(`/users/me/reservations${consulta}`, {
-          authenticated: true,
-          signal,
-        });
+        const { data: reservas, meta } = await MesaAPI.request(
+          `/users/me/reservations${consulta}`,
+          {
+            authenticated: true,
+            signal,
+          },
+        );
         if (signal.aborted || !panel.isConnected) return;
         lista.replaceChildren();
         if (!reservas.length) {
           mostrarReservasVacias(lista, grupo);
           return;
         }
-        const animar = window.AOS && !matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const animar =
+          window.AOS && !matchMedia("(prefers-reduced-motion: reduce)").matches;
         for (const reserva of reservas) {
           const tarjeta = crearTarjetaDeReserva(reserva);
           if (animar) {
@@ -152,7 +194,9 @@
         mostrarPaginacion(paginas, meta.page, meta.totalPages, cargarPagina);
       } catch {
         if (signal.aborted || !panel.isConnected) return;
-        mostrarEstado(lista, "No pudimos cargar tus reservas.", () => cargarPagina(pagina));
+        mostrarEstado(lista, "No pudimos cargar tus reservas.", () =>
+          cargarPagina(pagina),
+        );
       }
     }
 
@@ -164,7 +208,10 @@
       if (elegido === grupo) return;
       grupo = elegido;
       for (const boton of filtros.children) {
-        boton.setAttribute("aria-pressed", String(boton.dataset.grupo === grupo));
+        boton.setAttribute(
+          "aria-pressed",
+          String(boton.dataset.grupo === grupo),
+        );
       }
       cargarPagina(1);
     }

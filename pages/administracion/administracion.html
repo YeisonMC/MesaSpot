@@ -1,114 +1,124 @@
 <!doctype html>
 <html lang="es">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description"
-    content="Explora restaurantes en Lima, Perú. Filtra por distrito, cocina y precios en soles para encontrar tu próxima mesa." />
-  <meta name="theme-color" content="#c95830" />
-  <title>Administración · MesaSpot</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link
-    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"
-    rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" />
-  <link rel="stylesheet" href="../../styles/main.css" />
-  <script defer src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
-  <link rel="stylesheet" href="../../styles/auth.css" />
-  <link rel="stylesheet" href="../../styles/restaurants.css" />
-  <link rel="stylesheet" href="../../styles/integration.css" />
-  <script defer src="../../vendor/lucide-1.61.0.min.js"></script>
-  <script defer src="../../js/icons.js"></script>
-  <script defer src="../../js/config.js"></script>
-  <script defer src="../../js/api.js"></script>
-  <script defer src="../../js/ui.js"></script>
-  <script defer src="../../js/navbar.js"></script>
-  <script defer src="../../js/app.js"></script>
-  <script defer src="../../js/auth.js"></script>
-  <script defer src="../../js/admin.js"></script>
-  <link rel="stylesheet" href="../../styles/restaurant-detail.css" />
-  <link rel="stylesheet" href="../../styles/navbar.css" />
-</head>
-
-<body class="catalog-page" data-page="admin">
-  <a class="skip-link" href="#restaurantes">Saltar a restaurantes</a>
-
-  <header class="header" id="inicio">
-    <div class="container header-inner">
-      <a class="brand" href="../../index.html" aria-label="MesaSpot, inicio"><span class="brand-icon"><i
-            data-lucide="chef-hat" aria-hidden="true"></i></span>MesaSpot</a>
-      <button class="menu-toggle icon-button" aria-label="Abrir menú" aria-expanded="false"
-        aria-controls="navigation"><i data-lucide="menu" aria-hidden="true"></i></button>
-      <nav class="navigation" id="navigation" aria-label="Navegación principal">
-        <a href="../../index.html">Inicio</a><a class="active" aria-current="page"
-          href="../restaurantes/restaurantes.html">Restaurantes</a><a href="../promociones/promociones.html">Promociones</a>
-      </nav>
-      <div class="header-actions">
-        <button class="icon-button notifications" aria-label="Notificaciones" data-info="notifications">
-          <i data-lucide="bell" aria-hidden="true"></i></button><span class="header-divider"></span><button
-          class="login" data-account="login">Iniciar sesión</button><button class="button register"
-          data-account="register">
-          Registrarse
-        </button>
-      </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Gestiona la información, las fotografías, la carta y las promociones de tu restaurante en MesaSpot."
+    />
+    <meta name="theme-color" content="#c95830" />
+    <title>Mi restaurante · MesaSpot</title>
+    <link
+      rel="icon"
+      href="https://res.cloudinary.com/dtsfiwmzt/image/upload/v1793637908/MesaSpot_awonrz.ico"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css"
+    />
+    <link rel="stylesheet" href="../../styles/main.css" />
+    <link rel="stylesheet" href="../../styles/auth.css" />
+    <link rel="stylesheet" href="../../styles/integration.css" />
+    <link rel="stylesheet" href="../../styles/admin-panel.css" />
+    <link rel="stylesheet" href="../../styles/admin-promociones.css" />
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"
+    ></script>
+    <script defer src="../../vendor/lucide-1.61.0.min.js"></script>
+    <script defer src="../../js/icons.js"></script>
+    <script defer src="../../js/config.js"></script>
+    <script defer src="../../js/api.js"></script>
+    <script defer src="../../js/ui.js"></script>
+    <script defer src="../../js/app.js"></script>
+    <script defer src="../../js/auth.js"></script>
+    <script defer src="../../js/admin-componentes.js"></script>
+    <script defer src="../../js/admin-restaurante.js"></script>
+    <script defer src="../../js/admin-fotos.js"></script>
+    <script defer src="../../js/admin-platos.js"></script>
+    <script defer src="../../js/admin-promociones.js"></script>
+    <script defer src="../../js/admin.js"></script>
+    <script defer src="../../js/admin-panel.js"></script>
+  </head>
+  <body class="owner-page" data-page="admin-owner">
+    <a class="skip-link" href="#owner-content">Saltar al contenido</a>
+    <div class="owner-mobile-bar">
+      <a class="brand" href="../../index.html">MesaSpot</a>
+      <button
+        id="owner-menu"
+        class="owner-icon"
+        type="button"
+        aria-label="Abrir menú administrativo"
+        aria-expanded="false"
+        aria-controls="owner-sidebar"
+      >
+        <i data-lucide="menu"></i>
+      </button>
     </div>
-  </header>
-  <main class="container admin-page">
-    <h1>Administra tus restaurantes</h1>
-    <p class="muted">Gestiona tu información, locales, fotos, carta y promociones.</p>
-    <div id="admin-workspace" aria-live="polite"></div>
-  </main>
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-grid">
-        <div class="footer-about">
-          <a class="brand" href="../../index.html"><span class="brand-icon"><i data-lucide="chef-hat"
-                aria-hidden="true"></i></span>MesaSpot</a>
-          <p>
-            Tu plataforma de descubrimiento gastronómico en
-            Lima, Perú. Encuentra tu próxima experiencia culinaria
-            inolvidable.
-          </p>
-          <div class="socials" aria-label="Redes sociales">
-            <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i
-                data-lucide="external-link" aria-hidden="true"></i></a><a href="https://www.instagram.com/"
-              target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i data-lucide="camera"
-                aria-hidden="true"></i></a><a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer"
-              aria-label="YouTube"><i data-lucide="circle-play" aria-hidden="true"></i></a>
+    <button
+      id="owner-backdrop"
+      class="owner-backdrop"
+      type="button"
+      aria-label="Cerrar menú"
+      hidden
+    ></button>
+    <aside
+      class="owner-sidebar"
+      id="owner-sidebar"
+      aria-label="Panel del restaurante"
+    >
+      <a class="brand owner-brand" href="../../index.html"
+        ><span class="brand-icon"
+          ><img
+            src="https://res.cloudinary.com/dtsfiwmzt/image/upload/v1793635050/Logo_sin_fondo_d4ibca.png"
+            alt=""
+            width="42"
+            height="42" /></span
+        >MesaSpot</a
+      >
+      <div id="owner-selector" class="owner-selector"></div>
+      <nav
+        id="owner-navigation"
+        class="owner-navigation"
+        aria-label="Administración"
+      ></nav>
+      <div id="owner-account" class="owner-account"></div>
+    </aside>
+    <main id="owner-content" class="owner-content" tabindex="-1">
+      <div id="owner-screen" aria-busy="true">
+        <p class="owner-loading" role="status">Preparando tu restaurante…</p>
+      </div>
+      <section id="owner-legacy" hidden>
+        <div class="owner-heading">
+          <div>
+            <p class="owner-eyebrow">Herramientas del restaurante</p>
+            <h1>Gestión administrativa</h1>
           </div>
+          <a class="owner-button secondary" href="administracion.html"
+            >Volver a mi restaurante</a
+          >
         </div>
-        <div>
-          <h3>Descubre</h3>
-          <a href="../../index.html#restaurantes">Restaurantes destacados</a><button data-info="favorites">Favoritos del
-            mes</button><button data-info="experiences">Experiencias culinarias</button><a href="../promociones/promociones.html">Promociones activas</a>
-        </div>
-        <div>
-          <h3>Legal</h3>
-          <button data-info="terms">Términos de servicio</button><button data-info="privacy">Política de
-            privacidad</button><button data-info="cookies">Política de cookies</button><button
-            data-info="conditions">Condiciones de reserva</button>
-        </div>
-        <div>
-          <h3>Contacto</h3>
-          <button data-info="support">Soporte al cliente</button><button data-info="join">Únete como
-            restaurante</button><button data-info="faq">Preguntas frecuentes</button><button data-info="press">Prensa y
-            media</button>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <p>© 2026 MesaSpot. Diseñado con pasión gastronómica.</p>
-        <p>Hecho en Lima, Perú</p>
-      </div>
-    </div>
-  </footer>
-  <dialog id="modal" aria-labelledby="modal-title">
-    <button class="modal-close icon-button" id="close-modal" aria-label="Cerrar ventana"><i data-lucide="x"
-        aria-hidden="true"></i></button>
-    <div id="modal-content"></div>
-  </dialog>
-  <div class="toast" id="toast" role="status" hidden></div>
-</body>
-
+        <div id="admin-workspace" aria-live="polite"></div>
+      </section>
+    </main>
+    <dialog id="modal" aria-labelledby="modal-title">
+      <button
+        class="modal-close icon-button"
+        id="close-modal"
+        aria-label="Cerrar ventana"
+        type="button"
+      >
+        <i data-lucide="x"></i>
+      </button>
+      <div id="modal-content"></div>
+    </dialog>
+    <div class="toast" id="toast" role="status" hidden></div>
+  </body>
 </html>
