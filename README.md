@@ -192,6 +192,23 @@ El frontend se conecta con un backend independiente desarrollado con una arquite
 
 ---
 
+## Asistente del cliente
+
+El botón flotante del asistente está disponible en Inicio, Restaurantes, la ficha del restaurante, Promociones, Perfil y Reservas, con o sin sesión iniciada. El panel administrativo conserva su navegación propia.
+
+- Se implementa en `js/asistente.js` y `styles/asistente.css`, con HTML, CSS, JavaScript puro e iconos Lucide del proyecto. No requiere instalar paquetes.
+- Consume `POST /assistant/chat` usando `MesaAPI` y la URL pública de `js/config.js`. No envía el token de sesión. La clave de Gemini permanece exclusivamente en el backend.
+- Los accesos iniciales son «¿Qué promociones hay?», «Explorar tipos de comida» y «Elegir una zona». Elegir una categoría o zona no consulta Gemini hasta seleccionar una opción concreta. Se puede escribir cualquier otra preferencia.
+- Reutiliza `MesaUI.card`, sus enlaces y los corazones de favoritos. Distingue precios de platos, consumos promedio y precios por persona/pareja/paquete. Las promociones incluyen vigencia, horarios y condiciones cuando están disponibles.
+- Conserva hasta 12 mensajes en `sessionStorage` durante un máximo de cuatro horas para continuar al navegar dentro de la misma pestaña. No utiliza almacenamiento permanente. El historial enviado a la API se limita a 6 entradas y 3600 caracteres. «Nueva conversación» permite borrarlo sin reiniciar los límites de cuota.
+- Evita envíos simultáneos y reintentos automáticos. Ante `429`, muestra el aviso de cuota y respeta `Retry-After` cuando está expuesto por CORS; si no se puede leer, permite un nuevo intento manual después de una espera mínima de 60 segundos. Esa espera no garantiza que Google haya repuesto la cuota.
+- En escritorio el panel permite seguir explorando la página. En móvil ocupa el espacio disponible, se adapta al teclado y mantiene el foco dentro del chat. Se cierra con su botón o con Escape y respeta el movimiento reducido.
+- Los mensajes y nombres se insertan como texto; las fotos pasan por la validación de URL compartida. Las valoraciones no incluidas en la respuesta del asistente no se inventan.
+
+Para incorporar una nueva página del cliente, carga `styles/asistente.css` y, con `defer`, `js/asistente.js` después de `icons.js`, `config.js`, `api.js`, `ui.js` y los módulos de autenticación/favoritos. Usa rutas relativas correctas. El backend debe estar desplegado con el endpoint del asistente y permitir el origen del frontend en `CORS_ORIGINS`.
+
+Comprobación manual breve: abrir el chat sin sesión, seleccionar una categoría y revisar los enlaces de las tarjetas; continuar en otra página; verificar la vista móvil y el cierre con Escape. Las consultas reales consumen la cuota gratuita configurada en el backend.
+
 ## 📄 Licencia
 
 Este proyecto ha sido desarrollado con fines académicos para el curso de **Interacción Humano-Computador y Programación Web (UPC)**.
