@@ -19,6 +19,8 @@
   const clasico = parametros.get("vista") === "clasica" && !promocionAnterior;
   const vistas = {
     restaurante: MesaAdminRestaurante,
+    locales: MesaAdminLocales,
+    resenas: MesaAdminResenas,
     fotos: MesaAdminFotos,
     platos: MesaAdminPlatos,
     promociones: MesaAdminPromociones,
@@ -60,11 +62,11 @@
     const enlaces = [
       ["Resumen", "layout-dashboard", null],
       ["Restaurante", "store", "restaurante"],
-      ["Locales", "map-pin", "branches"],
+      ["Locales", "map-pin", "locales"],
       ["Fotos", "images", "fotos"],
       ["Platos", "utensils", "platos"],
       ["Promociones", "badge-percent", "promociones"],
-      ["Reseñas", "message-square", "reviews"],
+      ["Reseñas", "message-square", "resenas"],
       ["Reservas", "calendar-days", null],
     ];
     for (const [titulo, icono, destino] of enlaces) {
