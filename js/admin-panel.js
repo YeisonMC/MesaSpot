@@ -21,6 +21,7 @@
     restaurante: MesaAdminRestaurante,
     locales: MesaAdminLocales,
     resenas: MesaAdminResenas,
+    reservas: MesaAdminReservas,
     fotos: MesaAdminFotos,
     platos: MesaAdminPlatos,
     promociones: MesaAdminPromociones,
@@ -67,7 +68,7 @@
       ["Platos", "utensils", "platos"],
       ["Promociones", "badge-percent", "promociones"],
       ["Reseñas", "message-square", "resenas"],
-      ["Reservas", "calendar-days", null],
+      ["Reservas", "calendar-days", "reservas"],
     ];
     for (const [titulo, icono, destino] of enlaces) {
       const enlace = U.crearElemento(
