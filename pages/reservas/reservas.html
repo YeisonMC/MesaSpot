@@ -113,22 +113,24 @@
 
     <section class="rv-card rv-body rv-flow">
 
-      <!-- Radios ocultos: controlan el paso actual -->
+      <!-- RADIOS QUE CONTROLAN EL PASO ACTUAL -->
       <input class="sr-only" type="radio" name="paso" id="p1" checked aria-label="Paso 1" />
       <input class="sr-only" type="radio" name="paso" id="p2" aria-label="Paso 2" />
       <input class="sr-only" type="radio" name="paso" id="p3" aria-label="Paso 3" />
-      <input class="sr-only" type="radio" name="paso" id="p3b" aria-label="Paso 3 (segundo intento)" />
-      <input class="sr-only" type="radio" name="paso" id="p4" aria-label="Paso 4, pago aprobado" />
-      <input class="sr-only" type="radio" name="paso" id="p4f" aria-label="Paso 4, pago rechazado" />
+      <input class="sr-only" type="radio" name="paso" id="p3b" aria-label="Paso 3 alternativo" />
+      <input class="sr-only" type="radio" name="paso" id="p4" aria-label="Paso 4, confirmación" />
+      <input class="sr-only" type="radio" name="paso" id="p4f" aria-label="Paso 4 alternativo" />
 
       <ol class="rv-steps">
         <li class="rv-step"><b>1</b><span>Seleccionar mesa</span></li>
         <li class="rv-step"><b>2</b><span>Datos de la reserva</span></li>
-        <li class="rv-step"><b>3</b><span>Pago del adelanto</span></li>
+        <li class="rv-step"><b>3</b><span>Método de pago</span></li>
         <li class="rv-step"><b>4</b><span>Confirmación</span></li>
       </ol>
 
-      <!-- PASO 1 -->
+      <!-- ======================================
+           PASO 1: SELECCIÓN DE MESA
+      ======================================= -->
       <div class="rv-panel" id="panel1">
         <h2>Selecciona tu mesa</h2>
         <p class="rv-sub">Elige la mesa que prefieras según la disponibilidad.</p>
@@ -171,18 +173,20 @@
 
         <div class="rv-actions">
           <span></span>
-          <label class="button" id="next1" for="p2">Siguiente</label>
+          <button type="button" class="button" id="next1">Siguiente</button>
         </div>
       </div>
 
-
-      <!-- PASO 2 -->
+      <!-- ======================================
+           PASO 2: DATOS DE LA RESERVA
+      ======================================= -->
       <div class="rv-panel" id="panel2">
         <h2>Datos de la reserva</h2>
         <p class="rv-sub">Completa la información para confirmar tu reserva.</p>
 
         <div class="rv-cols">
           <div class="rv-card rv-sum rv-form">
+
             <div class="rv-two">
               <label>
                 Fecha de la reserva
@@ -282,27 +286,35 @@
         </div>
 
         <div class="rv-actions">
-          <label class="rv-ghost" for="p1">Volver</label>
-          <label class="button" id="next3" for="p3">Continuar al pago</label>
+          <button type="button" class="rv-ghost" id="back1">Volver</button>
+          <button type="button" class="button" id="next3">Continuar</button>
         </div>
       </div>
 
-      <!-- PASO 3 -->
+      <!-- ======================================
+           PASO 3: MÉTODO DE PAGO
+      ======================================= -->
       <div class="rv-panel" id="panel3">
-        <h2>Pago adelantado</h2>
-        <p class="rv-sub">Realiza el pago del adelanto para confirmar tu reserva.</p>
+        <h2>Método de pago</h2>
+        <p class="rv-sub">
+          Selecciona el método que utilizarás para realizar el adelanto de tu reserva.
+        </p>
 
         <div class="rv-cols">
           <div>
             <div class="rv-note">
               <i data-lucide="info" aria-hidden="true" class="rv-note-ic"></i>
-              <span><b>Importante:</b> el adelanto es del 30% del total de tu reserva.</span>
+              <span>
+                <b>Importante:</b> MesaSpot registrará tu método de pago.
+                El pago no se procesa ni se verifica desde esta plataforma.
+              </span>
             </div>
 
             <h3>Selecciona un método de pago</h3>
 
             <div class="rv-methods" role="radiogroup" aria-label="Método de pago">
-              <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt1" checked />
+
+              <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt1" value="YAPE" checked />
               <label class="rv-method" for="mt1">
                 <img
                   src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1wHEfIMvk2Iu6PEt52kZuoA5MPAM0Wm4vPhR9pnXjeg&s=10"
@@ -310,21 +322,21 @@
                 <span>Yape</span>
               </label>
 
-              <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt2" />
+              <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt2" value="PLIN" />
               <label class="rv-method" for="mt2">
                 <img src="https://images.seeklogo.com/logo-png/38/1/plin-logo-png_seeklogo-386806.png"
                   alt="" referrerpolicy="no-referrer" />
                 <span>Plin</span>
               </label>
 
-              <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt3" />
+              <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt3" value="CARD" />
               <label class="rv-method" for="mt3">
                 <img src="https://i.pinimg.com/736x/c6/a1/fe/c6a1fe7033dc3c76ec28d13c3c7699c2.jpg"
                   alt="" referrerpolicy="no-referrer" />
                 <span>Tarjeta de débito o crédito</span>
               </label>
 
-              <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt4" />
+              <input class="sr-only rv-met-in" type="radio" name="metodo" id="mt4" value="BANK_TRANSFER" />
               <label class="rv-method" for="mt4">
                 <i data-lucide="landmark" aria-hidden="true"></i>
                 <span>Transferencia bancaria</span>
@@ -333,79 +345,35 @@
 
             <div class="rv-pay">
               <div class="rv-pago pg-yape">
-                <h3>Paga con Yape</h3>
-                <p class="rv-hint">Escanea el código QR o ingresa el número del comercio.</p>
-
-                <div class="rv-pay-body">
-                  <img class="rv-qr"
-                    src="https://www.lanacion.com.ar/resizer/v2/U5SE7L2DWRCV7JWVQHMVSOARXE.jpg?auth=118965a2e5344b2e8f9baa30519d4afcbb0240978456c2e6a6c099d76b43946d&width=1200&height=900&quality=70&smart=true"
-                    alt="Código QR de Yape" referrerpolicy="no-referrer" />
-
-                  <div>
-                    <small>Número de Yape</small>
-                    <div class="rv-form">
-                      <input value="987 654 321" readonly aria-label="Número de Yape" />
-                    </div>
-                  </div>
-                </div>
+                <h3>Yape</h3>
+                <p class="rv-hint">
+                  Has seleccionado Yape como método de pago.
+                </p>
               </div>
 
               <div class="rv-pago pg-plin">
-                <h3>Paga con Plin</h3>
-                <p class="rv-hint">Escanea el código QR o ingresa el número del comercio.</p>
-
-                <div class="rv-pay-body">
-                  <img class="rv-qr"
-                    src="https://www.lanacion.com.ar/resizer/v2/U5SE7L2DWRCV7JWVQHMVSOARXE.jpg?auth=118965a2e5344b2e8f9baa30519d4afcbb0240978456c2e6a6c099d76b43946d&width=1200&height=900&quality=70&smart=true"
-                    alt="Código QR de Plin" referrerpolicy="no-referrer" />
-
-                  <div>
-                    <small>Número de Plin</small>
-                    <div class="rv-form">
-                      <input value="987 654 321" readonly aria-label="Número de Plin" />
-                    </div>
-                  </div>
-                </div>
+                <h3>Plin</h3>
+                <p class="rv-hint">
+                  Has seleccionado Plin como método de pago.
+                </p>
               </div>
 
               <div class="rv-pago pg-tarjeta">
-                <h3>Paga con tarjeta de débito o crédito</h3>
-
-                <div class="rv-form rv-card-form">
-                  <label class="rv-full">
-                    Número de tarjeta
-                    <input inputmode="numeric" maxlength="19" placeholder="0000 0000 0000 0000"
-                      autocomplete="cc-number" />
-                  </label>
-
-                  <label class="rv-full">
-                    Nombre en la tarjeta
-                    <input placeholder="Como aparece en la tarjeta" autocomplete="cc-name" />
-                  </label>
-
-                  <label>
-                    Vencimiento
-                    <input inputmode="numeric" maxlength="5" placeholder="MM/AA" autocomplete="cc-exp" />
-                  </label>
-
-                  <label>
-                    CVV
-                    <input inputmode="numeric" maxlength="4" placeholder="123" autocomplete="cc-csc" />
-                  </label>
-                </div>
+                <h3>Tarjeta de débito o crédito</h3>
+                <p class="rv-hint">
+                  Has seleccionado tarjeta como método de pago.
+                </p>
+                <p class="rv-hint">
+                  No ingreses datos de tarjeta en MesaSpot. Esta plataforma
+                  no procesa información bancaria.
+                </p>
               </div>
 
               <div class="rv-pago pg-transf">
-                <h3>Paga con transferencia bancaria</h3>
-                <p class="rv-hint">Transfiere el adelanto a la cuenta del restaurante y guarda tu constancia.</p>
-
-                <div class="rv-cuenta">
-                  <div class="rv-row"><span>Banco</span><b>BCP</b></div>
-                  <div class="rv-row"><span>Titular</span><b>El Asador de Surco S.A.C.</b></div>
-                  <div class="rv-row"><span>Cuenta corriente (S/)</span><b>191-0000000-0-00</b></div>
-                  <div class="rv-row"><span>CCI</span><b>002-191-000000000000-00</b></div>
-                  <div class="rv-row"><span>Monto a transferir</span><b>S/ 24.00</b></div>
-                </div>
+                <h3>Transferencia bancaria</h3>
+                <p class="rv-hint">
+                  Has seleccionado transferencia bancaria como método de pago.
+                </p>
               </div>
             </div>
           </div>
@@ -422,152 +390,180 @@
               </span>
             </div>
 
-            <div class="rv-row"><span>Fecha</span><span>Sáb, 7 de nov. 2026</span></div>
-            <div class="rv-row"><span>Hora</span><span>8:00 p. m.</span></div>
-            <div class="rv-row"><span>Personas</span><span>4 personas</span></div>
-            <div class="rv-row"><b>Total de la reserva</b><b>S/ 80.00</b></div>
+            <div class="rv-row">
+              <span>Fecha</span>
+              <span id="rv-pago-fecha">Por seleccionar</span>
+            </div>
+
+            <div class="rv-row">
+              <span>Hora</span>
+              <span id="rv-pago-hora">Por seleccionar</span>
+            </div>
+
+            <div class="rv-row">
+              <span>Personas</span>
+              <span id="rv-pago-personas">Por seleccionar</span>
+            </div>
+
+            <div class="rv-row">
+              <b>Total de la reserva</b>
+              <b id="rv-total-reserva">Por calcular</b>
+            </div>
 
             <div class="rv-total rv-total-col">
-              <div class="rv-row"><b>Adelanto (30%)</b><b>S/ 24.00</b></div>
               <div class="rv-row">
-                <span>Saldo pendiente en el restaurante</span>
-                <span>S/ 56.00</span>
+                <b id="rv-pago-adelanto-label">Adelanto</b>
+                <b id="rv-pago-adelanto">Por calcular</b>
+              </div>
+
+              <div class="rv-row">
+                <span>Saldo restante estimado</span>
+                <span id="rv-pago-saldo">Por calcular</span>
               </div>
             </div>
           </aside>
         </div>
 
         <div class="rv-actions">
-          <label class="rv-ghost" for="p2">Volver</label>
-          <label class="button go-ok" for="p4">Continuar</label>
-          <label class="button go-fail" for="p4f">Continuar</label>
+          <button type="button" class="rv-ghost" id="back2">Volver</button>
+          <button type="button" class="button" id="confirmReservation">
+            Confirmar reserva
+          </button>
         </div>
+
+        <p id="rv-error-reserva" role="alert" aria-live="assertive" hidden></p>
       </div>
 
-      <!-- PASO 4 -->
+      <!-- ======================================
+           PASO 4: CONFIRMACIÓN REAL
+      ======================================= -->
       <div class="rv-panel" id="panel4">
 
-        <!-- RESULTADO: PAGO APROBADO -->
         <div class="rv-res" id="res-ok">
           <div class="rv-badge ok">
             <i data-lucide="check" aria-hidden="true"></i>
           </div>
 
           <h2>¡Tu reserva ha sido confirmada!</h2>
-          <p class="rv-sub">Gracias por elegir MesaSpot. Te esperamos.</p>
+          <p class="rv-sub">
+            Gracias por elegir MesaSpot. Te esperamos.
+          </p>
 
           <div class="rv-detail">
             <div class="rv-card rv-ticket">
+
               <div class="rv-tk-top">
                 <div class="rv-tk-rest">
                   <img
+                    id="rv-confirmacion-img"
                     src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80"
                     alt="Restaurante" />
 
                   <div>
-                    <h3>El Asador de Surco</h3>
-                    <p>★ 4.8 (1,240 reseñas)</p>
-                    <p>Surco, Lima</p>
+                    <h3 id="rv-confirmacion-restaurante">Restaurante</h3>
+                    <p id="rv-confirmacion-sede">Sede</p>
+                    <p id="rv-confirmacion-direccion">Dirección</p>
                   </div>
                 </div>
 
                 <div class="rv-tk-facts">
+
                   <div class="rv-fact">
-                    <span><i data-lucide="calendar-days" aria-hidden="true"></i>Fecha</span>
-                    <b>Sáb, 7 de nov. 2026</b>
+                    <span>
+                      <i data-lucide="calendar-days" aria-hidden="true"></i>
+                      Fecha
+                    </span>
+                    <b id="rv-confirmacion-fecha">--</b>
                   </div>
 
                   <div class="rv-fact">
-                    <span><i data-lucide="clock" aria-hidden="true"></i>Hora</span>
-                    <b>8:00 p. m.</b>
+                    <span>
+                      <i data-lucide="clock" aria-hidden="true"></i>
+                      Hora
+                    </span>
+                    <b id="rv-confirmacion-hora">--</b>
                   </div>
 
                   <div class="rv-fact">
-                    <span><i data-lucide="users" aria-hidden="true"></i>Personas</span>
-                    <b>4 personas</b>
+                    <span>
+                      <i data-lucide="users" aria-hidden="true"></i>
+                      Personas
+                    </span>
+                    <b id="rv-confirmacion-personas">--</b>
                   </div>
                 </div>
               </div>
 
               <div class="rv-tk-bot">
+
                 <div class="rv-fact">
-                  <span><i data-lucide="armchair" aria-hidden="true"></i>Mesa seleccionada</span>
-                  <span class="rv-pill pm1">Mesa 1</span>
-                  <span class="rv-pill pm3">Mesa 3</span>
-                  <span class="rv-pill pm4">Mesa 4</span>
+                  <span>
+                    <i data-lucide="armchair" aria-hidden="true"></i>
+                    Mesa seleccionada
+                  </span>
+                  <b id="rv-confirmacion-mesa">--</b>
                 </div>
 
                 <div class="rv-fact">
-                  <span><i data-lucide="credit-card" aria-hidden="true"></i>Pago realizado (30%)</span>
-                  <b>S/ 24.00</b>
+                  <span>
+                    <i data-lucide="credit-card" aria-hidden="true"></i>
+                    Método de pago
+                  </span>
+                  <b id="rv-confirmacion-metodo">--</b>
                 </div>
 
                 <div class="rv-fact">
-                  <span><i data-lucide="coins" aria-hidden="true"></i>Saldo pendiente</span>
-                  <b>S/ 56.00</b>
+                  <span>
+                    <i data-lucide="wallet" aria-hidden="true"></i>
+                    Estado del adelanto
+                  </span>
+                  <b id="rv-confirmacion-pago">Pendiente de verificación</b>
                 </div>
+
+                <div class="rv-fact">
+                  <span>
+                    <i data-lucide="coins" aria-hidden="true"></i>
+                    Total de la reserva
+                  </span>
+                  <b id="rv-confirmacion-total">--</b>
+                </div>
+
+                <div class="rv-fact">
+                  <span>
+                    <i data-lucide="receipt" aria-hidden="true"></i>
+                    Adelanto
+                  </span>
+                  <b id="rv-confirmacion-adelanto">--</b>
+                </div>
+
+                <div class="rv-fact">
+                  <span>
+                    <i data-lucide="wallet" aria-hidden="true"></i>
+                    Saldo pendiente
+                  </span>
+                  <b id="rv-confirmacion-saldo">--</b>
+                </div>
+
               </div>
             </div>
 
             <aside class="rv-code">
               <h3>Código de reserva</h3>
-              <strong>MS-78453</strong>
+              <strong id="rv-confirmacion-codigo">--</strong>
+
               <i data-lucide="mail" aria-hidden="true"></i>
-              <p>Te hemos enviado un correo con los detalles de tu reserva.</p>
+
+              <p id="rv-confirmacion-correo">
+                Tu reserva ha sido registrada.
+              </p>
             </aside>
           </div>
 
           <div class="rv-end">
-            <a class="rv-ghost" href="../perfil/perfil.html">
+            <a class="rv-ghost" href="../perfil/perfil.html#reservations">
               <i data-lucide="chevron-left" aria-hidden="true"></i>
               Ver mis reservas
             </a>
-
-            <a class="button" href="../../index.html">
-              <i data-lucide="house" aria-hidden="true"></i>
-              Volver al inicio
-            </a>
-          </div>
-
-        </div>
-
-        <!-- RESULTADO: PAGO RECHAZADO -->
-        <div class="rv-res" id="res-fail">
-          <div class="rv-badge fail">
-            <i data-lucide="x" aria-hidden="true"></i>
-          </div>
-
-          <h2>No se pudo procesar tu pago</h2>
-          <p class="rv-sub">
-            Tu reserva no ha sido confirmada.<br />
-            Por favor, verifica tus datos o intenta nuevamente.
-          </p>
-
-          <div class="rv-help">
-            <div class="rv-card">
-              <span class="ic"><i data-lucide="credit-card" aria-hidden="true"></i></span>
-              <div>
-                <h3>¿Qué puedes hacer?</h3>
-                <p>Puedes intentar realizar el pago nuevamente o volver a seleccionar una mesa.</p>
-              </div>
-            </div>
-
-            <div class="rv-card">
-              <span class="ic"><i data-lucide="headset" aria-hidden="true"></i></span>
-              <div>
-                <h3>¿Necesitas ayuda?</h3>
-                <p>Contáctanos al 987 654 321 o escríbenos por nuestro chat.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="rv-end">
-            <label class="rv-ghost" for="p3">
-              <i data-lucide="chevron-left" aria-hidden="true"></i>
-              Reintentar el pago
-            </label>
-
-            <label class="rv-ghost" for="p1">Volver a reservar</label>
 
             <a class="button" href="../../index.html">
               <i data-lucide="house" aria-hidden="true"></i>
