@@ -179,6 +179,7 @@
     "perfil.html": "perfil",
     "administracion.html": "administracion",
     "promociones.html": "promociones",
+    "reservas.html": "reservas",
   };
   // ==========================================
   // Resolver la ruta de una página desde la raíz del sitio

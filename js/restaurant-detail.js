@@ -462,6 +462,32 @@
       block: "center",
     });
   });
+
+// ==========================================
+// Ir a reservas con el restaurante y local seleccionados
+// ==========================================
+  seleccionar("#reserve-button")?.addEventListener("click", (event) => {
+    if (!restaurant?._id) {
+      event.preventDefault();
+      mostrarEstado(
+        seleccionar("#detail-load-status"),
+        "Espera a que cargue la información del restaurante.",
+      );
+      return;
+    }
+
+    const parametros = new URLSearchParams({
+      restaurantId: restaurant._id,
+    });
+
+    if (selectedBranch?._id) {
+      parametros.set("branchId", selectedBranch._id);
+    }
+
+    event.currentTarget.href =
+      "../reservas/reservas.html?" + parametros.toString();
+  });
+
   window.addEventListener("mesa:session", () => {
     if (initialized) mostrarResenasDelRestaurante();
   });
