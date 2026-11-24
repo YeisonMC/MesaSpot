@@ -38,6 +38,14 @@
   const formulario = crearElemento("form", "assistant-form");
   const entrada = crearElemento("textarea", "assistant-input");
   const enviar = crearBotonConIcono("Enviar mensaje", "arrow-up", "assistant-send");
+  const ReconocimientoDeVoz = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const avisoVoz = crearElemento("p", "assistant-composer-help");
+  avisoVoz.setAttribute("role", "status");
+  avisoVoz.hidden = true;
+  const microfono = ReconocimientoDeVoz
+    ? crearBotonConIcono("Dictar mensaje", "mic", "assistant-icon-button", alternarDictado)
+    : null;
+  let reconocimientoActivo = null;
   const lanzador = crearBotonConIcono("Abrir asistente de MesaSpot", "bot", "assistant-launcher");
   const aviso = crearElemento("aside", "assistant-hint");
   const historial = [];
@@ -123,10 +131,15 @@
     entrada.setAttribute("aria-describedby", "assistant-composer-help");
     const fila = crearElemento("div", "assistant-compose-row");
     enviar.type = "submit";
-    fila.append(entrada, enviar);
+    fila.append(entrada);
+    if (microfono) {
+      microfono.setAttribute("aria-pressed", "false");
+      fila.append(microfono);
+    }
+    fila.append(enviar);
     const ayuda = crearElemento("p", "assistant-composer-help", "Respuestas basadas en el catálogo de MesaSpot.");
     ayuda.id = "assistant-composer-help";
-    formulario.append(fila, ayuda);
+    formulario.append(fila, avisoVoz, ayuda);
     formulario.addEventListener("submit", enviarFormulario);
     entrada.addEventListener("input", actualizarEntrada);
     entrada.addEventListener("keydown", controlarEnvioConTeclado);
@@ -185,6 +198,7 @@
   // Cerrar conservando la consulta pendiente y el historial de esta pestaña
   // ==========================================
   function cerrarAsistente() {
+    cancelarDictado();
     abierto = false;
     panel.hidden = true;
     raiz.classList.remove("assistant-is-open");
@@ -314,12 +328,131 @@
   }
 
   // ==========================================
+// ==========================================
+  // Indicar el estado del dictado en el formulario
+  // ==========================================
+  function mostrarEstadoDeVoz(mensaje) {
+    avisoVoz.textContent = mensaje;
+    avisoVoz.hidden = !mensaje;
+  }
+
+  // ==========================================
+  // Actualizar el botón de dictado y su estado accesible
+  // ==========================================
+  function actualizarBotonDeVoz(escuchando, deteniendo = false) {
+    const etiqueta = escuchando ? "Detener dictado" : "Dictar mensaje";
+    microfono.title = etiqueta;
+    microfono.setAttribute("aria-label", etiqueta);
+    microfono.setAttribute("aria-pressed", String(escuchando));
+    microfono.disabled = deteniendo;
+    microfono.replaceChildren(MesaIcons.icon(escuchando ? "square" : "mic"));
+    actualizarEntrada();
+  }
+
+  // ==========================================
+  // Finalizar la escucha e ignorar eventos tardíos de una sesión anterior
+  // ==========================================
+  function cancelarDictado() {
+    const anterior = reconocimientoActivo;
+    reconocimientoActivo = null;
+    if (anterior) {
+      anterior.abort();
+      actualizarBotonDeVoz(false);
+    }
+    mostrarEstadoDeVoz("");
+  }
+
+  // ==========================================
+  // Iniciar el dictado o detenerlo para recuperar el resultado final
+  // ==========================================
+  function alternarDictado() {
+    if (reconocimientoActivo) {
+      reconocimientoActivo.stop();
+      actualizarBotonDeVoz(true, true);
+      mostrarEstadoDeVoz("Terminando el dictado…");
+      return;
+    }
+
+    const sesion = new ReconocimientoDeVoz();
+    sesion.lang = "es-PE";
+    sesion.continuous = false;
+    sesion.interimResults = false;
+    reconocimientoActivo = sesion;
+    let resultadoRecibido = false;
+    let huboError = false;
+
+    // ==========================================
+    // Confirmar que el navegador empezó a escuchar
+    // ==========================================
+    function comenzarEscucha() {
+      if (reconocimientoActivo === sesion) mostrarEstadoDeVoz("Escuchando…");
+    }
+
+    // ==========================================
+    // Añadir el texto reconocido al borrador sin enviar el mensaje
+    // ==========================================
+    function recibirTranscripcion(evento) {
+      if (reconocimientoActivo !== sesion) return;
+      const texto = Array.from(evento.results).slice(evento.resultIndex)
+        .filter(resultado => resultado.isFinal)
+        .map(resultado => resultado[0].transcript.trim())
+        .filter(Boolean).join(" ");
+      if (!texto) return;
+      const borrador = entrada.value;
+      const separador = borrador && !/\s$/.test(borrador) ? " " : "";
+      entrada.value = (borrador + separador + texto).slice(0, entrada.maxLength);
+      resultadoRecibido = true;
+      actualizarEntrada();
+    }
+
+    // ==========================================
+    // Explicar los errores de permiso, audio y conexión
+    // ==========================================
+    function informarErrorDeVoz(evento) {
+      if (reconocimientoActivo !== sesion) return;
+      huboError = true;
+      const mensajes = {
+        "not-allowed": "El navegador no permitió usar el micrófono. Puedes escribir tu pregunta.",
+        "service-not-allowed": "El navegador no permitió el dictado. Puedes escribir tu pregunta.",
+        "audio-capture": "No se encontró un micrófono disponible.",
+        "no-speech": "No se detectó voz. Prueba de nuevo.",
+        network: "No se pudo conectar con el servicio de dictado.",
+      };
+      mostrarEstadoDeVoz(mensajes[evento.error] ?? "No se pudo completar el dictado. Puedes escribir tu pregunta.");
+    }
+
+    // ==========================================
+    // Habilitar el envío cuando el cliente pueda revisar el texto
+    // ==========================================
+    function terminarEscucha() {
+      if (reconocimientoActivo !== sesion) return;
+      reconocimientoActivo = null;
+      actualizarBotonDeVoz(false);
+      if (!huboError) mostrarEstadoDeVoz(resultadoRecibido ? "Revisa el texto antes de enviarlo." : "No se detectó voz. Prueba de nuevo.");
+    }
+
+    sesion.addEventListener("start", comenzarEscucha);
+    sesion.addEventListener("result", recibirTranscripcion);
+    sesion.addEventListener("error", informarErrorDeVoz);
+    sesion.addEventListener("end", terminarEscucha);
+    try {
+      sesion.start();
+      actualizarBotonDeVoz(true);
+      mostrarEstadoDeVoz("Activando el micrófono…");
+    } catch {
+      reconocimientoActivo = null;
+      actualizarBotonDeVoz(false);
+      mostrarEstadoDeVoz("No se pudo activar el dictado. Puedes escribir tu pregunta.");
+    }
+  }
+
+  // ==========================================
   // Ajustar el campo de escritura y evitar envíos vacíos o duplicados
   // ==========================================
   function actualizarEntrada() {
     entrada.style.height = "auto";
     entrada.style.height = `${Math.max(44, Math.min(entrada.scrollHeight, 112))}px`;
-    enviar.disabled = ocupado || !entrada.value.trim() || Date.now() < esperarHasta;
+    enviar.disabled = ocupado || Boolean(reconocimientoActivo) || !entrada.value.trim() || Date.now() < esperarHasta;
     panel.querySelectorAll(".assistant-start, .assistant-chip").forEach(boton => {
       boton.disabled = ocupado || Date.now() < esperarHasta;
     });
@@ -363,8 +496,9 @@
   // ==========================================
   async function enviarConsulta(valor) {
     const texto = valor.trim();
-    if (!texto || ocupado || Date.now() < esperarHasta) return;
+    if (!texto || ocupado || reconocimientoActivo || Date.now() < esperarHasta) return;
     if (texto.length > 600) { mostrarError("Tu pregunta debe tener como máximo 600 caracteres."); return; }
+    mostrarEstadoDeVoz("");
     const contexto = prepararHistorial();
     ultimaConsulta = texto;
     const mensajeUsuario = { rol: "user", texto };
@@ -629,6 +763,7 @@
   // Iniciar otra conversación conservando los límites de la cuota gratuita
   // ==========================================
   function reiniciarConversacion() {
+    cancelarDictado();
     controlador?.abort();
     controlador = null;
     ocupado = false;
@@ -651,5 +786,6 @@
   vistaMovil.addEventListener("change", adaptarVista);
   window.visualViewport?.addEventListener("resize", adaptarVista);
   window.visualViewport?.addEventListener("scroll", adaptarVista);
+  window.addEventListener("pagehide", cancelarDictado);
   window.addEventListener("pagehide", guardarConversacion);
 })();
