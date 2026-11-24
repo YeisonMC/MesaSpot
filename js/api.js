@@ -37,10 +37,12 @@
     // ==========================================
     // Crear el error con su estado HTTP y sus detalles
     // ==========================================
-    constructor(message, status = 0, details = []) {
+    constructor(message, status = 0, details = [], metadata = {}) {
       super(message);
       this.status = status;
       this.details = details;
+      this.code = metadata.code || null;
+      this.retryAfter = metadata.retryAfter || null;
     }
   }
   // ==========================================
@@ -85,6 +87,7 @@
         result?.message || `Error del servidor (${response.status}).`,
         response.status,
         result?.details,
+        { code: result?.code, retryAfter: response.headers.get("Retry-After") },
       );
     }
     return result;

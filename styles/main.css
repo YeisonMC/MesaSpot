@@ -15,6 +15,12 @@
   --radius: 17px;
   --body: "DM Sans", sans-serif;
   --heading: "Outfit", sans-serif;
+  --soft-border: #efd8cc;
+  --track: #efeae6;
+  --avatar-bg: #fbe7dd;
+  --chip-bg: #e6f2e0;
+  --chip-text: #2f6a2f;
+  --star-off: #e9c3b0;
 }
 * {
   box-sizing: border-box;
