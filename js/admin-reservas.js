@@ -133,6 +133,7 @@
       codigoDetalle: null,
       disponibilidad: null,
       turno: "",
+      editandoMesas: false,
     };
     let operacionReservas = 0,
       operacionMesas = 0,
@@ -157,8 +158,8 @@
     const contenedorPestanas = U.crearElemento("div", "owner-reservas-pestanas");
     contenedorPestanas.setAttribute("role", "tablist");
     contenedorPestanas.setAttribute("aria-label", "Estado de la reserva");
-    tarjetaFiltros.append(contenedorPestanas);
-    const campoCodigo = U.campo(tarjetaFiltros, "codigo", "Código de reserva", "", {
+    // Los controles se ordenan igual para navegación visual y con teclado.
+    const campoCodigo = U.campo(tarjetaFiltros, "codigo", "Código de reserva (todos los locales y fechas)", "", {
       tipo: "search",
       maxLength: 100,
     });
@@ -169,6 +170,16 @@
     const campoLocal = U.campo(tarjetaFiltros, "local", "Local", estado.localId, {
       opciones: locales.map((local) => [local._id, local.name]),
     });
+    const filtros = [campoLocal, campoFecha, campoCodigo];
+    for (const [indice, icono] of ["map-pin", "calendar", "search"].entries()) {
+      const campo = filtros[indice].closest(".owner-field");
+      if (!campo) continue;
+      const simbolo = MesaIcons.icon(icono);
+      simbolo.classList.add("owner-filtro-icono");
+      campo.append(simbolo);
+      tarjetaFiltros.append(campo);
+    }
+    tarjetaFiltros.append(contenedorPestanas);
     campoCodigo.addEventListener("input", () => {
       clearTimeout(temporizador);
       temporizador = setTimeout(() => filtrarReservasPorCodigo(campoCodigo.value), PAUSA_BUSQUEDA_MS);
@@ -239,6 +250,7 @@
     // ==========================================
     function cambiarLocal(localId) {
       estado.localId = localId;
+      estado.editandoMesas = false;
       estado.pagina = 1;
       estado.turno = "";
       cargarReservas();
@@ -255,8 +267,8 @@
         const consulta = MesaAPI.query({
           page: estado.pagina,
           limit: RESERVAS_POR_PAGINA,
-          date: estado.fecha,
-          branchId: estado.localId,
+          date: estado.codigo ? undefined : estado.fecha,
+          branchId: estado.codigo ? undefined : estado.localId,
           status: estado.estadoReserva,
           q: estado.codigo,
         });
@@ -292,8 +304,8 @@
       const titulo = U.crearElemento("header", "owner-reservas-titulo");
       const texto = U.crearElemento("div");
       texto.append(
-        U.crearElemento("h2", "", "Reservas del día"),
-        U.crearElemento("small", "owner-muted", formatearFechaVisita(estado.fecha)),
+        U.crearElemento("h2", "", estado.codigo ? "Resultados por código" : "Reservas del día"),
+        U.crearElemento("small", "owner-muted", estado.codigo ? "Todos los locales y fechas" : formatearFechaVisita(estado.fecha)),
       );
       titulo.append(texto);
       tarjetaReservas.replaceChildren(titulo);
@@ -304,8 +316,8 @@
           vacio,
           filtrado ? "Sin resultados con estos filtros" : "No hay reservas para esta fecha",
           filtrado
-            ? "Prueba con otro código o cambia la pestaña de estado."
-            : "Cuando un comensal reserve una mesa, la verás aquí.",
+            ? "Revisa el código, la fecha o el estado de la reserva."
+            : "Elige otra fecha o busca por código en todos los locales.",
         );
         tarjetaReservas.append(vacio);
       } else {
@@ -342,11 +354,10 @@
       );
       ver.setAttribute("aria-label", "Ver detalle de la reserva " + reserva.code);
       fila.append(
-        U.crearElemento("span", "owner-reserva-hora", reserva.time),
         crearDato(reserva.code, "Código", "owner-reserva-codigo is-ancho"),
-        crearDato(obtenerNombreCliente(reserva), "Cliente", "is-ancho"),
-        crearDato(String(reserva.tableNumber), "Mesa"),
+        crearDato(reserva.time, "Hora"),
         crearDato(String(reserva.partySize), "Personas"),
+        crearDato(String(reserva.tableNumber), "Mesa"),
         crearInsigniaEstado(reserva.status),
         ver,
       );
@@ -370,6 +381,7 @@
       estado.codigoDetalle = codigoReserva;
       renderizarDetalleReserva(reserva);
       tarjetaDetalle.hidden = false;
+      disposicion.classList.add("has-detalle");
       marcarReservaSeleccionada();
       tarjetaDetalle.scrollIntoView({ block: "nearest", behavior: "auto" });
       tarjetaDetalle.focus({ preventScroll: true });
@@ -384,6 +396,7 @@
       botonDetalle = null;
       tarjetaDetalle.hidden = true;
       tarjetaDetalle.replaceChildren();
+      disposicion.classList.remove("has-detalle");
       marcarReservaSeleccionada();
       volverA?.focus({ preventScroll: true });
     }
@@ -391,12 +404,14 @@
     // ==========================================
     // Agregar un par término-valor a la lista de detalle (parámetros: lista, etiqueta, valor o nodo y clase extra)
     // ==========================================
-    function agregarDatoDetalle(lista, etiqueta, valor, clase = "") {
+    function agregarDatoDetalle(lista, etiqueta, valor, clase = "", icono = "") {
       const grupo = U.crearElemento("div", clase);
       const descripcion = U.crearElemento("dd");
       if (valor instanceof Node) descripcion.append(valor);
       else descripcion.textContent = valor ?? "—";
-      grupo.append(U.crearElemento("dt", "", etiqueta), descripcion);
+      const termino = U.crearElemento("dt", "", etiqueta);
+      if (icono) termino.prepend(MesaIcons.icon(icono));
+      grupo.append(termino, descripcion);
       lista.append(grupo);
     }
 
@@ -422,21 +437,27 @@
       const lista = U.crearElemento("dl");
       const precio = reserva.pricing || {};
       const local = reserva.branch || {};
-      agregarDatoDetalle(lista, "Código", reserva.code);
-      agregarDatoDetalle(lista, "Estado", crearInsigniaEstado(reserva.status));
-      agregarDatoDetalle(lista, "Fecha de visita", formatearFechaVisita(reserva.date), "is-ancho");
-      agregarDatoDetalle(lista, "Hora", reserva.time);
-      agregarDatoDetalle(lista, "Mesa y personas", "Mesa " + reserva.tableNumber + " · " + reserva.partySize + " pers.");
+      const banda = U.crearElemento("div", "owner-reserva-banda");
+      banda.append(MesaIcons.icon("calendar-check"), U.crearElemento("strong", "", reserva.code), crearInsigniaEstado(reserva.status));
+      agregarDatoDetalle(lista, "Cliente", obtenerNombreCliente(reserva), "is-ancho", "user");
+      agregarDatoDetalle(lista, "Correo", crearEnlaceContacto("mailto", reserva.contactEmail), "", "mail");
+      agregarDatoDetalle(lista, "Teléfono", crearEnlaceContacto("tel", reserva.contactPhone), "", "phone");
+      agregarDatoDetalle(lista, "Fecha de visita", formatearFechaVisita(reserva.date), "", "calendar");
+      const salida = reserva.endsAt && new Intl.DateTimeFormat("es-PE", {
+        timeZone: ZONA_HORARIA, hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+      }).format(new Date(reserva.endsAt));
+      agregarDatoDetalle(lista, "Hora", salida ? reserva.time + " – " + salida : reserva.time, "", "clock");
+      agregarDatoDetalle(lista, "Mesa", String(reserva.tableNumber), "", "armchair");
+      agregarDatoDetalle(lista, "Personas", String(reserva.partySize), "", "users");
       agregarDatoDetalle(
         lista,
         "Local",
         [local.name, local.street, local.district].filter(Boolean).join(" · ") || "—",
-        "is-ancho",
+        "is-ancho owner-detalle-separador", "map-pin",
       );
-      agregarDatoDetalle(lista, "Cliente", obtenerNombreCliente(reserva), "is-ancho");
-      agregarDatoDetalle(lista, "Teléfono", crearEnlaceContacto("tel", reserva.contactPhone));
-      agregarDatoDetalle(lista, "Correo", crearEnlaceContacto("mailto", reserva.contactEmail));
-      agregarDatoDetalle(lista, "Total de la reserva", U.dinero(precio.totalCents));
+      agregarDatoDetalle(lista, "Reserva registrada", formatearInstante(reserva.createdAt), "is-ancho", "history");
+      agregarDatoDetalle(lista, "Total de la reserva", U.dinero(precio.totalCents), "", "receipt");
+      agregarDatoDetalle(lista, "Saldo pendiente", U.dinero(precio.balanceDueCents), "", "wallet");
       agregarDatoDetalle(
         lista,
         "Adelanto informativo" + (precio.advancePercent ? " (" + precio.advancePercent + " %)" : ""),
@@ -448,12 +469,12 @@
         (METODOS_PAGO[reserva.payment?.method] || "No informado") + " · pago sin verificar",
         "is-ancho",
       );
-      agregarDatoDetalle(lista, "Reserva registrada", formatearInstante(reserva.createdAt), "is-ancho");
+
       if (reserva.status === "CANCELLED") {
         agregarDatoDetalle(lista, "Cancelada el", formatearInstante(reserva.cancelledAt), "is-ancho");
         agregarDatoDetalle(lista, "Motivo de cancelación", reserva.cancellationReason || "Sin motivo indicado", "is-ancho");
       }
-      tarjetaDetalle.replaceChildren(cabecera, lista);
+      tarjetaDetalle.replaceChildren(cabecera, banda, lista);
       refrescarIconos();
     }
 
@@ -506,6 +527,15 @@
     }
 
     // ==========================================
+    // Activar los controles de capacidad del local seleccionado
+    // ==========================================
+    function alternarEdicionDeMesas() {
+      estado.editandoMesas = !estado.editandoMesas;
+      renderizarMesas();
+      tarjetaMesas.querySelector("[data-configurar-mesas]")?.focus();
+    }
+
+    // ==========================================
     // Dibujar el bloque Mesas y disponibilidad con turno, resumen y mesas
     // ==========================================
     function renderizarMesas() {
@@ -524,6 +554,14 @@
         refrescarIconos();
         return;
       }
+      const configurar = U.boton(
+        estado.editandoMesas ? "Terminar edición" : "Configurar mesas",
+        alternarEdicionDeMesas, estado.editandoMesas ? "check" : "settings", "owner-button secondary",
+      );
+      configurar.dataset.configurarMesas = "";
+      configurar.setAttribute("aria-expanded", String(estado.editandoMesas));
+      configurar.setAttribute("aria-controls", "owner-mesas-grilla");
+      titulo.append(configurar);
       const controles = U.crearElemento("div", "owner-mesas-controles");
       const turnos = datos.slots;
       const selectorTurno = U.campo(controles, "turno", "Turno", estado.turno, {
@@ -545,8 +583,15 @@
           : datos.tables.length + " mesas configuradas",
       );
       const grilla = U.crearElemento("div", "owner-mesas-grilla");
+      grilla.id = "owner-mesas-grilla";
       grilla.append(...datos.tables.map(crearTarjetaMesa));
-      tarjetaMesas.append(controles, resumen, grilla);
+      const nota = U.crearElemento("p", "owner-mesas-nota");
+      nota.append(MesaIcons.icon("info"), document.createTextNode(
+        estado.editandoMesas ? "Guarda la capacidad de cada mesa para aplicar el cambio." : "Una reserva cancelada libera la mesa.",
+      ));
+      const local = locales.find((item) => item._id === estado.localId);
+      if (local) resumen.prepend(local.name + " · " + formatearFechaVisita(estado.fecha) + " · ");
+      tarjetaMesas.append(controles, resumen, grilla, nota);
       refrescarIconos();
     }
 
@@ -565,6 +610,12 @@
           situacion === "ocupada" ? "Ocupada" : "Disponible",
         );
         cabecera.append(insignia);
+      }
+      tarjeta.classList.toggle("is-disponible", situacion === "disponible");
+      tarjeta.append(MesaIcons.icon("armchair"), cabecera);
+      if (!estado.editandoMesas) {
+        tarjeta.append(U.crearElemento("small", "owner-muted", "Capacidad: " + mesa.capacity));
+        return tarjeta;
       }
       const capacidad = U.crearElemento("div", "owner-mesa-capacidad");
       const entrada = U.crearElemento("input");
@@ -586,7 +637,7 @@
       guardar.addEventListener("click", () =>
         actualizarCapacidadMesa(mesa.number, Number(entrada.value), entrada, guardar),
       );
-      tarjeta.append(cabecera, capacidad, guardar);
+      tarjeta.append(capacidad, guardar);
       return tarjeta;
     }
 
@@ -612,7 +663,8 @@
       U.estado.guardando = true;
       boton.disabled = true;
       try {
-        const respuesta = await contexto.peticion("/branches/" + encodeURIComponent(estado.localId), {
+        const localId = estado.localId;
+        const respuesta = await contexto.peticion("/branches/" + encodeURIComponent(localId), {
           method: "PATCH",
           body: {
             reservationSettings: {
@@ -625,10 +677,12 @@
           },
         });
         if (!contexto.vigente()) return;
-        const local = contexto.locales.find((item) => item._id === estado.localId);
+        const local = contexto.locales.find((item) => item._id === localId);
         if (local && respuesta.data) local.reservationSettings = respuesta.data.reservationSettings;
+        if (estado.localId !== localId) return;
         await cargarDisponibilidad();
-        U.confirmarExito("La capacidad de la mesa " + numeroMesa + " se actualizó correctamente.");
+        if (contexto.vigente() && estado.localId === localId)
+          U.confirmarExito("La capacidad de la mesa " + numeroMesa + " se actualizó correctamente.");
       } catch (error) {
         if (!contexto.vigente()) return;
         boton.disabled = false;

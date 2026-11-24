@@ -97,6 +97,11 @@
   font-weight: 700;
 }
 
+.reservation-status--cancelled {
+  color: #8d3528;
+  background: #fbeee8;
+}
+
 .reservation-status .lucide {
   width: 15px;
   height: 15px;

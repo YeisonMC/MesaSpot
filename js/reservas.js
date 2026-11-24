@@ -84,14 +84,16 @@
     mostrarError("");
   }
 
+  // ==========================================
+  // Obtener la fecha del calendario de reservas en Lima
+  // ==========================================
   function obtenerFechaLocal() {
-    const ahora = new Date();
-
-    const anio = ahora.getFullYear();
-    const mes = String(ahora.getMonth() + 1).padStart(2, "0");
-    const dia = String(ahora.getDate()).padStart(2, "0");
-
-    return `${anio}-${mes}-${dia}`;
+    return new Intl.DateTimeFormat("sv-SE", {
+      timeZone: "America/Lima",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
   }
 
   function formatearDireccion(branch) {

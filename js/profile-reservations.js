@@ -79,8 +79,10 @@
       crearElemento("h2", "", reserva.restaurant?.name || "Restaurante"),
       crearElemento("p", "", reserva.branch?.name || "Sede de la reserva"),
     );
-    const estado = crearElemento("span", "reservation-status", "Confirmada");
-    estado.prepend(crearIcono("circle-check"));
+    const cancelada = reserva.status === "CANCELLED";
+    const estado = crearElemento("span", "reservation-status", cancelada ? "Cancelada" : "Confirmada");
+    estado.classList.toggle("reservation-status--cancelled", cancelada);
+    estado.prepend(crearIcono(cancelada ? "circle-x" : "circle-check"));
     cabecera.append(
       crearImagen(
         reserva.restaurant?.thumbnailUrl,
