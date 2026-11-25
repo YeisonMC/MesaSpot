@@ -1,4 +1,4 @@
-/* Promociones: página estática con datos de ejemplo. Reutiliza los tokens de main.css. */
+/* Promociones: tarjetas generadas desde la API. Reutiliza los tokens de main.css. */
 .promotions-page .header {
   border-bottom: 1px solid var(--line);
 }
@@ -29,6 +29,7 @@
 .promo-card__image {
   position: relative;
   aspect-ratio: 1.65;
+  overflow: hidden;
   background: var(--soft);
 }
 .promo-card__image img {
@@ -132,42 +133,6 @@
   .promo-card:hover {
     transform: none;
   }
-}
-
-/* Corazón de favoritos: casilla oculta + etiqueta; al marcarla se rellena. */
-.promo-card__fav-input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-.promo-card__fav {
-  position: absolute;
-  right: 12px;
-  top: 12px;
-  width: 36px;
-  height: 36px;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-  background: #fff;
-  color: var(--accent-dark);
-  box-shadow: 0 2px 8px #372a1c26;
-  cursor: pointer;
-  transition: transform 0.15s;
-}
-.promo-card__fav:hover {
-  transform: scale(1.08);
-}
-.promo-card__fav .lucide {
-  width: 20px;
-  height: 20px;
-}
-.promo-card__fav-input:checked + .promo-card__fav .lucide {
-  fill: var(--accent);
-}
-.promo-card__fav-input:focus-visible + .promo-card__fav {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
 }
 
 /* Las tarjetas aparecen con un fundido corto al cargar y al cambiar de filtro. */
@@ -292,6 +257,45 @@
   font-weight: 700;
 }
 
+/* Casillas "Disponibles ahora" y "Destacadas": ocupan toda la fila de filtros. */
+.promo-filters__toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.promo-filters__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  font: 600 14px/1 var(--body);
+  cursor: pointer;
+}
+.promo-filters__toggle input {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+.promo-filters__toggle:hover {
+  border-color: var(--accent);
+}
+.promo-filters__toggle:has(input:checked) {
+  border-color: var(--accent);
+  background: var(--soft);
+  color: var(--accent-dark);
+}
+.promo-filters__toggle:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 /* Estado vacío del filtro. */
 .promo-empty {
   padding: 40px 20px;
@@ -314,7 +318,8 @@
   .promo-filters {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .promo-filters__field--search {
+  .promo-filters__field--search,
+  .promo-filters__toggles {
     grid-column: 1 / -1;
   }
 }
@@ -349,4 +354,124 @@
   .promo-filters__field--search {
     grid-column: auto;
   }
+  .promo-filters__toggles {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Acciones de la tarjeta: detalle y enlace al restaurante. */
+.promo-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+.promo-card__actions .promo-card__link {
+  margin-top: 0;
+  padding-top: 0;
+}
+.promo-card__more {
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--accent-dark);
+  font: 700 14px/1 var(--body);
+  cursor: pointer;
+}
+.promo-card__more:hover {
+  background: var(--soft);
+}
+.promo-card__more:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Disponibilidad calculada por la API. */
+.promo-card__status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+.promo-card__status::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.promo-card__status--on {
+  color: #2e7d4f;
+}
+
+/* Paginación visual del resultado filtrado. */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 40px;
+}
+.pagination button {
+  display: grid;
+  place-items: center;
+  min-width: 37px;
+  min-height: 37px;
+  padding: 7px;
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 8px;
+  font-weight: 700;
+}
+.pagination button[aria-current="page"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.pagination button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.pagination button:not(:disabled):hover {
+  border-color: var(--accent);
+}
+
+/* Detalle de la promoción en el diálogo. */
+.promo-detail {
+  display: grid;
+  gap: 12px;
+  margin-top: 8px;
+}
+.promo-detail__image {
+  width: 100%;
+  aspect-ratio: 2.2;
+  max-height: 280px;
+  object-fit: cover;
+  border-radius: 12px;
+  background: var(--soft);
+}
+.promo-detail__section {
+  display: grid;
+  gap: 6px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.promo-detail__section h3 {
+  font: 700 16px/1.3 var(--heading);
+}
+.promo-detail__list {
+  display: grid;
+  gap: 4px;
+  padding-left: 18px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.promo-detail .button {
+  justify-self: start;
 }
