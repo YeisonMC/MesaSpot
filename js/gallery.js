@@ -1,7 +1,20 @@
+// ==========================================
+// Galería de fotos y visor del restaurante
+// ==========================================
+
 (() => {
   "use strict";
-  const { element, button, image, label, state } = MesaUI;
-  const icon = (name) => MesaIcons.icon(name);
+  const {
+    element: crearElemento,
+    button: crearBoton,
+    image: crearImagen,
+    label: traducirEtiqueta,
+    state: mostrarEstado,
+  } = MesaUI;
+  // ==========================================
+  // Crear un icono de la galería
+  // ==========================================
+  const crearIcono = (name) => MesaIcons.icon(name);
   const categories = [
     ["", "Todo", "images"],
     ["AMBIENCE", "Ambiente", "image"],
@@ -15,51 +28,54 @@
     expanded = false;
 
   // Construye el visor a partir de las mismas fotos filtradas, sin nuevas peticiones.
-  function openViewer(records, initialIndex = 0) {
+  // ==========================================
+  // Abrir el visor desde la foto seleccionada
+  // ==========================================
+  function abrirVisorDeFotos(records, initialIndex = 0) {
     if (!records.length) return;
     const opener = document.activeElement;
     const previousOverflow = document.body.style.overflow;
-    const dialog = element("dialog", "photo-viewer");
+    const dialog = crearElemento("dialog", "photo-viewer");
     dialog.setAttribute("aria-label", "Galería de fotografías del restaurante");
-    const toolbar = element("div", "viewer-toolbar");
-    const counter = element("p", "viewer-counter");
+    const toolbar = crearElemento("div", "viewer-toolbar");
+    const counter = crearElemento("p", "viewer-counter");
     counter.setAttribute("role", "status");
-    counter.append(icon("images"), element("span"));
-    const close = button("", () => dialog.close(), "viewer-close");
+    counter.append(crearIcono("images"), crearElemento("span"));
+    const close = crearBoton("", () => dialog.close(), "viewer-close");
     close.setAttribute("aria-label", "Cerrar galería");
-    close.append(icon("x"));
+    close.append(crearIcono("x"));
     toolbar.append(counter, close);
-    const stage = element("div", "viewer-stage");
-    const main = element("div", "swiper viewer-main");
-    const wrapper = element("div", "swiper-wrapper");
-    const previous = button("", null, "viewer-arrow viewer-prev");
+    const stage = crearElemento("div", "viewer-stage");
+    const main = crearElemento("div", "swiper viewer-main");
+    const wrapper = crearElemento("div", "swiper-wrapper");
+    const previous = crearBoton("", null, "viewer-arrow viewer-prev");
     previous.setAttribute("aria-label", "Foto anterior");
-    previous.append(icon("chevron-left"));
-    const next = button("", null, "viewer-arrow viewer-next");
+    previous.append(crearIcono("chevron-left"));
+    const next = crearBoton("", null, "viewer-arrow viewer-next");
     next.setAttribute("aria-label", "Foto siguiente");
-    next.append(icon("chevron-right"));
-    const thumbnails = element("div", "swiper viewer-thumbs");
+    next.append(crearIcono("chevron-right"));
+    const thumbnails = crearElemento("div", "swiper viewer-thumbs");
     thumbnails.setAttribute("aria-label", "Miniaturas de la galería");
-    const thumbnailWrapper = element("div", "swiper-wrapper");
+    const thumbnailWrapper = crearElemento("div", "swiper-wrapper");
     const thumbnailButtons = [];
     records.forEach((photo, index) => {
-      const slide = element("div", "swiper-slide viewer-slide");
-      const photoImage = image(photo.url, photo.altText || photo.title);
+      const slide = crearElemento("div", "swiper-slide viewer-slide");
+      const photoImage = crearImagen(photo.url, photo.altText || photo.title);
       photoImage.loading = index === initialIndex ? "eager" : "lazy";
-      const caption = element("div", "viewer-caption");
+      const caption = crearElemento("div", "viewer-caption");
       caption.append(
-        element("h2", "", photo.title),
-        element("p", "", photo.altText || label(photo.type)),
+        crearElemento("h2", "", photo.title),
+        crearElemento("p", "", photo.altText || traducirEtiqueta(photo.type)),
       );
       slide.append(photoImage, caption);
       wrapper.append(slide);
-      const thumb = element("div", "swiper-slide");
-      const select = button("", null, "viewer-thumb");
+      const thumb = crearElemento("div", "swiper-slide");
+      const select = crearBoton("", null, "viewer-thumb");
       select.setAttribute(
         "aria-label",
         "Ver foto " + (index + 1) + ": " + photo.title,
       );
-      select.append(image(photo.url, ""));
+      select.append(crearImagen(photo.url, ""));
       thumbnailButtons.push(select);
       thumb.append(select);
       thumbnailWrapper.append(thumb);
@@ -76,7 +92,10 @@
       index = initialIndex;
 
     // Mantiene sincronizados contador, miniatura activa y controles accesibles.
-    function synchronize(activeIndex) {
+    // ==========================================
+    // Actualizar contador, texto y miniatura de la foto activa
+    // ==========================================
+    function sincronizarFotoActiva(activeIndex) {
       index = activeIndex;
       counter.lastElementChild.textContent = index + 1 + " / " + records.length;
       [...wrapper.children].forEach((slide, i) =>
@@ -108,8 +127,11 @@
           slideLabelMessage: "Foto {{index}} de {{slidesLength}}",
         },
         on: {
-          slideChange() {
-            synchronize(this.activeIndex);
+          // ==========================================
+          // Sincronizar el visor cuando Swiper cambia de foto
+          // ==========================================
+          slideChange: function sincronizarCambioDeDiapositiva() {
+            sincronizarFotoActiva(this.activeIndex);
           },
         },
       });
@@ -118,30 +140,33 @@
       );
     } else {
       // Si el CDN falla, las flechas, miniaturas y el teclado siguen funcionando.
-      const go = (value) => {
+      // ==========================================
+      // Cambiar la foto del visor sin Swiper
+      // ==========================================
+      const irAFoto = (value) => {
         const target = Math.max(0, Math.min(records.length - 1, value));
         [...wrapper.children].forEach((slide, i) => {
           slide.hidden = i !== target;
         });
         previous.disabled = target === 0;
         next.disabled = target === records.length - 1;
-        synchronize(target);
+        sincronizarFotoActiva(target);
       };
-      previous.addEventListener("click", () => go(index - 1));
-      next.addEventListener("click", () => go(index + 1));
+      previous.addEventListener("click", () => irAFoto(index - 1));
+      next.addEventListener("click", () => irAFoto(index + 1));
       thumbnailButtons.forEach((thumb, i) =>
-        thumb.addEventListener("click", () => go(i)),
+        thumb.addEventListener("click", () => irAFoto(i)),
       );
       dialog.addEventListener("keydown", (event) => {
         if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
           event.preventDefault();
-          go(index + (event.key === "ArrowRight" ? 1 : -1));
+          irAFoto(index + (event.key === "ArrowRight" ? 1 : -1));
         }
       });
       dialog.classList.add("viewer-without-swiper");
-      go(initialIndex);
+      irAFoto(initialIndex);
     }
-    synchronize(initialIndex);
+    sincronizarFotoActiva(initialIndex);
     dialog.addEventListener(
       "close",
       () => {
@@ -157,7 +182,10 @@
   }
 
   // Presenta el mosaico, las categorías con sus cantidades y el resumen lateral.
-  function render({ panel, restaurant, branch, photos, menu = [] }) {
+  // ==========================================
+  // Mostrar el mosaico y los filtros de la galería
+  // ==========================================
+  function mostrarGaleria({ panel, restaurant, branch, photos, menu = [] }) {
     panel.replaceChildren();
     const records = photos
       .filter((p) => !p.branchId || p.branchId === branch?._id)
@@ -169,21 +197,21 @@
           (item) => item.photoId === p._id && item.recommendation?.featured,
         ),
       ) || records.find((p) => p.type === "DISH");
-    const layout = element("div", "restaurant-gallery");
-    const introduction = element(
+    const layout = crearElemento("div", "restaurant-gallery");
+    const introduction = crearElemento(
       "section",
       "gallery-introduction detail-panel",
     );
     introduction.setAttribute("aria-labelledby", "gallery-heading");
-    const heading = element("div", "gallery-heading");
-    const badge = element("span", "panel-icon");
-    badge.append(icon("camera"));
-    const headingCopy = element("div");
-    const h2 = element("h2", "", "Galería del restaurante");
+    const heading = crearElemento("div", "gallery-heading");
+    const badge = crearElemento("span", "panel-icon");
+    badge.append(crearIcono("camera"));
+    const headingCopy = crearElemento("div");
+    const h2 = crearElemento("h2", "", "Galería del restaurante");
     h2.id = "gallery-heading";
     headingCopy.append(
       h2,
-      element(
+      crearElemento(
         "p",
         "",
         "Descubre la esencia de " +
@@ -193,65 +221,65 @@
     );
     heading.append(badge, headingCopy);
     introduction.append(heading);
-    const filters = element("div", "gallery-filters");
+    const filters = crearElemento("div", "gallery-filters");
     filters.setAttribute("role", "group");
     filters.setAttribute("aria-label", "Filtrar fotos por categoría");
     categories
       .filter(([type]) => !type || records.some((p) => p.type === type))
       .forEach(([type, title, symbol]) => {
         const count = records.filter((p) => !type || p.type === type).length;
-        const filter = button(
+        const filter = crearBoton(
           "",
           () => {
             selectedType = type;
             expanded = false;
-            render({ panel, restaurant, branch, photos, menu });
+            mostrarGaleria({ panel, restaurant, branch, photos, menu });
           },
           "gallery-filter",
         );
-        if (type) filter.append(icon(symbol));
+        if (type) filter.append(crearIcono(symbol));
         filter.append(
-          element("span", "", title),
-          element("span", "", "(" + count + ")"),
+          crearElemento("span", "", title),
+          crearElemento("span", "", "(" + count + ")"),
         );
         filter.setAttribute("aria-pressed", String(type === selectedType));
         filters.append(filter);
       });
     introduction.append(filters);
-    const sidebar = element("aside", "gallery-summary detail-panel");
+    const sidebar = crearElemento("aside", "gallery-summary detail-panel");
     sidebar.setAttribute("aria-label", "Resumen de la galería");
-    const total = element("div", "gallery-stat");
-    total.append(icon("images"));
-    const totalText = element("div");
+    const total = crearElemento("div", "gallery-stat");
+    total.append(crearIcono("images"));
+    const totalText = crearElemento("div");
     totalText.append(
-      element(
+      crearElemento(
         "strong",
         "",
         records.length + (records.length === 1 ? " foto" : " fotos"),
       ),
-      element("span", "", "de nuestro restaurante"),
+      crearElemento("span", "", "de nuestro restaurante"),
     );
     total.append(totalText);
     sidebar.append(total);
     if (featured) {
-      const highlight = element("div", "gallery-stat gallery-featured");
-      highlight.append(icon("eye"));
-      const description = element("div");
+      const highlight = crearElemento("div", "gallery-stat gallery-featured");
+      highlight.append(crearIcono("eye"));
+      const description = crearElemento("div");
       description.append(
-        element("strong", "", "Plato destacado"),
-        element("span", "", featured.title),
+        crearElemento("strong", "", "Plato destacado"),
+        crearElemento("span", "", featured.title),
       );
-      const preview = button(
+      const preview = crearBoton(
         "",
-        () => openViewer(records, records.indexOf(featured)),
+        () => abrirVisorDeFotos(records, records.indexOf(featured)),
         "gallery-featured-preview",
       );
       preview.setAttribute("aria-label", "Ver " + featured.title);
-      preview.append(image(featured.url, ""));
+      preview.append(crearImagen(featured.url, ""));
       highlight.append(description, preview);
       sidebar.append(highlight);
     }
-    const share = button(
+    const share = crearBoton(
       "",
       async () => {
         const url = new URL(location.href);
@@ -284,53 +312,57 @@
       },
       "gallery-share",
     );
-    share.append(icon("share-2"), element("span", "", "Compartir galería"));
+    share.append(
+      crearIcono("share-2"),
+      crearElemento("span", "", "Compartir galería"),
+    );
     sidebar.append(share);
     const filtered = records.filter(
       (p) => !selectedType || p.type === selectedType,
     );
-    const grid = element("div", "gallery-mosaic");
+    const grid = crearElemento("div", "gallery-mosaic");
     grid.setAttribute("aria-label", "Fotografías del restaurante");
     filtered.slice(0, expanded ? undefined : 8).forEach((photo, index) => {
-      const figure = element("figure", "gallery-tile");
+      const figure = crearElemento("figure", "gallery-tile");
       figure.dataset.aos = "fade-up";
       figure.dataset.aosDelay = String(Math.min((index % 5) * 35, 140));
-      const open = button(
+      const open = crearBoton(
         "",
-        () => openViewer(filtered, index),
+        () => abrirVisorDeFotos(filtered, index),
         "gallery-photo-button",
       );
       open.setAttribute("aria-label", "Ampliar " + photo.title);
-      open.append(image(photo.url, photo.altText || photo.title));
-      const caption = element(
+      open.append(crearImagen(photo.url, photo.altText || photo.title));
+      const caption = crearElemento(
         "figcaption",
         photo === featured
           ? "gallery-photo-label is-featured"
           : "gallery-photo-label",
       );
       caption.append(
-        icon(
+        crearIcono(
           photo === featured
             ? "crown"
             : categories.find((c) => c[0] === photo.type)?.[2] || "image",
         ),
-        element(
+        crearElemento(
           "span",
           "",
-          photo === featured ? "Plato estrella" : label(photo.type),
+          photo === featured ? "Plato estrella" : traducirEtiqueta(photo.type),
         ),
       );
       figure.append(open, caption);
       grid.append(figure);
     });
-    if (!filtered.length) state(grid, "No hay fotos en esta categoría.");
+    if (!filtered.length)
+      mostrarEstado(grid, "No hay fotos en esta categoría.");
     layout.append(introduction, sidebar, grid);
     if (filtered.length > 8 && !expanded) {
-      const more = button(
+      const more = crearBoton(
         "Ver las " + filtered.length + " fotos",
         () => {
           expanded = true;
-          render({ panel, restaurant, branch, photos, menu });
+          mostrarGaleria({ panel, restaurant, branch, photos, menu });
         },
         "gallery-show-more",
       );
@@ -339,5 +371,8 @@
     panel.append(layout);
     window.AOS?.refreshHard();
   }
-  window.MesaGallery = { render, openViewer };
+  window.MesaGallery = {
+    render: mostrarGaleria,
+    openViewer: abrirVisorDeFotos,
+  };
 })();

@@ -1,7 +1,14 @@
+// ==========================================
+// Iconos Lucide compartidos por la interfaz
+// ==========================================
+
 (() => {
   "use strict";
   // Usamos la misma fábrica para iconos estáticos y para elementos creados desde la API.
-  function icon(name) {
+  // ==========================================
+  // Crear un icono Lucide a partir de su nombre
+  // ==========================================
+  function crearIcono(name) {
     const key = name
       .split("-")
       .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
@@ -16,7 +23,7 @@
       "stroke-width": 1.8,
     });
   }
-  window.MesaIcons = { icon };
+  window.MesaIcons = { icon: crearIcono };
   window.lucide?.createIcons({
     attrs: { "aria-hidden": "true", focusable: "false", "stroke-width": 1.8 },
   });

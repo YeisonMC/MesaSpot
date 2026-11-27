@@ -1,11 +1,36 @@
+// ==========================================
+// Administración de restaurantes y sus recursos
+// ==========================================
+
 (() => {
   "use strict";
-  const { $, element, button, field, label, state, feedback, modal } = MesaUI;
-  const root = $("#admin-workspace");
+  // El editor anterior sigue disponible para las secciones del siguiente bloque.
+  const parametrosDelPanel = new URLSearchParams(location.search);
+  if (
+    document.body.dataset.page === "admin-owner" &&
+    (parametrosDelPanel.get("vista") !== "clasica" ||
+      parametrosDelPanel.get("seccion") === "promotions")
+  )
+    return;
+  const {
+    $: seleccionar,
+    element: crearElemento,
+    button: crearBoton,
+    field: crearCampo,
+    label: traducirEtiqueta,
+    state: mostrarEstado,
+    feedback: mostrarMensaje,
+    modal: abrirModal,
+  } = MesaUI;
+  const root = seleccionar("#admin-workspace");
   let restaurants = [],
     selected,
     metadata,
-    activeType = "restaurants",
+    activeType = ["branches", "promotions", "reviews"].includes(
+      parametrosDelPanel.get("seccion"),
+    )
+      ? parametrosDelPanel.get("seccion")
+      : "restaurants",
     resources = {},
     operation = 0;
   const names = {
@@ -16,11 +41,18 @@
     promotions: "Promociones",
     reviews: "Reseñas",
   };
-  const path = (type) =>
+  // ==========================================
+  // Construir la ruta del recurso administrativo
+  // ==========================================
+  const rutaAdministrativa = (type) =>
     "/admin/restaurants" +
     (selected ? "/" + selected._id : "") +
     (type === "restaurants" ? "" : "/" + type);
-  const choices = (values) => values.map((code) => [code, label(code)]);
+  // ==========================================
+  // Preparar opciones con etiquetas legibles
+  // ==========================================
+  const opcionesConEtiqueta = (values) =>
+    values.map((code) => [code, traducirEtiqueta(code)]);
   const days = [
     "Lunes",
     "Martes",
@@ -30,24 +62,30 @@
     "Sábado",
     "Domingo",
   ];
-  function checkboxes(form, name, title, records, values = []) {
-    const group = element("fieldset", "check-fields");
-    group.append(element("legend", "", title));
+  // ==========================================
+  // Crear un grupo de casillas de selección
+  // ==========================================
+  function crearCasillas(form, name, title, records, values = []) {
+    const group = crearElemento("fieldset", "check-fields");
+    group.append(crearElemento("legend", "", title));
     records.forEach(([value, text]) => {
-      const wrap = element("label");
-      const input = element("input");
+      const wrap = crearElemento("label");
+      const input = crearElemento("input");
       input.type = "checkbox";
       input.name = name;
       input.value = value;
       input.checked = values.includes(value);
-      wrap.append(input, element("span", "", text));
+      wrap.append(input, crearElemento("span", "", text));
       group.append(wrap);
     });
     form.append(group);
   }
-  async function loadRestaurants() {
+  // ==========================================
+  // Cargar los restaurantes administrados por la cuenta
+  // ==========================================
+  async function cargarRestaurantesAdministrados() {
     const token = ++operation;
-    state(root, "Cargando administración…");
+    mostrarEstado(root, "Cargando administración…");
     try {
       restaurants = await MesaAPI.all(
         "/admin/restaurants",
@@ -57,15 +95,21 @@
       metadata ||= (await MesaAPI.request("/metadata")).data;
       if (token !== operation) return;
       selected =
-        restaurants.find((r) => r._id === selected?._id) || restaurants[0];
-      await loadWorkspace();
+        restaurants.find(
+          (r) =>
+            r._id === (selected?._id || parametrosDelPanel.get("restaurante")),
+        ) || restaurants[0];
+      await cargarRecursosDelRestaurante();
     } catch (error) {
-      state(root, error.message, loadRestaurants);
+      mostrarEstado(root, error.message, cargarRestaurantesAdministrados);
     }
   }
-  async function loadWorkspace() {
-    if (!selected) return render();
-    state(root, "Cargando contenido de " + selected.name + "…");
+  // ==========================================
+  // Cargar los recursos del restaurante seleccionado
+  // ==========================================
+  async function cargarRecursosDelRestaurante() {
+    if (!selected) return mostrarPanelAdministrativo();
+    mostrarEstado(root, "Cargando contenido de " + selected.name + "…");
     try {
       const types = ["branches", "photos", "menu-items", "promotions"];
       const loaded = await Promise.all(
@@ -78,15 +122,18 @@
         ),
       );
       resources = Object.fromEntries(types.map((type, i) => [type, loaded[i]]));
-      render();
+      mostrarPanelAdministrativo();
     } catch (error) {
-      state(root, error.message, loadWorkspace);
+      mostrarEstado(root, error.message, cargarRecursosDelRestaurante);
     }
   }
-  function render() {
+  // ==========================================
+  // Mostrar el panel de administración
+  // ==========================================
+  function mostrarPanelAdministrativo() {
     root.replaceChildren();
-    const toolbar = element("div", "admin-toolbar");
-    const select = field(
+    const toolbar = crearElemento("div", "admin-toolbar");
+    const select = crearCampo(
       toolbar,
       "restaurant",
       "Tu restaurante",
@@ -95,31 +142,51 @@
       {
         choices: restaurants.map((r) => [
           r._id,
-          r.name + " · " + label(r.status),
+          r.name + " · " + traducirEtiqueta(r.status),
         ]),
       },
     );
-    select.addEventListener("change", () => {
+    // ==========================================
+    // Cargar el contenido del restaurante elegido
+    // ==========================================
+    const cambiarRestauranteAdministrado = () => {
       selected = restaurants.find((r) => r._id === select.value);
-      loadWorkspace();
-    });
-    toolbar.append(button("Crear restaurante", () => edit("restaurants")));
+      cargarRecursosDelRestaurante();
+    };
+
+    select.addEventListener("change", cambiarRestauranteAdministrado);
+    toolbar.append(
+      crearBoton("Crear restaurante", () =>
+        abrirEditorDeRecurso("restaurants"),
+      ),
+    );
     root.append(toolbar);
     if (!selected) {
-      const empty = element("div");
+      const empty = crearElemento("div");
       root.append(empty);
-      return state(
+      return mostrarEstado(
         empty,
         "Todavía no administras restaurantes. Crea el primero para comenzar.",
       );
     }
-    const nav = element("div", "categories");
+    const nav = crearElemento("div", "categories");
     Object.entries(names).forEach(([type, title]) => {
-      const b = button(
+      const b = crearBoton(
         title,
         () => {
+          // Las promociones utilizan su propia vista dentro del sidebar actual.
+          if (
+            type === "promotions" &&
+            document.body.dataset.page === "admin-owner"
+          ) {
+            location.href =
+              "administracion.html?restaurante=" +
+              encodeURIComponent(selected._id) +
+              "#promociones";
+            return;
+          }
           activeType = type;
-          render();
+          mostrarPanelAdministrativo();
         },
         "category",
       );
@@ -127,28 +194,35 @@
       nav.append(b);
     });
     root.append(nav);
-    const area = element("section", "detail-panel");
-    area.append(element("h2", "", names[activeType]));
+    const area = crearElemento("section", "detail-panel");
+    area.append(crearElemento("h2", "", names[activeType]));
     root.append(area);
     if (activeType === "restaurants") {
       area.append(
-        element("p", "", selected.shortDescription),
-        element("p", "muted", "Estado: " + label(selected.status)),
-        button("Editar restaurante", () => edit("restaurants", selected)),
+        crearElemento("p", "", selected.shortDescription),
+        crearElemento(
+          "p",
+          "muted",
+          "Estado: " + traducirEtiqueta(selected.status),
+        ),
+        crearBoton("Editar restaurante", () =>
+          abrirEditorDeRecurso("restaurants", selected),
+        ),
       );
       if (selected.status !== "ARCHIVED")
         area.append(
-          button(
+          crearBoton(
             "Archivar restaurante",
-            () => archive("restaurants", selected),
+            () => archivarRecurso("restaurants", selected),
             "text-link danger",
           ),
         );
       return;
     }
-    if (activeType === "reviews") return void renderReviews(area);
+    if (activeType === "reviews")
+      return void mostrarResenasParaAdministrar(area);
     area.append(
-      button(
+      crearBoton(
         "Agregar " +
           {
             branches: "local",
@@ -156,69 +230,79 @@
             "menu-items": "plato",
             promotions: "promoción",
           }[activeType],
-        () => edit(activeType),
+        () => abrirEditorDeRecurso(activeType),
       ),
     );
-    const list = element("div", "admin-resource-list");
+    const list = crearElemento("div", "admin-resource-list");
     area.append(list);
     const items = resources[activeType] || [];
-    if (!items.length) state(list, "No hay registros todavía.");
+    if (!items.length) mostrarEstado(list, "No hay registros todavía.");
     items.forEach((item) => {
-      const row = element("article", "admin-resource");
+      const row = crearElemento("article", "admin-resource");
       row.append(
-        element("strong", "", item.name || item.title),
-        element("span", "tag", label(item.status)),
-        button("Editar", () => edit(activeType, item), "text-link"),
+        crearElemento("strong", "", item.name || item.title),
+        crearElemento("span", "tag", traducirEtiqueta(item.status)),
+        crearBoton(
+          "Editar",
+          () => abrirEditorDeRecurso(activeType, item),
+          "text-link",
+        ),
       );
       if (item.status !== "ARCHIVED")
         row.append(
-          button(
+          crearBoton(
             "Archivar",
-            () => archive(activeType, item),
+            () => archivarRecurso(activeType, item),
             "text-link danger",
           ),
         );
       list.append(row);
     });
   }
-  async function archive(type, item) {
+  // ==========================================
+  // Confirmar y archivar un recurso
+  // ==========================================
+  async function archivarRecurso(type, item) {
     if (!confirm("¿Archivar " + (item.name || item.title) + "?")) return;
     try {
       await MesaAPI.request(
         type === "restaurants"
           ? "/admin/restaurants/" + item._id
-          : path(type) + "/" + item._id,
+          : rutaAdministrativa(type) + "/" + item._id,
         { method: "DELETE", authenticated: true },
       );
-      await loadRestaurants();
+      await cargarRestaurantesAdministrados();
     } catch (error) {
-      modal("No se pudo archivar").append(
-        element("p", "is-error", error.message),
+      abrirModal("No se pudo archivar").append(
+        crearElemento("p", "is-error", error.message),
       );
     }
   }
-  async function renderReviews(area) {
+  // ==========================================
+  // Mostrar reseñas y controles de respuesta
+  // ==========================================
+  async function mostrarResenasParaAdministrar(area) {
     const rid = selected._id;
-    state(area, "Cargando reseñas…");
+    mostrarEstado(area, "Cargando reseñas…");
     try {
       const reviews = await MesaAPI.all("/restaurants/" + rid + "/reviews");
       if (!area.isConnected) return;
-      area.replaceChildren(element("h2", "", "Reseñas de clientes"));
+      area.replaceChildren(crearElemento("h2", "", "Reseñas de clientes"));
       if (!reviews.length)
-        area.append(element("p", "", "No hay reseñas publicadas."));
+        area.append(crearElemento("p", "", "No hay reseñas publicadas."));
       reviews.forEach((review) => {
-        const article = element("article", "review-card");
+        const article = crearElemento("article", "review-card");
         article.append(
-          element("h3", "", review.title),
-          element("p", "", review.comment),
-          element(
+          crearElemento("h3", "", review.title),
+          crearElemento("p", "", review.comment),
+          crearElemento(
             "p",
             "muted",
             "Calificación: " + review.ratings.overall + "/5",
           ),
         );
-        const form = element("form", "modal-form");
-        const reply = field(
+        const form = crearElemento("form", "modal-form");
+        const reply = crearCampo(
           form,
           "comment",
           "Respuesta del restaurante",
@@ -226,12 +310,15 @@
           review.adminReply?.comment || "",
           { required: true, minlength: "3", maxlength: "2000" },
         );
-        const submit = element("button", "button", "Guardar respuesta");
+        const submit = crearElemento("button", "button", "Guardar respuesta");
         submit.type = "submit";
-        const status = element("p", "auth-feedback");
+        const status = crearElemento("p", "auth-feedback");
         status.setAttribute("role", "status");
         form.append(submit, status);
-        form.addEventListener("submit", async (event) => {
+        // ==========================================
+        // Publicar o actualizar la respuesta del administrador
+        // ==========================================
+        const guardarRespuestaDeResena = async (event) => {
           event.preventDefault();
           submit.disabled = true;
           try {
@@ -243,17 +330,19 @@
                 body: { comment: reply.value },
               },
             );
-            feedback(status, "Respuesta guardada.");
+            mostrarMensaje(status, "Respuesta guardada.");
           } catch (error) {
-            feedback(status, error.message, true);
+            mostrarMensaje(status, error.message, true);
           } finally {
             submit.disabled = false;
           }
-        });
+        };
+
+        form.addEventListener("submit", guardarRespuestaDeResena);
         article.append(form);
         if (review.adminReply)
           article.append(
-            button(
+            crearBoton(
               "Eliminar respuesta",
               async (event) => {
                 event.currentTarget.disabled = true;
@@ -266,9 +355,9 @@
                       "/reply",
                     { method: "DELETE", authenticated: true },
                   );
-                  renderReviews(area);
+                  mostrarResenasParaAdministrar(area);
                 } catch (error) {
-                  feedback(status, error.message, true);
+                  mostrarMensaje(status, error.message, true);
                   event.currentTarget.disabled = false;
                 }
               },
@@ -278,19 +367,31 @@
         area.append(article);
       });
     } catch (error) {
-      state(area, error.message, () => renderReviews(area));
+      mostrarEstado(area, error.message, () =>
+        mostrarResenasParaAdministrar(area),
+      );
     }
   }
-  function edit(type, item) {
-    const content = modal(
+  // ==========================================
+  // Abrir el formulario para agregar o editar un recurso
+  // ==========================================
+  function abrirEditorDeRecurso(type, item) {
+    const content = abrirModal(
       (item ? "Editar " : "Agregar ") + names[type].toLowerCase(),
       "wide-modal",
     );
-    const form = element("form", "modal-form admin-form");
+    const form = crearElemento("form", "modal-form admin-form");
     content.append(form);
-    const value = (key, fallback = "") => item?.[key] ?? fallback;
-    const text = (name, title, val, options = {}) =>
-      field(form, name, title, "text", val, options);
+    // ==========================================
+    // Leer un valor existente o su valor inicial
+    // ==========================================
+    const obtenerValorDelRecurso = (key, fallback = "") =>
+      item?.[key] ?? fallback;
+    // ==========================================
+    // Agregar un campo de texto al formulario
+    // ==========================================
+    const crearCampoDeTexto = (name, title, val, options = {}) =>
+      crearCampo(form, name, title, "text", val, options);
     const activeBranches = (resources.branches || []).filter(
       (b) => b.status === "ACTIVE",
     );
@@ -303,56 +404,70 @@
     ];
     let build;
     if (type === "restaurants") {
-      text("name", "Nombre", value("name"), {
+      // ==========================================
+      // Datos generales del restaurante
+      // ==========================================
+      crearCampoDeTexto("name", "Nombre", obtenerValorDelRecurso("name"), {
         required: true,
         maxlength: "120",
       });
-      text(
+      crearCampoDeTexto(
         "slug",
         "Identificador para el enlace (ejemplo: mi-restaurante)",
-        value("slug"),
+        obtenerValorDelRecurso("slug"),
         { required: true, pattern: "[a-z0-9]+(-[a-z0-9]+)*" },
       );
-      text("shortDescription", "Descripción breve", value("shortDescription"), {
-        required: true,
-        maxlength: "300",
-      });
-      field(
+      crearCampoDeTexto(
+        "shortDescription",
+        "Descripción breve",
+        obtenerValorDelRecurso("shortDescription"),
+        {
+          required: true,
+          maxlength: "300",
+        },
+      );
+      crearCampo(
         form,
         "description",
         "Sobre el restaurante (un párrafo por línea)",
         "textarea",
-        value("description", []).join("\n"),
+        obtenerValorDelRecurso("description", []).join("\n"),
       );
-      field(
+      crearCampo(
         form,
         "foundedYear",
         "Año de fundación",
         "number",
-        value("foundedYear"),
+        obtenerValorDelRecurso("foundedYear"),
         { min: "1500", max: String(new Date().getFullYear()) },
       );
-      field(
+      crearCampo(
         form,
         "email",
         "Correo de contacto",
         "email",
         item?.contact?.email || "",
       );
-      field(form, "website", "Página web", "url", item?.contact?.website || "");
-      checkboxes(
+      crearCampo(
+        form,
+        "website",
+        "Página web",
+        "url",
+        item?.contact?.website || "",
+      );
+      crearCasillas(
         form,
         "cuisine",
         "Tipos de cocina",
-        choices(metadata.cuisines),
-        value("cuisineTypes", []),
+        opcionesConEtiqueta(metadata.cuisines),
+        obtenerValorDelRecurso("cuisineTypes", []),
       );
-      field(
+      crearCampo(
         form,
         "featured",
         "Mostrar como destacado",
         "select",
-        String(value("featured", false)),
+        String(obtenerValorDelRecurso("featured", false)),
         {
           choices: [
             ["false", "No"],
@@ -361,12 +476,12 @@
         },
       );
       if (item) {
-        field(
+        crearCampo(
           form,
           "mainBranchId",
           "Local principal",
           "select",
-          value("mainBranchId"),
+          obtenerValorDelRecurso("mainBranchId"),
           {
             choices: [
               ["", "Sin local principal"],
@@ -374,20 +489,20 @@
             ],
           },
         );
-        field(
+        crearCampo(
           form,
           "coverPhotoId",
           "Foto de portada",
           "select",
-          value("coverPhotoId"),
+          obtenerValorDelRecurso("coverPhotoId"),
           { choices: photoOptions },
         );
-        field(
+        crearCampo(
           form,
           "thumbnailPhotoId",
           "Foto de tarjeta",
           "select",
-          value("thumbnailPhotoId"),
+          obtenerValorDelRecurso("thumbnailPhotoId"),
           { choices: photoOptions },
         );
       }
@@ -414,39 +529,51 @@
         }),
       });
     } else if (type === "branches") {
-      text("name", "Nombre del local", value("name"), { required: true });
-      text("street", "Dirección", item?.address?.street || "", {
+      // ==========================================
+      // Dirección, horarios y servicios del local
+      // ==========================================
+      crearCampoDeTexto(
+        "name",
+        "Nombre del local",
+        obtenerValorDelRecurso("name"),
+        { required: true },
+      );
+      crearCampoDeTexto("street", "Dirección", item?.address?.street || "", {
         required: true,
       });
-      text(
+      crearCampoDeTexto(
         "district",
         "Distrito de Lima Metropolitana",
         item?.address?.district || "",
         { required: true },
       );
-      text("reference", "Referencia", item?.address?.reference || "");
-      field(
+      crearCampoDeTexto(
+        "reference",
+        "Referencia",
+        item?.address?.reference || "",
+      );
+      crearCampo(
         form,
         "phone",
         "Teléfono (+51…)",
         "tel",
         item?.contact?.phone || "",
       );
-      field(
+      crearCampo(
         form,
         "whatsapp",
         "WhatsApp (+51…)",
         "tel",
         item?.contact?.whatsapp || "",
       );
-      field(
+      crearCampo(
         form,
         "email",
         "Correo del local",
         "email",
         item?.contact?.email || "",
       );
-      field(
+      crearCampo(
         form,
         "averagePrice",
         "Precio aproximado por persona (S/)",
@@ -454,11 +581,18 @@
         item ? (item.averagePricePerPersonCents / 100).toFixed(2) : "",
         { required: true, min: "0", step: "0.01" },
       );
-      field(form, "capacity", "Capacidad", "number", value("capacity"), {
-        min: "1",
-        step: "1",
-      });
-      field(
+      crearCampo(
+        form,
+        "capacity",
+        "Capacidad",
+        "number",
+        obtenerValorDelRecurso("capacity"),
+        {
+          min: "1",
+          step: "1",
+        },
+      );
+      crearCampo(
         form,
         "latitude",
         "Latitud verificada (opcional)",
@@ -466,7 +600,7 @@
         item?.location?.coordinates?.[1] ?? "",
         { min: "-90", max: "90", step: "any" },
       );
-      field(
+      crearCampo(
         form,
         "longitude",
         "Longitud verificada (opcional)",
@@ -474,22 +608,22 @@
         item?.location?.coordinates?.[0] ?? "",
         { min: "-180", max: "180", step: "any" },
       );
-      field(
+      crearCampo(
         form,
         "mapsUrl",
         "Enlace de Google Maps",
         "url",
         item?.googleMaps?.mapsUrl || "",
       );
-      checkboxes(
+      crearCasillas(
         form,
         "service",
         "Servicios",
-        choices(metadata.services),
-        value("services", []),
+        opcionesConEtiqueta(metadata.services),
+        obtenerValorDelRecurso("services", []),
       );
       form.append(
-        element(
+        crearElemento(
           "p",
           "muted",
           "Horarios: escribe 13:00-16:30,20:00-23:00. Deja vacío para cerrado. Para un cierre de madrugada añade +1, por ejemplo 20:00-02:00+1.",
@@ -499,7 +633,7 @@
         const existing = item?.openingHours?.find(
           (d) => d.dayOfWeek === index + 1,
         );
-        text(
+        crearCampoDeTexto(
           "day" + (index + 1),
           day,
           existing
@@ -562,26 +696,56 @@
         };
       };
     } else if (type === "photos") {
-      text("title", "Título", value("title"), { required: true });
-      field(form, "url", "Enlace público de la imagen", "url", value("url"), {
+      // ==========================================
+      // Fotos y etiquetas de la galería
+      // ==========================================
+      crearCampoDeTexto("title", "Título", obtenerValorDelRecurso("title"), {
         required: true,
       });
-      text("altText", "Descripción de la imagen", value("altText"));
-      field(form, "type", "Tipo", "select", value("type", "AMBIENCE"), {
-        choices: choices(metadata.photoTypes),
-      });
-      field(form, "branchId", "Local", "select", value("branchId"), {
-        choices: [
-          ["", "Toda la marca"],
-          ...activeBranches.map((b) => [b._id, b.name]),
-        ],
-      });
-      field(
+      crearCampo(
+        form,
+        "url",
+        "Enlace público de la imagen",
+        "url",
+        obtenerValorDelRecurso("url"),
+        {
+          required: true,
+        },
+      );
+      crearCampoDeTexto(
+        "altText",
+        "Descripción de la imagen",
+        obtenerValorDelRecurso("altText"),
+      );
+      crearCampo(
+        form,
+        "type",
+        "Tipo",
+        "select",
+        obtenerValorDelRecurso("type", "AMBIENCE"),
+        {
+          choices: opcionesConEtiqueta(metadata.photoTypes),
+        },
+      );
+      crearCampo(
+        form,
+        "branchId",
+        "Local",
+        "select",
+        obtenerValorDelRecurso("branchId"),
+        {
+          choices: [
+            ["", "Toda la marca"],
+            ...activeBranches.map((b) => [b._id, b.name]),
+          ],
+        },
+      );
+      crearCampo(
         form,
         "menuItemId",
         "Plato relacionado",
         "select",
-        value("menuItemId"),
+        obtenerValorDelRecurso("menuItemId"),
         {
           choices: [
             ["", "Ninguno"],
@@ -591,12 +755,19 @@
           ],
         },
       );
-      field(form, "sortOrder", "Orden", "number", value("sortOrder", 0), {
-        min: "0",
-        step: "1",
-      });
+      crearCampo(
+        form,
+        "sortOrder",
+        "Orden",
+        "number",
+        obtenerValorDelRecurso("sortOrder", 0),
+        {
+          min: "0",
+          step: "1",
+        },
+      );
       form.append(
-        element(
+        crearElemento(
           "p",
           "muted",
           "Usa una URL de imagen HTTPS. La carga de archivos en Vercel requiere un servicio de almacenamiento externo.",
@@ -612,27 +783,42 @@
         sortOrder: Number(v.sortOrder),
       });
     } else if (type === "menu-items") {
-      text("name", "Nombre del plato", value("name"), { required: true });
-      field(
+      // ==========================================
+      // Información y disponibilidad de platos
+      // ==========================================
+      crearCampoDeTexto(
+        "name",
+        "Nombre del plato",
+        obtenerValorDelRecurso("name"),
+        { required: true },
+      );
+      crearCampo(
         form,
         "description",
         "Descripción",
         "textarea",
-        value("description"),
+        obtenerValorDelRecurso("description"),
       );
-      field(
+      crearCampo(
         form,
         "category",
         "Categoría",
         "select",
-        value("category", "MAIN"),
-        { choices: choices(metadata.menuCategories) },
+        obtenerValorDelRecurso("category", "MAIN"),
+        { choices: opcionesConEtiqueta(metadata.menuCategories) },
       );
-      field(form, "photoId", "Foto", "select", value("photoId"), {
-        choices: photoOptions,
-      });
+      crearCampo(
+        form,
+        "photoId",
+        "Foto",
+        "select",
+        obtenerValorDelRecurso("photoId"),
+        {
+          choices: photoOptions,
+        },
+      );
       form.append(
-        element(
+        crearElemento(
           "p",
           "muted",
           "Completa el precio de los locales donde se ofrece. Un precio vacío retira la oferta de ese local.",
@@ -640,7 +826,7 @@
       );
       activeBranches.forEach((b) => {
         const offer = item?.branchOffers.find((o) => o.branchId === b._id);
-        field(
+        crearCampo(
           form,
           "price_" + b._id,
           b.name + " · precio (S/)",
@@ -648,7 +834,7 @@
           offer ? (offer.priceCents / 100).toFixed(2) : "",
           { min: "0", step: "0.01" },
         );
-        field(
+        crearCampo(
           form,
           "available_" + b._id,
           "Disponible en " + b.name,
@@ -662,7 +848,7 @@
           },
         );
       });
-      field(
+      crearCampo(
         form,
         "featured",
         "Sugerir este plato",
@@ -675,30 +861,30 @@
           ],
         },
       );
-      field(
+      crearCampo(
         form,
         "recommendation",
         "Etiqueta de sugerencia",
         "select",
         item?.recommendation?.label || "RECOMMENDED",
-        { choices: choices(metadata.recommendations) },
+        { choices: opcionesConEtiqueta(metadata.recommendations) },
       );
-      text(
+      crearCampoDeTexto(
         "allergens",
         "Alérgenos (separados por comas)",
-        value("allergens", []).join(", "),
+        obtenerValorDelRecurso("allergens", []).join(", "),
       );
-      text(
+      crearCampoDeTexto(
         "dietaryTags",
         "Características alimentarias (separadas por comas)",
-        value("dietaryTags", []).join(", "),
+        obtenerValorDelRecurso("dietaryTags", []).join(", "),
       );
-      field(
+      crearCampo(
         form,
         "allergenInformationConfirmed",
         "Información de alérgenos confirmada",
         "select",
-        String(value("allergenInformationConfirmed", false)),
+        String(obtenerValorDelRecurso("allergenInformationConfirmed", false)),
         {
           choices: [
             ["false", "No"],
@@ -735,26 +921,44 @@
         allergenInformationConfirmed: v.allergenInformationConfirmed === "true",
       });
     } else if (type === "promotions") {
-      text("title", "Título", value("title"), { required: true });
-      field(
+      // ==========================================
+      // Vigencia y condiciones de promociones
+      // ==========================================
+      crearCampoDeTexto("title", "Título", obtenerValorDelRecurso("title"), {
+        required: true,
+      });
+      crearCampo(
         form,
         "description",
         "Descripción",
         "textarea",
-        value("description"),
+        obtenerValorDelRecurso("description"),
       );
-      field(form, "terms", "Condiciones", "textarea", value("terms"));
-      field(form, "photoId", "Foto", "select", value("photoId"), {
-        choices: photoOptions,
-      });
-      checkboxes(
+      crearCampo(
+        form,
+        "terms",
+        "Condiciones",
+        "textarea",
+        obtenerValorDelRecurso("terms"),
+      );
+      crearCampo(
+        form,
+        "photoId",
+        "Foto",
+        "select",
+        obtenerValorDelRecurso("photoId"),
+        {
+          choices: photoOptions,
+        },
+      );
+      crearCasillas(
         form,
         "branch",
         "Locales donde aplica",
         activeBranches.map((b) => [b._id, b.name]),
-        value("branchIds", []),
+        obtenerValorDelRecurso("branchIds", []),
       );
-      field(
+      crearCampo(
         form,
         "price",
         "Precio promocional (S/)",
@@ -762,67 +966,70 @@
         item ? (item.priceCents / 100).toFixed(2) : "",
         { required: true, min: "0", step: "0.01" },
       );
-      field(
+      crearCampo(
         form,
         "pricingUnit",
         "Unidad de precio",
         "select",
-        value("pricingUnit", "PERSON"),
-        { choices: choices(["PERSON", "COUPLE", "PACKAGE"]) },
+        obtenerValorDelRecurso("pricingUnit", "PERSON"),
+        { choices: opcionesConEtiqueta(["PERSON", "COUPLE", "PACKAGE"]) },
       );
-      field(
+      crearCampo(
         form,
         "peopleCount",
         "Número de personas",
         "number",
-        value("peopleCount", 1),
+        obtenerValorDelRecurso("peopleCount", 1),
         { required: true, min: "1", step: "1" },
       );
-      const lima = (date) =>
+      // ==========================================
+      // Adaptar la fecha al campo en hora de Lima
+      // ==========================================
+      const formatearFechaDeLima = (date) =>
         date
           ? new Date(new Date(date).getTime() - 5 * 3600000)
               .toISOString()
               .slice(0, 16)
           : "";
-      field(
+      crearCampo(
         form,
         "startsAt",
         "Inicio (hora de Lima)",
         "datetime-local",
-        lima(value("startsAt")),
+        formatearFechaDeLima(obtenerValorDelRecurso("startsAt")),
         { required: true },
       );
-      field(
+      crearCampo(
         form,
         "endsAt",
         "Fin (hora de Lima)",
         "datetime-local",
-        lima(value("endsAt")),
+        formatearFechaDeLima(obtenerValorDelRecurso("endsAt")),
         { required: true },
       );
-      checkboxes(
+      crearCasillas(
         form,
         "day",
         "Días válidos",
         days.map((day, i) => [String(i + 1), day]),
-        value("validDays", [1, 2, 3, 4, 5, 6, 7]).map(String),
+        obtenerValorDelRecurso("validDays", [1, 2, 3, 4, 5, 6, 7]).map(String),
       );
-      text(
+      crearCampoDeTexto(
         "validTimeRanges",
         "Horario promocional (vacío: todo el día)",
-        value("validTimeRanges", [])
+        obtenerValorDelRecurso("validTimeRanges", [])
           .map((p) => p.opens + "-" + p.closes + (p.closesNextDay ? "+1" : ""))
           .join(","),
       );
       form.append(
-        element(
+        crearElemento(
           "p",
           "muted",
           "Formato de horario: 13:00-16:30,20:00-23:00. Para madrugada: 20:00-02:00+1.",
         ),
       );
       form.append(
-        element(
+        crearElemento(
           "p",
           "muted",
           "Platos incluidos: indica cantidad, o deja vacío si no se incluye.",
@@ -831,7 +1038,7 @@
       (resources["menu-items"] || [])
         .filter((m) => m.status === "ACTIVE")
         .forEach((m) =>
-          field(
+          crearCampo(
             form,
             "qty_" + m._id,
             m.name,
@@ -878,20 +1085,30 @@
       type === "branches" || type === "menu-items"
         ? ["ACTIVE", "INACTIVE", "ARCHIVED"]
         : ["DRAFT", "PUBLISHED", "ARCHIVED"];
-    field(form, "status", "Estado", "select", value("status", statuses[0]), {
-      choices: choices(statuses),
-    });
-    const save = element("button", "button", "Guardar");
+    crearCampo(
+      form,
+      "status",
+      "Estado",
+      "select",
+      obtenerValorDelRecurso("status", statuses[0]),
+      {
+        choices: opcionesConEtiqueta(statuses),
+      },
+    );
+    const save = crearElemento("button", "button", "Guardar");
     save.type = "submit";
-    const status = element("p", "auth-feedback");
+    const status = crearElemento("p", "auth-feedback");
     status.setAttribute("role", "status");
     form.append(save, status);
     // Solo se envían campos editables. El propietario y el restaurante los valida la API.
     const target =
       type === "restaurants"
         ? "/admin/restaurants" + (item ? "/" + item._id : "")
-        : path(type) + (item ? "/" + item._id : "");
-    form.addEventListener("submit", async (event) => {
+        : rutaAdministrativa(type) + (item ? "/" + item._id : "");
+    // ==========================================
+    // Validar y guardar el recurso del restaurante
+    // ==========================================
+    const guardarRecursoAdministrado = async (event) => {
       event.preventDefault();
       save.disabled = true;
       try {
@@ -904,41 +1121,50 @@
           body,
         });
         if (type === "restaurants") selected = result.data;
-        if (form.isConnected) $("#modal").close();
-        await loadRestaurants();
+        if (form.isConnected) seleccionar("#modal").close();
+        await cargarRestaurantesAdministrados();
       } catch (error) {
         const details = error.details
           ?.filter((d) => d?.field)
           .map((d) => d.field + ": " + d.message)
           .join(". ");
-        feedback(status, error.message + (details ? " " + details : ""), true);
+        mostrarMensaje(
+          status,
+          error.message + (details ? " " + details : ""),
+          true,
+        );
       } finally {
         save.disabled = false;
       }
-    });
+    };
+
+    form.addEventListener("submit", guardarRecursoAdministrado);
   }
-  async function init() {
+  // ==========================================
+  // Validar la cuenta e iniciar la administración
+  // ==========================================
+  async function iniciarAdministracion() {
     const user = await MesaAuth.ready;
     if (!user) {
       root.replaceChildren(
-        element("p", "", "Inicia sesión con tu cuenta administradora."),
-        button("Iniciar sesión", () => MesaAuth.open("login")),
+        crearElemento("p", "", "Inicia sesión con tu cuenta administradora."),
+        crearBoton("Iniciar sesión", () => MesaAuth.open("login")),
       );
       return;
     }
     if (user.role !== "RESTAURANT_ADMIN")
-      return state(
+      return mostrarEstado(
         root,
         "Esta sección está disponible para administradores de restaurantes.",
       );
-    await loadRestaurants();
+    await cargarRestaurantesAdministrados();
   }
   window.addEventListener("mesa:session", () => {
     if (!MesaAPI.session) {
       operation += 1;
-      state(root, "Sesión cerrada.");
+      mostrarEstado(root, "Sesión cerrada.");
     } else if (MesaAPI.session.user.role === "RESTAURANT_ADMIN")
-      loadRestaurants();
+      cargarRestaurantesAdministrados();
   });
-  init();
+  iniciarAdministracion();
 })();

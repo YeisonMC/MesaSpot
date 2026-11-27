@@ -1,3 +1,7 @@
+// ==========================================
+// Filtros y orden del catálogo de promociones
+// ==========================================
+
 (() => {
   "use strict";
   // Promociones: filtra y ordena las tarjetas que ya están en el HTML (datos de ejemplo, sin API).
@@ -8,7 +12,10 @@
   const empty = document.querySelector("#promo-empty");
   const count = document.querySelector("#promo-count");
   // Sin tildes ni mayúsculas para que "pollo" encuentre "Pollo" y "Dulce Tradicion" encuentre "Tradición".
-  const normalize = (text) =>
+  // ==========================================
+  // Normalizar texto para buscar sin tildes ni mayúsculas
+  // ==========================================
+  const normalizarTexto = (text) =>
     text
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
@@ -20,15 +27,19 @@
     high: [70.01, Infinity],
   };
 
-  function apply() {
-    const query = normalize(form.query.value.trim());
+  // ==========================================
+  // Filtrar y ordenar las tarjetas de promociones
+  // ==========================================
+  function aplicarFiltrosDePromociones() {
+    const query = normalizarTexto(form.query.value.trim());
     const [min, max] = priceRanges[form.price.value];
     let visible = 0;
     cards.forEach((card) => {
       const price = Number(card.dataset.precio);
       const show =
-        (!query || normalize(card.textContent).includes(query)) &&
-        (!form.district.value || card.dataset.distrito === form.district.value) &&
+        (!query || normalizarTexto(card.textContent).includes(query)) &&
+        (!form.district.value ||
+          card.dataset.distrito === form.district.value) &&
         (!form.type.value || card.dataset.tipo === form.type.value) &&
         price >= min &&
         price <= max;
@@ -48,17 +59,42 @@
       .forEach((card) => list.append(card));
     empty.hidden = visible > 0;
     count.textContent =
-      visible + (visible === 1 ? " promoción encontrada" : " promociones encontradas");
+      visible +
+      (visible === 1 ? " promoción encontrada" : " promociones encontradas");
   }
-  form.addEventListener("input", apply);
-  form.addEventListener("change", apply);
-  form.addEventListener("submit", (event) => event.preventDefault());
-  document.querySelector("#promo-reset")?.addEventListener("click", () => {
+  form.addEventListener("input", aplicarFiltrosDePromociones);
+  form.addEventListener("change", aplicarFiltrosDePromociones);
+  // ==========================================
+  // Evitar que el formulario recargue la página
+  // ==========================================
+  const evitarEnvioDeFiltros = (event) => event.preventDefault();
+
+  // ==========================================
+  // Restablecer los filtros y volver a mostrar las promociones
+  // ==========================================
+  const restablecerFiltrosDePromociones = () => {
     form.reset();
-    apply();
-  });
+    aplicarFiltrosDePromociones();
+  };
+
+  // ==========================================
+  // Mostrar una alternativa cuando falla una foto de promoción
+  // ==========================================
+  const recuperarImagenDePromocion = (event) => {
+    if (event.target instanceof HTMLImageElement)
+      mostrarImagenDeReemplazo(event.target);
+  };
+
+  // Eventos de la interfaz.
+  form.addEventListener("submit", evitarEnvioDeFiltros);
+  document
+    .querySelector("#promo-reset")
+    ?.addEventListener("click", restablecerFiltrosDePromociones);
   // Si una foto no existe todavía: la tarjeta muestra la imagen de reemplazo y el hero oculta la imagen.
-  function fallback(img) {
+  // ==========================================
+  // Resolver una imagen de promoción que no cargó
+  // ==========================================
+  function mostrarImagenDeReemplazo(img) {
     if (img.dataset.fallback) return;
     img.dataset.fallback = "1";
     if (img.closest(".promo-hero__art")) img.hidden = true;
@@ -68,14 +104,8 @@
   document
     .querySelectorAll(".promo-card__image img, .promo-hero__art img")
     .forEach((img) => {
-      if (img.complete && img.naturalWidth === 0) fallback(img);
+      if (img.complete && img.naturalWidth === 0) mostrarImagenDeReemplazo(img);
     });
-  document.addEventListener(
-    "error",
-    (event) => {
-      if (event.target instanceof HTMLImageElement) fallback(event.target);
-    },
-    true,
-  );
-  apply();
+  document.addEventListener("error", recuperarImagenDePromocion, true);
+  aplicarFiltrosDePromociones();
 })();

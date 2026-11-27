@@ -49,7 +49,7 @@ Los nombres de roles anteriores son los códigos del sistema; los textos de la i
 | Reseñas        | Resumen de puntuaciones, listado, ordenación y formulario modal para comida, servicio, ambiente y comentario. |
 | Ubicación      | Google Maps y datos de dirección y contacto del local seleccionado.                                           |
 | Acceso         | Registro e inicio de sesión conectados al backend mediante formularios modales.                               |
-| Perfil         | Edición de datos del cliente, avatar, reseñas propias y ayuda sencilla.                                       |
+| Perfil         | Edición de datos del cliente, avatar, favoritos, reseñas propias y ayuda sencilla.                            |
 | Administración | Gestión de restaurantes, locales, fotografías, platos y promociones, y respuesta a reseñas.                   |
 
 El filtro **Tipo de comida** incluye Criolla, Chifa, Pollería, Makis, Mariscos, Carnes, Desayunos y Cafeterías. La selección de varios tipos funciona como OR y se combina con los demás filtros.
@@ -58,7 +58,7 @@ Las reseñas requieren tres calificaciones de 1 a 5. El comentario admite de 10 
 
 ### 3.3. Funcionalidades pendientes
 
-Reservas reales, disponibilidad de mesas, favoritos, pagos, notificaciones, recuperación de contraseña y acceso con Google no forman parte de lo implementado actualmente. Las opciones pendientes deben mantenerse identificadas o deshabilitadas; no deben aparentar una operación completada.
+Reservas reales, disponibilidad de mesas, pagos, notificaciones, recuperación de contraseña y acceso con Google no forman parte de lo implementado actualmente. Las opciones pendientes deben mantenerse identificadas o deshabilitadas; no deben aparentar una operación completada.
 
 El botón **Ver detalles** está reservado a promociones destacadas. Su experiencia completa sigue pendiente. Las fotografías y los datos comerciales de demostración no deben presentarse como información comercial verificada.
 

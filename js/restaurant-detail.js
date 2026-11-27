@@ -1,6 +1,19 @@
+// ==========================================
+// Ficha del restaurante, locales y pestañas
+// ==========================================
+
 (() => {
   "use strict";
-  const { $, element, label, money, image, button, state, external } = MesaUI;
+  const {
+    $: seleccionar,
+    element: crearElemento,
+    label: traducirEtiqueta,
+    money: formatearImporte,
+    image: crearImagen,
+    button: crearBoton,
+    state: mostrarEstado,
+    external: crearEnlaceExterno,
+  } = MesaUI;
   let restaurant,
     branches = [],
     selectedBranch,
@@ -16,7 +29,10 @@
     "Sábado",
     "Domingo",
   ];
-  const address = (branch) =>
+  // ==========================================
+  // Formatear la dirección del local
+  // ==========================================
+  const formatearDireccion = (branch) =>
     branch?.address
       ? [
           branch.address.street,
@@ -26,7 +42,10 @@
           .filter(Boolean)
           .join(", ")
       : "Dirección pendiente";
-  const hours = (periods) =>
+  // ==========================================
+  // Formatear los tramos del horario de atención
+  // ==========================================
+  const formatearHorarios = (periods) =>
     periods
       .map(
         (p) =>
@@ -36,9 +55,15 @@
           (p.closesNextDay ? " (día siguiente)" : ""),
       )
       .join(", ");
-  const base = () => "/restaurants/" + restaurant._id;
+  // ==========================================
+  // Construir la ruta de la ficha en la API
+  // ==========================================
+  const rutaDelRestaurante = () => "/restaurants/" + restaurant._id;
   // Cambia las pestañas y conserva la navegación accesible mediante teclado.
-  function selectTab(name, focus = false) {
+  // ==========================================
+  // Activar la pestaña y actualizar su panel
+  // ==========================================
+  function seleccionarPestana(name, focus = false) {
     document.querySelectorAll('[role="tab"]').forEach((tab) => {
       const selected = tab.id === "tab-" + name;
       tab.setAttribute("aria-selected", String(selected));
@@ -52,7 +77,9 @@
   }
   const tabs = [...document.querySelectorAll('[role="tab"]')];
   tabs.forEach((tab, index) => {
-    tab.addEventListener("click", () => selectTab(tab.id.replace("tab-", "")));
+    tab.addEventListener("click", () =>
+      seleccionarPestana(tab.id.replace("tab-", "")),
+    );
     tab.addEventListener("keydown", (event) => {
       const next =
         event.key === "ArrowRight"
@@ -66,17 +93,21 @@
                 : null;
       if (next) {
         event.preventDefault();
-        selectTab(next.id.replace("tab-", ""), true);
+        seleccionarPestana(next.id.replace("tab-", ""), true);
       }
     });
   });
   // Actualiza dirección, servicios, horarios y contacto al elegir una sede.
-  function practicalInfo() {
+  // ==========================================
+  // Mostrar contacto, horarios y servicios del local
+  // ==========================================
+  function mostrarInformacionDelLocal() {
     const branch = selectedBranch;
-    $("#detail-address").textContent = address(branch);
-    $("#detail-price").textContent =
-      money(branch?.averagePricePerPersonCents) + " aprox. por persona";
-    const services = $("#services-list");
+    seleccionar("#detail-address").textContent = formatearDireccion(branch);
+    seleccionar("#detail-price").textContent =
+      formatearImporte(branch?.averagePricePerPersonCents) +
+      " aprox. por persona";
+    const services = seleccionar("#services-list");
     services.replaceChildren();
     (branch?.services || []).forEach((code) => {
       const symbols = {
@@ -88,13 +119,13 @@
         DELIVERY: "bike",
         TAKEAWAY: "shopping-bag",
       };
-      const item = element("li", "", label(code));
+      const item = crearElemento("li", "", traducirEtiqueta(code));
       item.prepend(MesaIcons.icon(symbols[code] || "check"));
       services.append(item);
     });
     if (!services.children.length)
-      services.append(element("li", "", "Servicios por confirmar"));
-    const dl = $("#hours-list");
+      services.append(crearElemento("li", "", "Servicios por confirmar"));
+    const dl = seleccionar("#hours-list");
     dl.replaceChildren();
     // Agrupa días consecutivos con el mismo horario, sin perder los turnos partidos.
     const weeklyGroups = [];
@@ -102,7 +133,7 @@
       .slice()
       .sort((a, b) => a.dayOfWeek - b.dayOfWeek)
       .forEach((day) => {
-        const text = day.closed ? "Cerrado" : hours(day.periods);
+        const text = day.closed ? "Cerrado" : formatearHorarios(day.periods);
         const previous = weeklyGroups.at(-1);
         if (
           previous &&
@@ -122,43 +153,50 @@
         group.first === group.last
           ? days[group.first - 1]
           : days[group.first - 1] + " a " + days[group.last - 1];
-      const row = element("div");
-      row.append(element("dt", "", title), element("dd", "", group.text));
+      const row = crearElemento("div");
+      row.append(
+        crearElemento("dt", "", title),
+        crearElemento("dd", "", group.text),
+      );
       dl.append(row);
     });
     (branch?.specialHours || []).forEach((day) => {
-      const row = element("div");
+      const row = crearElemento("div");
       row.append(
-        element("dt", "", day.date),
-        element("dd", "", day.closed ? "Cerrado" : hours(day.periods)),
+        crearElemento("dt", "", day.date),
+        crearElemento(
+          "dd",
+          "",
+          day.closed ? "Cerrado" : formatearHorarios(day.periods),
+        ),
       );
       dl.append(row);
     });
     if (!dl.children.length)
-      dl.append(element("p", "muted", "Horarios por confirmar"));
-    const contact = $("#contact-list");
+      dl.append(crearElemento("p", "muted", "Horarios por confirmar"));
+    const contact = seleccionar("#contact-list");
     contact.replaceChildren();
     const phone = branch?.contact?.phone;
     const email = branch?.contact?.email || restaurant.contact?.email;
     if (phone) {
-      const li = element("li");
-      li.append(external(phone, "tel:" + phone, ["tel:"]));
+      const li = crearElemento("li");
+      li.append(crearEnlaceExterno(phone, "tel:" + phone, ["tel:"]));
       contact.append(li);
     }
     if (email) {
-      const li = element("li");
-      li.append(external(email, "mailto:" + email, ["mailto:"]));
+      const li = crearElemento("li");
+      li.append(crearEnlaceExterno(email, "mailto:" + email, ["mailto:"]));
       contact.append(li);
     }
     if (restaurant.contact?.website) {
-      const li = element("li");
-      li.append(external("Página web", restaurant.contact.website));
+      const li = crearElemento("li");
+      li.append(crearEnlaceExterno("Página web", restaurant.contact.website));
       contact.append(li);
     }
     if (branch?.contact?.whatsapp) {
-      const li = element("li");
+      const li = crearElemento("li");
       li.append(
-        external(
+        crearEnlaceExterno(
           "WhatsApp",
           "https://wa.me/" + branch.contact.whatsapp.replace(/\D/g, ""),
         ),
@@ -166,12 +204,18 @@
       contact.append(li);
     }
     if (!contact.children.length)
-      contact.append(element("li", "", "Contacto por confirmar"));
-    const summary = $("#summary-list");
+      contact.append(crearElemento("li", "", "Contacto por confirmar"));
+    const summary = seleccionar("#summary-list");
     summary.replaceChildren();
     const values = [
-      ["Tipo de cocina", restaurant.cuisineTypes.map(label).join(", ")],
-      ["Precio por persona", money(branch?.averagePricePerPersonCents)],
+      [
+        "Tipo de cocina",
+        restaurant.cuisineTypes.map(traducirEtiqueta).join(", "),
+      ],
+      [
+        "Precio por persona",
+        formatearImporte(branch?.averagePricePerPersonCents),
+      ],
       [
         "Capacidad",
         branch?.capacity ? branch.capacity + " personas" : "Por confirmar",
@@ -179,25 +223,31 @@
       ["Estacionamiento", branch?.parking?.description || "Por confirmar"],
     ];
     values.forEach(([title, value]) => {
-      const row = element("div");
-      row.append(element("dt", "", title), element("dd", "", value));
+      const row = crearElemento("div");
+      row.append(
+        crearElemento("dt", "", title),
+        crearElemento("dd", "", value),
+      );
       summary.append(row);
     });
-    renderMap();
+    mostrarMapaDelLocal();
   }
   // Cada local mantiene sus propios horarios, precios y datos de contacto.
-  function renderLocations() {
-    const list = $("#locations-list");
+  // ==========================================
+  // Mostrar la lista de locales y la selección actual
+  // ==========================================
+  function mostrarLocales() {
+    const list = seleccionar("#locations-list");
     list.replaceChildren();
     branches.forEach((branch) => {
-      const b = button(
+      const b = crearBoton(
         "",
         () => {
           selectedBranch = branch;
-          renderLocations();
-          practicalInfo();
-          renderGallery();
-          renderMenu();
+          mostrarLocales();
+          mostrarInformacionDelLocal();
+          mostrarFotosDelLocal();
+          mostrarCartaDelLocal();
         },
         "location-card",
       );
@@ -206,44 +256,56 @@
         String(branch._id === selectedBranch?._id),
       );
       b.classList.toggle("selected", branch._id === selectedBranch?._id);
-      const text = element("span");
+      const text = crearElemento("span");
       text.append(
-        element(
+        crearElemento(
           "strong",
           "",
           branch.name +
             (branch._id === restaurant.mainBranchId ? " · Principal" : ""),
         ),
-        element("span", "", address(branch)),
+        crearElemento("span", "", formatearDireccion(branch)),
       );
       b.prepend(MesaIcons.icon("map-pin"));
       b.append(text);
       list.append(b);
     });
     if (!branches.length)
-      state(list, "Este restaurante todavía no tiene locales publicados.");
+      mostrarEstado(
+        list,
+        "Este restaurante todavía no tiene locales publicados.",
+      );
   }
   // La pestaña de ubicación comparte el local activo con toda la ficha.
-  function renderMap() {
+  // ==========================================
+  // Mostrar el mapa y sincronizar la sede seleccionada
+  // ==========================================
+  function mostrarMapaDelLocal() {
     MesaRestaurantTabs.renderLocation({
-      panel: $("#panel-location"),
+      panel: seleccionar("#panel-location"),
       restaurant,
       branch: selectedBranch,
       branches,
-      onBranchChange: (id) => {
+      // ==========================================
+      // Actualizar la ficha al elegir otro local en el mapa
+      // ==========================================
+      onBranchChange: function seleccionarSedeDelMapa(id) {
         selectedBranch =
           branches.find((branch) => branch._id === id) || selectedBranch;
-        renderLocations();
-        practicalInfo();
-        renderGallery();
-        renderMenu();
+        mostrarLocales();
+        mostrarInformacionDelLocal();
+        mostrarFotosDelLocal();
+        mostrarCartaDelLocal();
       },
     });
   }
   // La galería y el visor comparten las fotos y el local seleccionados.
-  function renderGallery() {
+  // ==========================================
+  // Mostrar las fotos del restaurante y su local
+  // ==========================================
+  function mostrarFotosDelLocal() {
     MesaGallery.render({
-      panel: $("#panel-photos"),
+      panel: seleccionar("#panel-photos"),
       restaurant,
       branch: selectedBranch,
       photos: photoRecords,
@@ -252,9 +314,12 @@
   }
   let promotions = [];
   // Compone promociones, categorías y sugerencias a partir de los recursos de la API.
-  function renderMenu() {
+  // ==========================================
+  // Mostrar platos y promociones del local
+  // ==========================================
+  function mostrarCartaDelLocal() {
     MesaRestaurantTabs.renderDishes({
-      panel: $("#panel-menu"),
+      panel: seleccionar("#panel-menu"),
       restaurant,
       branch: selectedBranch,
       photos: photoRecords,
@@ -263,19 +328,25 @@
     });
   }
   // El módulo de reseñas administra listado, sesión, modal y confirmación de publicación.
-  async function renderReviews() {
+  // ==========================================
+  // Mostrar las reseñas del restaurante
+  // ==========================================
+  async function mostrarResenasDelRestaurante() {
     await MesaReviews.render({
-      panel: $("#panel-reviews"),
+      panel: seleccionar("#panel-reviews"),
       restaurant,
       branches,
       selectedBranch,
-      onPublished: refreshRatings,
+      onPublished: actualizarCalificaciones,
     });
   }
-  async function refreshRatings() {
-    const { data } = await MesaAPI.request(base());
+  // ==========================================
+  // Consultar y actualizar el resumen de calificaciones
+  // ==========================================
+  async function actualizarCalificaciones() {
+    const { data } = await MesaAPI.request(rutaDelRestaurante());
     restaurant.ratingSummary = data.ratingSummary;
-    $("#detail-rating").textContent = data.ratingSummary.reviewCount
+    seleccionar("#detail-rating").textContent = data.ratingSummary.reviewCount
       ? data.ratingSummary.overall.toFixed(1) +
         " (" +
         data.ratingSummary.reviewCount +
@@ -283,9 +354,12 @@
       : "Sin reseñas todavía";
   }
   // Recupera el restaurante y sus recursos desde la API antes de mostrar la ficha.
-  async function load() {
-    const status = $("#detail-load-status");
-    state(status, "Cargando restaurante…");
+  // ==========================================
+  // Cargar la ficha y los recursos asociados
+  // ==========================================
+  async function cargarFichaDelRestaurante() {
+    const status = seleccionar("#detail-load-status");
+    mostrarEstado(status, "Cargando restaurante…");
     try {
       const id = new URLSearchParams(location.search).get("id");
       if (!id)
@@ -298,43 +372,47 @@
         "/restaurants/" + encodeURIComponent(id),
       );
       restaurant = data;
+      seleccionar("#detail-favorite")?.replaceChildren(
+        MesaFavoritos.crearBoton(restaurant, "detail"),
+      );
       document.title = restaurant.name + " · MesaSpot";
-      $("#restaurant-title").textContent = restaurant.name;
+      seleccionar("#restaurant-title").textContent = restaurant.name;
       document.querySelector('meta[name="description"]').content =
         restaurant.shortDescription;
-      $("#detail-description").textContent = restaurant.shortDescription;
-      $("#detail-cuisine").textContent = restaurant.cuisineTypes
-        .map(label)
+      seleccionar("#detail-description").textContent =
+        restaurant.shortDescription;
+      seleccionar("#detail-cuisine").textContent = restaurant.cuisineTypes
+        .map(traducirEtiqueta)
         .join(" · ");
-      $("#hero-cuisine").textContent = restaurant.cuisineTypes
-        .map(label)
+      seleccionar("#hero-cuisine").textContent = restaurant.cuisineTypes
+        .map(traducirEtiqueta)
         .join(", ");
-      $("#hero-founded").textContent = restaurant.foundedYear
+      seleccionar("#hero-founded").textContent = restaurant.foundedYear
         ? "Desde " + restaurant.foundedYear
         : "Conoce el restaurante";
       const cover = MesaUI.safeUrl(restaurant.coverPhoto?.url);
       if (cover)
-        $(".detail-hero").style.backgroundImage =
+        seleccionar(".detail-hero").style.backgroundImage =
           "linear-gradient(90deg, #1b120ce0, #1b120c55), url(" +
           JSON.stringify(cover) +
           ")";
-      const about = $("#about-copy");
+      const about = seleccionar("#about-copy");
       about.replaceChildren(
         ...(restaurant.description.length
           ? restaurant.description
           : [restaurant.shortDescription]
-        ).map((text) => element("p", "", text)),
+        ).map((text) => crearElemento("p", "", text)),
       );
-      const aboutImage = $(".about-panel img");
+      const aboutImage = seleccionar(".about-panel img");
       aboutImage.replaceWith(
-        image(restaurant.thumbnailPhoto?.url, restaurant.name),
+        crearImagen(restaurant.thumbnailPhoto?.url, restaurant.name),
       );
-      await refreshRatings();
+      await actualizarCalificaciones();
       const results = await Promise.allSettled([
-        MesaAPI.all(base() + "/branches"),
-        MesaAPI.all(base() + "/photos"),
-        MesaAPI.all(base() + "/menu-items"),
-        MesaAPI.all(base() + "/promotions"),
+        MesaAPI.all(rutaDelRestaurante() + "/branches"),
+        MesaAPI.all(rutaDelRestaurante() + "/photos"),
+        MesaAPI.all(rutaDelRestaurante() + "/menu-items"),
+        MesaAPI.all(rutaDelRestaurante() + "/promotions"),
       ]);
       if (results[0].status === "rejected") throw results[0].reason;
       branches = results[0].value.sort(
@@ -348,43 +426,51 @@
       promotions = results[3].value || [];
       selectedBranch =
         branches.find((b) => b._id === restaurant.mainBranchId) || branches[0];
-      renderLocations();
-      practicalInfo();
-      renderGallery();
-      renderMenu();
+      mostrarLocales();
+      mostrarInformacionDelLocal();
+      mostrarFotosDelLocal();
+      mostrarCartaDelLocal();
       if (results[1].status === "rejected")
-        state($("#panel-photos"), results[1].reason.message, load);
+        mostrarEstado(
+          seleccionar("#panel-photos"),
+          results[1].reason.message,
+          cargarFichaDelRestaurante,
+        );
       if (results[2].status === "rejected" || results[3].status === "rejected")
-        state(
-          $("#panel-menu"),
+        mostrarEstado(
+          seleccionar("#panel-menu"),
           "No pudimos cargar la carta o sus promociones.",
-          load,
+          cargarFichaDelRestaurante,
         );
       status.replaceChildren();
       initialized = true;
       await MesaAuth.ready;
-      await renderReviews();
+      await mostrarResenasDelRestaurante();
     } catch (error) {
-      $("#restaurant-title").textContent = "Restaurante no disponible";
-      state(status, error.message, load);
+      seleccionar("#restaurant-title").textContent =
+        "Restaurante no disponible";
+      mostrarEstado(status, error.message, cargarFichaDelRestaurante);
     }
   }
-  $("#all-locations")?.addEventListener("click", () => {
-    $("#locations-list").classList.toggle("expanded");
+  seleccionar("#all-locations")?.addEventListener("click", () => {
+    seleccionar("#locations-list").classList.toggle("expanded");
   });
-  $("#contact-trigger")?.addEventListener("click", () => {
-    selectTab("information");
-    $("#contact-list").scrollIntoView({ behavior: "smooth", block: "center" });
+  seleccionar("#contact-trigger")?.addEventListener("click", () => {
+    seleccionarPestana("information");
+    seleccionar("#contact-list").scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
   });
   window.addEventListener("mesa:session", () => {
-    if (initialized) renderReviews();
+    if (initialized) mostrarResenasDelRestaurante();
   });
-  selectTab(
+  seleccionarPestana(
     ["information", "photos", "menu", "reviews", "location"].includes(
       location.hash.slice(1),
     )
       ? location.hash.slice(1)
       : "information",
   );
-  load();
+  cargarFichaDelRestaurante();
 })();

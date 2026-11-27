@@ -1,8 +1,23 @@
+// ==========================================
+// Contenido de platos, promociones y ubicación
+// ==========================================
+
 (() => {
   "use strict";
-  const { element, image, button, money, label, state, external, safeUrl } =
-    MesaUI;
-  const icon = (name) => MesaIcons.icon(name);
+  const {
+    element: crearElemento,
+    image: crearImagen,
+    button: crearBoton,
+    money: formatearImporte,
+    label: traducirEtiqueta,
+    state: mostrarEstado,
+    external: crearEnlaceExterno,
+    safeUrl: validarUrl,
+  } = MesaUI;
+  // ==========================================
+  // Crear un icono del panel
+  // ==========================================
+  const crearIcono = (name) => MesaIcons.icon(name);
   const categories = [
     ["STARTER", "Entradas", "salad", "Para empezar y compartir en la mesa."],
     [
@@ -24,35 +39,50 @@
   let selectedCategory = "";
 
   // Comparte encabezados e iconos; AOS se actualiza cuando cambia el contenido de la API.
-  function heading(title, symbol, subtitle) {
-    const wrap = element("div", "tab-section-heading");
-    const badge = element("span", "panel-icon");
-    badge.append(icon(symbol));
-    const copy = element("div");
-    copy.append(element("h2", "", title));
-    if (subtitle) copy.append(element("p", "", subtitle));
+  // ==========================================
+  // Crear el encabezado de una sección
+  // ==========================================
+  function crearCabeceraDePanel(title, symbol, subtitle) {
+    const wrap = crearElemento("div", "tab-section-heading");
+    const badge = crearElemento("span", "panel-icon");
+    badge.append(crearIcono(symbol));
+    const copy = crearElemento("div");
+    copy.append(crearElemento("h2", "", title));
+    if (subtitle) copy.append(crearElemento("p", "", subtitle));
     wrap.append(badge, copy);
     return wrap;
   }
-  function animate(node, delay = 0) {
+  // ==========================================
+  // Configurar la animación según la preferencia del usuario
+  // ==========================================
+  function prepararAnimacion(node, delay = 0) {
     if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
       node.dataset.aos = "fade-up";
       node.dataset.aosDelay = String(delay);
     }
     return node;
   }
-  function refreshAnimations() {
+  // ==========================================
+  // Actualizar AOS tras renderizar el contenido
+  // ==========================================
+  function actualizarAnimaciones() {
     window.AOS?.refreshHard();
   }
-  function recommendation(item) {
+  // ==========================================
+  // Crear la etiqueta de un plato recomendado
+  // ==========================================
+  function crearEtiquetaDeRecomendacion(item) {
     const code = item.recommendation?.label || "FEATURED";
-    const badge = element("span", "dish-badge", label(code));
-    badge.prepend(icon(code === "CHEF_FAVORITE" ? "star" : "thumbs-up"));
+    const badge = crearElemento("span", "dish-badge", traducirEtiqueta(code));
+    badge.prepend(crearIcono(code === "CHEF_FAVORITE" ? "star" : "thumbs-up"));
     return badge;
   }
 
   // Los precios y sugerencias corresponden siempre al local seleccionado, en céntimos PEN.
-  function renderDishes({
+  // ==========================================
+  // Mostrar carta, sugerencias y promociones destacadas
+  // ==========================================
+  function mostrarPlatosYPromociones({
     panel,
     restaurant,
     branch,
@@ -66,13 +96,20 @@
         (offer) => offer.branchId === branch?._id && offer.available,
       ),
     );
-    const photoFor = (id) => photos.find((photo) => photo._id === id)?.url;
-    const offerFor = (item) =>
+    // ==========================================
+    // Buscar la URL de una foto por su identificador
+    // ==========================================
+    const buscarFotoPorId = (id) =>
+      photos.find((photo) => photo._id === id)?.url;
+    // ==========================================
+    // Buscar el precio y la disponibilidad en el local
+    // ==========================================
+    const buscarOfertaDelLocal = (item) =>
       item.branchOffers.find(
         (offer) => offer.branchId === branch?._id && offer.available,
       );
-    const layout = element("div", "dishes-layout");
-    const main = element("div", "dishes-main");
+    const layout = crearElemento("div", "dishes-layout");
+    const main = crearElemento("div", "dishes-main");
 
     // Solo las promociones destacadas y vigentes de esta sede muestran el botón de detalles.
     const now = Date.now();
@@ -84,66 +121,66 @@
         (!p.endsAt || new Date(p.endsAt).getTime() > now),
     );
     if (featured.length) {
-      const offers = animate(
-        element("section", "detail-panel featured-promotions"),
+      const offers = prepararAnimacion(
+        crearElemento("section", "detail-panel featured-promotions"),
       );
       offers.append(
-        heading(
+        crearCabeceraDePanel(
           "Promociones destacadas",
           "badge-percent",
           "Disfruta más de tus sabores favoritos.",
         ),
       );
-      const grid = element("div", "featured-promo-grid");
+      const grid = crearElemento("div", "featured-promo-grid");
       featured.forEach((promo) => {
-        const card = element("article", "featured-promo-card");
-        const visual = element("div", "featured-promo-image");
-        visual.append(image(photoFor(promo.photoId), promo.title));
+        const card = crearElemento("article", "featured-promo-card");
+        const visual = crearElemento("div", "featured-promo-image");
+        visual.append(crearImagen(buscarFotoPorId(promo.photoId), promo.title));
         visual.append(
-          element(
+          crearElemento(
             "span",
             "promo-ribbon",
             promo.pricingUnit === "COUPLE" ? "Ideal para dos" : "Destacada",
           ),
         );
-        const body = element("div", "featured-promo-body");
+        const body = crearElemento("div", "featured-promo-body");
         body.append(
-          element("h3", "", promo.title),
-          element("p", "promo-description", promo.description || ""),
+          crearElemento("h3", "", promo.title),
+          crearElemento("p", "promo-description", promo.description || ""),
         );
-        const meta = element("div", "promo-meta");
+        const meta = crearElemento("div", "promo-meta");
         const count = (promo.items || []).reduce(
           (sum, item) => sum + item.quantity,
           0,
         );
         if (count) {
-          const items = element(
+          const items = crearElemento(
             "span",
             "",
             count + (count === 1 ? " producto" : " productos"),
           );
-          items.prepend(icon("utensils"));
+          items.prepend(crearIcono("utensils"));
           meta.append(items);
         }
         if (promo.peopleCount) {
-          const people = element(
+          const people = crearElemento(
             "span",
             "",
             promo.peopleCount +
               (promo.peopleCount === 1 ? " persona" : " personas"),
           );
-          people.prepend(icon("users"));
+          people.prepend(crearIcono("users"));
           meta.append(people);
         }
         body.append(meta);
-        const bottom = element("div", "promo-bottom");
-        const price = element("div", "promo-price");
+        const bottom = crearElemento("div", "promo-bottom");
+        const price = crearElemento("div", "promo-price");
         price.append(
-          element("strong", "", money(promo.priceCents)),
-          element("span", "", label(promo.pricingUnit)),
+          crearElemento("strong", "", formatearImporte(promo.priceCents)),
+          crearElemento("span", "", traducirEtiqueta(promo.pricingUnit)),
         );
         // El detalle completo se desarrollará después; este aviso evita un botón sin respuesta.
-        const details = button(
+        const details = crearBoton(
           "Ver detalles",
           () => {
             const toast = document.getElementById("toast");
@@ -170,9 +207,12 @@
     }
 
     // Las categorías actúan como filtros reales, sin mezclar platos de otras sedes.
-    const carta = animate(element("section", "detail-panel dishes-carta"), 50);
+    const carta = prepararAnimacion(
+      crearElemento("section", "detail-panel dishes-carta"),
+      50,
+    );
     carta.append(
-      heading(
+      crearCabeceraDePanel(
         "Carta",
         "chef-hat",
         "Descubre nuestros platos, preparados para disfrutar cada momento.",
@@ -183,12 +223,15 @@
     );
     if (!present.some(([code]) => code === selectedCategory))
       selectedCategory = "";
-    const filters = element("div", "dish-filters");
+    const filters = crearElemento("div", "dish-filters");
     filters.setAttribute("role", "group");
     filters.setAttribute("aria-label", "Categorías de platos");
-    const content = element("div", "dish-category-content");
+    const content = crearElemento("div", "dish-category-content");
     const choices = [["", "Todo", "layout-grid"], ...present];
-    function updateCategory(code) {
+    // ==========================================
+    // Actualizar los platos de la categoría activa
+    // ==========================================
+    function seleccionarCategoriaDePlatos(code) {
       selectedCategory = code;
       [...filters.children].forEach((choice) =>
         choice.setAttribute(
@@ -200,27 +243,31 @@
       present
         .filter(([category]) => !code || code === category)
         .forEach(([category, title, , subtitle]) => {
-          const group = element("section", "dish-category-group");
+          const group = crearElemento("section", "dish-category-group");
           group.append(
-            element("h3", "", title),
-            element("p", "dish-category-description", subtitle),
+            crearElemento("h3", "", title),
+            crearElemento("p", "dish-category-description", subtitle),
           );
-          const grid = element("div", "dish-list");
+          const grid = crearElemento("div", "dish-list");
           available
             .filter((item) => item.category === category)
             .forEach((item) => {
-              const card = element("article", "dish-item");
+              const card = crearElemento("article", "dish-item");
               card.append(
-                image(photoFor(item.photoId), item.name, "dish-image"),
+                crearImagen(
+                  buscarFotoPorId(item.photoId),
+                  item.name,
+                  "dish-image",
+                ),
               );
-              const copy = element("div", "dish-copy");
-              const titleRow = element("div", "dish-title-row");
-              titleRow.append(element("h4", "", item.name));
+              const copy = crearElemento("div", "dish-copy");
+              const titleRow = crearElemento("div", "dish-title-row");
+              titleRow.append(crearElemento("h4", "", item.name));
               if (item.recommendation?.featured)
-                titleRow.append(recommendation(item));
+                titleRow.append(crearEtiquetaDeRecomendacion(item));
               copy.append(
                 titleRow,
-                element(
+                crearElemento(
                   "p",
                   "",
                   item.description || "Preparado al momento en nuestra cocina.",
@@ -231,13 +278,13 @@
                 ? "Alérgenos: " +
                   (item.allergens?.join(", ") || "Sin alérgenos declarados")
                 : "Consulta ingredientes y alérgenos con el restaurante.";
-              copy.append(element("span", "sr-only", allergenInfo));
+              copy.append(crearElemento("span", "sr-only", allergenInfo));
               card.append(
                 copy,
-                element(
+                crearElemento(
                   "strong",
                   "dish-price",
-                  money(offerFor(item).priceCents),
+                  formatearImporte(buscarOfertaDelLocal(item).priceCents),
                 ),
               );
               grid.append(card);
@@ -246,18 +293,22 @@
           content.append(group);
         });
       if (!available.length)
-        state(content, "No hay platos disponibles para este local.");
-      refreshAnimations();
+        mostrarEstado(content, "No hay platos disponibles para este local.");
+      actualizarAnimaciones();
     }
     choices.forEach(([code, text, symbol]) => {
-      const choice = button(text, () => updateCategory(code), "dish-filter");
+      const choice = crearBoton(
+        text,
+        () => seleccionarCategoriaDePlatos(code),
+        "dish-filter",
+      );
       choice.dataset.category = code;
-      choice.prepend(icon(symbol));
+      choice.prepend(crearIcono(symbol));
       filters.append(choice);
     });
     carta.append(filters, content);
     carta.append(
-      element(
+      crearElemento(
         "p",
         "dish-footnote",
         "Precios en soles (S/). Consulta ingredientes y alérgenos con el restaurante.",
@@ -275,27 +326,35 @@
       )
       .slice(0, 3);
     if (suggested.length) {
-      const aside = animate(
-        element("aside", "detail-panel dishes-suggestions"),
+      const aside = prepararAnimacion(
+        crearElemento("aside", "detail-panel dishes-suggestions"),
         100,
       );
       aside.setAttribute("aria-label", "Sugerencias de platos");
       aside.append(
-        heading(
+        crearCabeceraDePanel(
           "Hoy te sugerimos",
           "thumbs-up",
           "Una selección de la casa para ti.",
         ),
       );
       suggested.forEach((item) => {
-        const card = element("article", "suggested-dish");
-        card.append(image(photoFor(item.photoId), item.name));
-        const copy = element("div", "suggested-copy");
+        const card = crearElemento("article", "suggested-dish");
+        card.append(crearImagen(buscarFotoPorId(item.photoId), item.name));
+        const copy = crearElemento("div", "suggested-copy");
         copy.append(
-          element("h3", "", item.name),
-          recommendation(item),
-          element("p", "", item.description || "Especialidad de la casa."),
-          element("strong", "dish-price", money(offerFor(item).priceCents)),
+          crearElemento("h3", "", item.name),
+          crearEtiquetaDeRecomendacion(item),
+          crearElemento(
+            "p",
+            "",
+            item.description || "Especialidad de la casa.",
+          ),
+          crearElemento(
+            "strong",
+            "dish-price",
+            formatearImporte(buscarOfertaDelLocal(item).priceCents),
+          ),
         );
         card.append(copy);
         aside.append(card);
@@ -303,11 +362,14 @@
       layout.append(aside);
     } else layout.classList.add("without-suggestions");
     panel.append(layout);
-    updateCategory(selectedCategory);
+    seleccionarCategoriaDePlatos(selectedCategory);
   }
 
   // Copia o comparte un enlace público; el mensaje permanece accesible si el navegador lo rechaza.
-  async function shareLocation(url, title, status) {
+  // ==========================================
+  // Compartir la ubicación o copiar su enlace
+  // ==========================================
+  async function compartirUbicacion(url, title, status) {
     try {
       if (navigator.share) await navigator.share({ title, url });
       else if (navigator.clipboard?.writeText) {
@@ -328,7 +390,10 @@
   }
 
   // Google Maps admite coordenadas o búsqueda por dirección: no generamos coordenadas ficticias.
-  function renderLocation({
+  // ==========================================
+  // Mostrar mapa, dirección y contacto del local
+  // ==========================================
+  function mostrarUbicacionYContacto({
     panel,
     restaurant,
     branch,
@@ -350,7 +415,7 @@
     const placeId = branch?.googleMaps?.placeId;
     const query = destination;
     const mapsUrl =
-      safeUrl(branch?.googleMaps?.mapsUrl) ||
+      validarUrl(branch?.googleMaps?.mapsUrl) ||
       "https://www.google.com/maps/search/?api=1&query=" +
         encodeURIComponent(destination);
     const directionsUrl =
@@ -358,18 +423,23 @@
       encodeURIComponent(destination) +
       (placeId ? "&destination_place_id=" + encodeURIComponent(placeId) : "");
     if (!branch) {
-      state(panel, "Este restaurante todavía no tiene un local publicado.");
+      mostrarEstado(
+        panel,
+        "Este restaurante todavía no tiene un local publicado.",
+      );
       return;
     }
-    const layout = element("div", "location-layout");
-    const map = animate(element("section", "detail-panel location-map-panel"));
-    const mapHeading = heading("Ubicación en el mapa", "map-pin");
+    const layout = crearElemento("div", "location-layout");
+    const map = prepararAnimacion(
+      crearElemento("section", "detail-panel location-map-panel"),
+    );
+    const mapHeading = crearCabeceraDePanel("Ubicación en el mapa", "map-pin");
     if (branches.length > 1) {
-      const selector = element("label", "map-branch-select", "Local");
-      const select = element("select");
+      const selector = crearElemento("label", "map-branch-select", "Local");
+      const select = crearElemento("select");
       select.setAttribute("aria-label", "Local en el mapa");
       branches.forEach((item) => {
-        const option = element("option", "", item.name);
+        const option = crearElemento("option", "", item.name);
         option.value = item._id;
         select.append(option);
       });
@@ -381,7 +451,7 @@
     }
     map.append(mapHeading);
     if (destination) {
-      const iframe = element("iframe", "restaurant-map");
+      const iframe = crearElemento("iframe", "restaurant-map");
       iframe.title = "Mapa de " + branch.name;
       iframe.loading = "lazy";
       iframe.referrerPolicy = "no-referrer-when-downgrade";
@@ -392,7 +462,7 @@
         "&z=16&output=embed";
       map.append(iframe);
       map.append(
-        element(
+        crearElemento(
           "p",
           "map-note",
           hasCoords || placeId
@@ -401,61 +471,79 @@
         ),
       );
     } else
-      state(map, "La dirección de este local está pendiente de publicación.");
-    const contact = animate(
-      element("aside", "detail-panel location-contact"),
+      mostrarEstado(
+        map,
+        "La dirección de este local está pendiente de publicación.",
+      );
+    const contact = prepararAnimacion(
+      crearElemento("aside", "detail-panel location-contact"),
       75,
     );
     contact.append(
-      heading("Dirección y contacto", "map-pin"),
-      element("p", "location-branch-name", branch.name),
+      crearCabeceraDePanel("Dirección y contacto", "map-pin"),
+      crearElemento("p", "location-branch-name", branch.name),
     );
-    const list = element("ul", "location-contact-list");
-    function row(symbol, node) {
-      const li = element("li");
-      li.append(icon(symbol), node);
+    const list = crearElemento("ul", "location-contact-list");
+    // ==========================================
+    // Agregar una fila de contacto con su icono
+    // ==========================================
+    function agregarFilaDeContacto(symbol, node) {
+      const li = crearElemento("li");
+      li.append(crearIcono(symbol), node);
       list.append(li);
     }
-    if (address) row("map-pin", element("span", "", address));
+    if (address)
+      agregarFilaDeContacto("map-pin", crearElemento("span", "", address));
     const phone = branch.contact?.phone || restaurant.contact?.phone;
     const email = branch.contact?.email || restaurant.contact?.email;
-    if (phone) row("phone", external(phone, "tel:" + phone, ["tel:"]));
-    if (email) row("mail", external(email, "mailto:" + email, ["mailto:"]));
-    if (safeUrl(restaurant.contact?.website))
-      row(
+    if (phone)
+      agregarFilaDeContacto(
+        "phone",
+        crearEnlaceExterno(phone, "tel:" + phone, ["tel:"]),
+      );
+    if (email)
+      agregarFilaDeContacto(
+        "mail",
+        crearEnlaceExterno(email, "mailto:" + email, ["mailto:"]),
+      );
+    if (validarUrl(restaurant.contact?.website))
+      agregarFilaDeContacto(
         "globe",
-        external(
+        crearEnlaceExterno(
           new URL(restaurant.contact.website).hostname,
           restaurant.contact.website,
         ),
       );
     if (branch.contact?.whatsapp)
-      row(
+      agregarFilaDeContacto(
         "message-circle",
-        external(
+        crearEnlaceExterno(
           "WhatsApp",
           "https://wa.me/" + branch.contact.whatsapp.replace(/\D/g, ""),
         ),
       );
     contact.append(list);
     if (destination) {
-      const directions = external("Cómo llegar", directionsUrl);
+      const directions = crearEnlaceExterno("Cómo llegar", directionsUrl);
       directions.className = "button location-directions";
-      directions.querySelector("svg")?.replaceWith(icon("navigation"));
+      directions.querySelector("svg")?.replaceWith(crearIcono("navigation"));
       contact.append(directions);
-      const shareStatus = element("p", "location-share-status");
+      const shareStatus = crearElemento("p", "location-share-status");
       shareStatus.setAttribute("role", "status");
-      const share = button(
+      const share = crearBoton(
         "Compartir ubicación",
-        () => shareLocation(mapsUrl, restaurant.name, shareStatus),
+        () => compartirUbicacion(mapsUrl, restaurant.name, shareStatus),
         "location-share",
       );
-      share.prepend(icon("share-2"));
+      share.prepend(crearIcono("share-2"));
       contact.append(share, shareStatus);
     }
     layout.append(map, contact);
     panel.append(layout);
-    refreshAnimations();
+    actualizarAnimaciones();
   }
-  window.MesaRestaurantTabs = { renderDishes, renderLocation };
+  window.MesaRestaurantTabs = {
+    renderDishes: mostrarPlatosYPromociones,
+    renderLocation: mostrarUbicacionYContacto,
+  };
 })();
