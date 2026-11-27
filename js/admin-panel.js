@@ -18,6 +18,7 @@
     parametros.get("seccion") === "promotions";
   const clasico = parametros.get("vista") === "clasica" && !promocionAnterior;
   const vistas = {
+    resumen: MesaAdminResumen,
     restaurante: MesaAdminRestaurante,
     locales: MesaAdminLocales,
     resenas: MesaAdminResenas,
@@ -35,7 +36,7 @@
     ? location.hash.slice(1)
     : promocionAnterior
       ? "promociones"
-      : "restaurante";
+      : "resumen";
 
   // ==========================================
   // Abrir y cerrar el menú lateral en dispositivos pequeños
@@ -61,7 +62,7 @@
   function mostrarNavegacion() {
     navegacion.replaceChildren();
     const enlaces = [
-      ["Resumen", "layout-dashboard", null],
+      ["Resumen", "layout-dashboard", "resumen"],
       ["Restaurante", "store", "restaurante"],
       ["Locales", "map-pin", "locales"],
       ["Fotos", "images", "fotos"],
